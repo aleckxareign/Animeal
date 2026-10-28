@@ -12,6 +12,18 @@ dist
 dist-ssr
 *.local
 
+# Environment variables / secrets (keep .env.example committed)
+.env
+.env.*
+!.env.example
+
+# Licensed (non-redistributable) fonts - keep these out of the public repo
+src/assets/fonts/TT-Ramillas-*
+
+# OS / misc
+Thumbs.db
+coverage
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
