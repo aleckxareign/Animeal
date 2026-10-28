@@ -1,10 +1,28 @@
-
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
+@theme {
+  --color-brand-dark: #164040;
+  --color-brand-sage: #44632f;
+  --color-brand-sage-light: #8ea777;
+  --color-brand-cream: #f6f3ec;
+  --color-brand-alert: #b5432f;
+  --color-brand-alert-light: #f9e3df;
+  --font-display: "TT Ramillas", Georgia, serif;
+}
+
+@font-face {
+  font-family: "TT Ramillas";
+  src: url("./assets/fonts/TT-Ramillas-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  font-family: Arial, Helvetica, sans-serif;
-  color: #174642;
-  background-color: #F6F3EB;
+  font-family: "Inter", Arial, sans-serif;
+  color: #164040;
+  background-color: #f6f3ec;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -13,6 +31,10 @@
 
 * {
   box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {

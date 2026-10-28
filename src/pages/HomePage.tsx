@@ -1,7 +1,19 @@
+import Hero from '../components/home/Hero'
+import TrustStrip from '../components/home/TrustStrip'
+import FeatureCards from '../components/home/FeatureCards'
+import HowItWorks from '../components/home/HowItWorks'
+import NearbyVets from '../components/home/NearbyVets'
+import MealiePreview from '../components/home/MealiePreview'
+
 export default function HomePage() {
   return (
-    <div className="mx-auto max-w-6xl px-6 py-12">
-      <h1 className="text-3xl font-bold">Home</h1>
-    </div>
+    <>
+      <Hero />
+      <TrustStrip />
+      <FeatureCards />
+      <HowItWorks />
+      <NearbyVets />
+      <MealiePreview />
+    </>
   )
 }
