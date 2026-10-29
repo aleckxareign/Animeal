@@ -23,7 +23,7 @@ export default function FeatureCards() {
               >
                 <div className="flex flex-col">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-sage-light/30 text-brand-dark">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-sage/30 text-brand-dark">
                       <Icon size={22} />
                     </span>
                     <h3 className="font-display text-2xl text-brand-dark">{feature.title}</h3>
@@ -31,7 +31,7 @@ export default function FeatureCards() {
                   <p className="mt-4 text-gray-600">{feature.description}</p>
                   <Link
                     to={feature.to}
-                    className="mt-6 inline-flex items-center gap-2 font-semibold text-brand-sage-light hover:underline sm:mt-auto"
+                    className="mt-6 inline-flex items-center gap-2 font-semibold text-brand-sage hover:underline sm:mt-auto"
                   >
                     {feature.linkLabel} <ArrowRight size={18} />
                   </Link>

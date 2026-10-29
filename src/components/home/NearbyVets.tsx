@@ -31,7 +31,7 @@ export default function NearbyVets() {
                 key={f}
                 className={`rounded-full border px-3 py-1 font-medium ${
                   f === '24/7 Emergency'
-                    ? 'border-brand-alert/30 bg-brand-alert-light text-brand-alert'
+                    ? 'border-brand-alert/30 bg-white text-brand-alert'
                     : 'border-gray-300 bg-white text-brand-dark'
                 }`}
               >

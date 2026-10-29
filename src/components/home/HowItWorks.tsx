@@ -37,7 +37,7 @@ export default function HowItWorks() {
             <Fragment key={step.number}>
               <div className="w-40 text-center sm:w-48">
                 <div className="relative">
-                  <span className="absolute -left-2 -top-2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-brand-sage-light/40 text-lg font-bold text-brand-dark">
+                  <span className="absolute -left-2 -top-2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-brand-sage/40 text-lg font-bold text-brand-dark">
                     {step.number}
                   </span>
                   {/* PLACEHOLDER: put the real app screen inside PhoneFrame */}
