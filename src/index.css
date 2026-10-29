@@ -4,17 +4,15 @@
 @theme {
   --color-brand-dark: #164040;
   --color-brand-sage: #44632f;
-  --color-brand-sage-light: #8ea777;
   --color-brand-cream: #f6f3ec;
   --color-brand-alert: #b5432f;
-  --color-brand-alert-light: #f9e3df;
   --font-display: "TT Ramillas", Georgia, serif;
 }
 
 @font-face {
   font-family: "TT Ramillas";
-  src: url("./assets/fonts/TT-Ramillas-Bold.ttf") format("truetype");
-  font-weight: 700;
+  src: url("src/assets/fonts/TT-Ramillas-Bold.ttf") format("truetype");
+  font-weight: 900;
   font-style: normal;
   font-display: swap;
 }

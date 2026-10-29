@@ -58,7 +58,7 @@ export default function NearbyVets() {
                   className={`rounded-full px-3 py-1 text-xs font-bold ${
                     vet.emergency
                       ? 'bg-brand-alert text-white'
-                      : 'bg-brand-sage-light/30 text-brand-dark'
+                      : 'bg-brand-sage/30 text-brand-dark'
                   }`}
                 >
                   {vet.emergency ? '24/7 Emergency' : 'Open now'}

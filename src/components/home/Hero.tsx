@@ -8,10 +8,10 @@ export default function Hero() {
     <section className="bg-brand-cream">
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-6 py-16 md:grid-cols-2 md:py-24">
         <div>
-          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-brand-dark/70">
+          <p className="mb-3 text-sm font-bold uppercase tracking-widest text-brand-dark/70">
             Pet nutrition, made simpler
           </p>
-          <h1 className="font-display text-5xl font-semibold leading-tight md:text-6xl">
+          <h1 className="font-display text-5xl leading-tight md:text-6xl">
             <span className="block text-brand-sage">Better meals.</span>
             <span className="block text-brand-dark">Happier Tails.</span>
           </h1>
