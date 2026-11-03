@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, Send, Sparkles } from 'lucide-react'
 import SectionHeading from '../ui/SectionHeading'
 import Button from '../ui/button'
-import { Card } from '../ui/card'
+import { Card } from '../ui/Card'
 import { Badge } from '../ui/badge'
 import { Avatar, AvatarFallback } from '../ui/avatar'
 

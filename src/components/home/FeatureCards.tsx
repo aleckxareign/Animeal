@@ -12,7 +12,7 @@ import {
   Flame,
 } from 'lucide-react'
 import SectionHeading from '../ui/SectionHeading'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../ui/card'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../ui/Card'
 import { Badge } from '../ui/badge'
 import { Progress } from '../ui/progress'
 

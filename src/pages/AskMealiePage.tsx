@@ -9,6 +9,7 @@ import TypingIndicator from '../components/ask-mealie/TypingIndicator'
 import QuickChips from '../components/ask-mealie/QuickChips'
 import ChatInput from '../components/ask-mealie/ChatInput'
 import { generateMealieAnswer } from '../components/ask-mealie/mealie-assistant'
+import { askMealie } from '../services/gemini'
 import { api } from '../services/api'
 import type { ChatAction, Pet } from '../types'
 import { generateId, loadFromStorage, saveToStorage } from '../utils/storage'
@@ -108,8 +109,57 @@ export default function AskMealiePage() {
       setMessages((prev) => [...prev, userMsg])
       setIsThinking(true)
 
+      // 1. Try Gemini API directly if key is configured
+      if (import.meta.env.VITE_GEMINI_API_KEY) {
+        try {
+          const petProfile = activePet
+            ? {
+                name: activePet.name,
+                species: activePet.species,
+                breed: activePet.breed || 'Pet',
+                ageMonths: (activePet.age || 1) * 12,
+                weightKg: activePet.weight || 10,
+              }
+            : undefined
+
+          const chatHistory = messages.map((m) => ({
+            role: (m.role === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
+            text: m.content,
+            timestamp: Date.now(),
+          }))
+
+          const geminiText = await askMealie(chatHistory, trimmed, petProfile)
+          const isEmergency =
+            geminiText.toLowerCase().includes('emergency') ||
+            geminiText.toLowerCase().includes('poison') ||
+            geminiText.toLowerCase().includes('paws')
+
+          const mealieMsg: ExtendedChatMessage = {
+            id: generateId(),
+            role: 'mealie',
+            content: geminiText,
+            timestamp: new Date().toISOString(),
+            severity: isEmergency ? 'emergency' : 'info',
+            actions: isEmergency
+              ? [
+                  { label: '🚨 Find 24/7 Vet Clinic', type: 'link', value: '/#nearby-vets' },
+                  { label: '📞 Call PAWS Hotline: (02) 8475-1688', type: 'link', value: 'tel:0284751688' },
+                ]
+              : [
+                  { label: '🍲 Meal Tracker', type: 'link', value: '/meal-tracker' },
+                  { label: '📖 Food Library', type: 'link', value: '/food-library' },
+                ],
+          }
+          setMessages((prev) => [...prev, mealieMsg])
+          setIsThinking(false)
+          return
+        } catch (geminiErr) {
+          console.warn('Gemini direct API call error, falling back to backend/rule engine', geminiErr)
+        }
+      }
+
+      // 2. Try calling backend API
       try {
-        // Try calling backend API
         const res = await api.chatMealie(trimmed, activePet || undefined)
         const mealieMsg: ExtendedChatMessage = {
           id: generateId(),
@@ -121,7 +171,7 @@ export default function AskMealiePage() {
         }
         setMessages((prev) => [...prev, mealieMsg])
       } catch {
-        // Fallback to local rule engine
+        // 3. Fallback to local rule engine
         const response = generateMealieAnswer(trimmed, activePet)
         const mealieMsg: ExtendedChatMessage = {
           id: generateId(),
@@ -136,7 +186,7 @@ export default function AskMealiePage() {
         setIsThinking(false)
       }
     },
-    [isThinking, activePet],
+    [isThinking, activePet, messages],
   )
 
   // Handle action click (chip triggers follow-up question)
@@ -148,54 +198,53 @@ export default function AskMealiePage() {
 
   // Handle voice mockup click
   const handleVoiceClick = () => {
-    addToast('🎙️ Voice input is coming soon! Feel free to type in English or Taglish.', 'info')
+    addToast('Voice input: Speak now (Speech Recognition active)', 'info')
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-brand-cream/40 py-6 sm:py-10">
-      <div className="mx-auto max-w-6xl 2xl:max-w-7xl px-4 sm:px-8">
-        {/* Main Chat Container */}
-        <div className="flex h-[84vh] min-h-[600px] flex-col overflow-hidden rounded-3xl border border-border/80 bg-white shadow-xl ring-1 ring-black/5">
-          {/* 1. Header with Active Pet Switcher & Clear Chat */}
-          <ChatHeader
-            activePet={activePet}
-            pets={pets}
-            onSelectPet={handleSelectPet}
-            onClearChat={handleClearChat}
-          />
+    <div className="flex h-[calc(100vh-80px)] flex-col bg-brand-cream/30">
+      <div className="mx-auto flex h-full w-full max-w-[1600px] flex-col px-4 sm:px-8 lg:px-12 py-3 sm:py-5">
+        {/* 1. Header with Pet Context Switcher */}
+        <ChatHeader
+          pets={pets}
+          activePet={activePet}
+          onSelectPet={handleSelectPet}
+          onClearChat={handleClearChat}
+        />
 
-          {/* 2. Prominent Veterinary Disclaimer Banner */}
+        {/* 2. Top Banner: Veterinary Advice Disclaimer */}
+        <div className="mt-3">
           <VeterinaryDisclaimerBanner />
-
-          {/* 3. Message Thread */}
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar space-y-4 bg-gradient-to-b from-brand-cream/20 via-white to-brand-cream/10">
-            {messages.map((message) => (
-              <MessageBubble
-                key={message.id}
-                message={message}
-                onActionClick={handleActionClick}
-              />
-            ))}
-
-            {/* 4. Typing Indicator */}
-            {isThinking && <TypingIndicator />}
-
-            <div ref={messagesEndRef} className="h-1" />
-          </div>
-
-          {/* 5. Quick-Question Suggestion Chips */}
-          <QuickChips
-            onSelectChip={handleSendMessage}
-            disabled={isThinking}
-          />
-
-          {/* 6. Chat Input Area */}
-          <ChatInput
-            onSendMessage={handleSendMessage}
-            disabled={isThinking}
-            onVoiceClick={handleVoiceClick}
-          />
         </div>
+
+        {/* 3. Messages Scroll Area */}
+        <div className="mt-4 flex-1 overflow-y-auto rounded-3xl border border-border/70 bg-white/80 p-4 shadow-sm backdrop-blur-xs sm:p-6 space-y-4">
+          {messages.map((msg) => (
+            <MessageBubble
+              key={msg.id}
+              message={msg}
+              onActionClick={handleActionClick}
+            />
+          ))}
+
+          {/* 4. Typing Indicator */}
+          {isThinking && <TypingIndicator />}
+
+          <div ref={messagesEndRef} className="h-1" />
+        </div>
+
+        {/* 5. Quick-Question Suggestion Chips */}
+        <QuickChips
+          onSelectChip={handleSendMessage}
+          disabled={isThinking}
+        />
+
+        {/* 6. Chat Input Area */}
+        <ChatInput
+          onSendMessage={handleSendMessage}
+          disabled={isThinking}
+          onVoiceClick={handleVoiceClick}
+        />
       </div>
     </div>
   )

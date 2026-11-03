@@ -155,18 +155,45 @@ export type Vet = {
   rating?: number
 }
 
+// ─── Pet Profile (used for AI context) ─────────────────────────
+export type PetProfile = {
+  name: string
+  species: 'dog' | 'cat'
+  breed: string
+  ageMonths: number
+  weightKg: number
+}
+
+// ─── Chat types ────────────────────────────────────────────────
+export type GeminiChatRole = 'user' | 'assistant'
+
+export type GeminiChatMessage = {
+  role: GeminiChatRole
+  text: string
+  timestamp: number
+}
+
 // ===== Scanner types =====
 export type ScanResult = {
   productName: string
+  product?: string
   brand: string
   calories: number | null
+  caloriesPer100g?: number | null
   protein: number | null
+  crudeProteinPct?: number | null
   fat: number | null
+  crudeFatPct?: number | null
   fiber: number | null
+  crudeFiberPct?: number | null
   moisture: number | null
+  moisturePct?: number | null
   packageWeight: number | null
   price: number | null
   confidence: 'high' | 'medium' | 'low'
+  suitability?: 'safe' | 'caution' | 'unsafe' | 'unknown'
+  suitabilityNote?: string
+  ingredients?: string[]
 }
 
 export type FoodVerdict = 'good' | 'okay' | 'review'
