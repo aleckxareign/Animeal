@@ -1,0 +1,97 @@
+{
+  "pets": [
+    {
+      "id": "sample-bruno",
+      "name": "Bruno",
+      "species": "dog",
+      "breed": "Golden Retriever",
+      "weight": 12,
+      "age": 24,
+      "neutered": true,
+      "lifeStage": "adult",
+      "avatarEmoji": "🐕",
+      "dailyCalorieTarget": 720,
+      "waterGoal": 600,
+      "createdAt": "2026-11-03T16:03:12.465Z"
+    }
+  ],
+  "feedings": [
+    {
+      "id": "feed-1",
+      "petId": "sample-bruno",
+      "foodId": "dog-ped-adult",
+      "foodName": "Pedigree Adult Chicken & Vegetables",
+      "portion": 180,
+      "unit": "g",
+      "calories": 621,
+      "protein": 38,
+      "fat": 18,
+      "fiber": 9,
+      "fedBy": "Maria",
+      "timestamp": "2026-11-03T16:03:12.468Z"
+    }
+  ],
+  "waterLogs": [
+    {
+      "id": "water-1",
+      "petId": "sample-bruno",
+      "amount": 450,
+      "timestamp": "2026-11-03T16:03:12.468Z"
+    }
+  ],
+  "weightLogs": [
+    {
+      "id": "weight-1",
+      "petId": "sample-bruno",
+      "weight": 12.4,
+      "date": "2026-11-03T16:03:12.468Z",
+      "notes": "Healthy active weight"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task-1",
+      "petId": "sample-bruno",
+      "type": "deworming",
+      "title": "Deworming Booster",
+      "notes": "Quarterly veterinary scheduled dose",
+      "frequency": "monthly",
+      "time": "09:00",
+      "dueDate": "2026-11-06T16:03:12.468Z",
+      "completed": false,
+      "createdAt": "2026-11-03T16:03:12.468Z"
+    },
+    {
+      "id": "task-2",
+      "petId": "sample-bruno",
+      "type": "feeding",
+      "title": "Dinner Time (180g)",
+      "frequency": "daily",
+      "time": "18:00",
+      "dueDate": "2026-11-03T16:03:12.468Z",
+      "completed": false,
+      "createdAt": "2026-11-03T16:03:12.468Z"
+    }
+  ],
+  "household": [
+    {
+      "id": "owner",
+      "name": "Me",
+      "color": "#44632f",
+      "isOwner": true
+    },
+    {
+      "id": "member-1",
+      "name": "Maria",
+      "color": "#164040",
+      "isOwner": false
+    },
+    {
+      "id": "member-2",
+      "name": "Kuya Jun",
+      "color": "#b5432f",
+      "isOwner": false
+    }
+  ],
+  "customFoods": []
+}
