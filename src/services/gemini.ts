@@ -25,8 +25,8 @@ function getClient(): GoogleGenAI {
 }
 
 // ─── Model config ──────────────────────────────────────────────
-const CHAT_MODEL = 'gemini-3.8-flash'
-const VISION_MODEL = 'gemini-3.8-flash'
+const CHAT_MODEL = 'gemini-3.5-flash-lite'
+const VISION_MODEL = 'gemini-3.5-flash-lite'
 
 // ─── System prompt (Ask Mealie) ────────────────────────────────
 function buildChatSystemPrompt(pet?: PetProfile): string {
