@@ -5,6 +5,7 @@
 @import "@fontsource-variable/geist";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant landing-wide (@media (min-width: 1440px));
 
 @theme {
   --color-brand-dark: #164040;
@@ -77,10 +78,9 @@ section[id] {
 
 body {
   margin: 0;
-  min-width: 320px;
   width: 100%;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 #root {
@@ -88,7 +88,7 @@ body {
   width: 100%;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 button,

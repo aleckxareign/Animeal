@@ -36,7 +36,7 @@ function MealieAvatar({ size = 'md' }: { size?: 'sm' | 'md' }) {
 export default function MealiePreview() {
   return (
     <section className="bg-white py-12 sm:py-16 lg:py-20">
-      <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-12 lg:px-10">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-5 sm:px-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-12 lg:px-10">
 
         {/* Left Content */}
         <div>
@@ -50,7 +50,7 @@ export default function MealiePreview() {
             <Button
               to="/ask-mealie"
               size="lg"
-              className="h-auto min-h-12 whitespace-normal rounded-xl px-5 py-3 text-sm sm:text-base font-semibold shadow-sm"
+              className="h-auto min-h-12 max-w-full whitespace-normal rounded-xl px-5 py-3 text-sm sm:text-base font-semibold shadow-sm"
             >
               <span>Start a conversation with Mealie</span>
               <ArrowRight className="size-5" />
@@ -68,7 +68,7 @@ export default function MealiePreview() {
 
             {/* Chat Header */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/50 bg-brand-cream/40 px-4 py-4 sm:px-5">
-              <div className="flex items-center gap-3.5">
+              <div className="flex min-w-0 items-center gap-3.5">
 
                 {/* Mealie Logo + Online Indicator */}
                 <div className="relative">
@@ -79,7 +79,7 @@ export default function MealiePreview() {
 
                 {/* Assistant Details */}
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                     <h4 className="text-base font-bold text-brand-dark sm:text-lg">
                       Mealie Assistant
                     </h4>

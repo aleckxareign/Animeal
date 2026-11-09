@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import { ChevronDown, Menu, X, LogOut } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useApp } from '../../context/AppContext'
@@ -18,6 +18,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const { isLoggedIn, logout } = useAuth()
   const { activePet } = useApp()
+  const { pathname } = useLocation()
 
 
   const closeAll = () => {
@@ -26,7 +27,7 @@ export default function Navbar() {
   }
 
   return (
-    <header className="site-nav sticky top-0 z-50 border-b border-border/50 bg-white/95 backdrop-blur-md"
+    <header data-landing={pathname === '/'} className="group/site-nav site-nav sticky top-0 z-50 border-b border-border/50 bg-white/95 backdrop-blur-md"
       onKeyDown={(event) => {
         if (event.key === 'Escape') {
           closeAll()
@@ -35,18 +36,18 @@ export default function Navbar() {
         }
       }}
     >
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10 py-3">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10 py-3 group-data-[landing=true]/site-nav:max-w-[98.5rem] landing-wide:group-data-[landing=true]/site-nav:py-[1.0625rem]">
         {/* Original Logo (Full unclipped with paw + AniMeal) */}
         <Link to="/" onClick={closeAll} className="shrink-0 flex items-center group py-0.5">
           <img
             src="/images/logo.svg"
             alt="AniMeal"
-            className="h-10 sm:h-11 w-auto transition-transform group-hover:scale-[1.02]"
+            className="h-10 sm:h-11 landing-wide:group-data-[landing=true]/site-nav:h-[3.375rem] w-auto transition-transform group-hover:scale-[1.02]"
           />
         </Link>
 
         {/* Desktop Navigation Links */}
-        <ul className="hidden items-center gap-5 text-sm font-semibold text-brand-dark xl:flex">
+        <ul className="hidden items-center gap-5 text-sm font-semibold text-brand-dark xl:flex landing-wide:group-data-[landing=true]/site-nav:gap-6 landing-wide:group-data-[landing=true]/site-nav:text-lg">
           <li>
             <NavLink
               to="/"
@@ -126,7 +127,7 @@ export default function Navbar() {
             <NavLink
               to="/ask-mealie"
               className={({ isActive }) =>
-                `flex items-center gap-2 rounded-full bg-brand-sage/10 px-4 py-1.5 text-sm font-bold text-brand-sage transition hover:bg-brand-sage/20 ${
+                `flex items-center gap-2 rounded-full bg-brand-sage/10 px-4 py-1.5 text-sm font-bold text-brand-sage transition hover:bg-brand-sage/20 landing-wide:group-data-[landing=true]/site-nav:px-5 landing-wide:group-data-[landing=true]/site-nav:text-lg ${
                   isActive ? 'ring-2 ring-brand-sage/40' : ''
                 }`
               }
@@ -145,18 +146,18 @@ export default function Navbar() {
           {activePet && (
             <Link
               to="/meal-tracker"
-              className="hidden 2xl:flex items-center gap-2 rounded-full border border-border/80 bg-brand-cream/50 px-3.5 py-1.5 text-sm font-medium text-brand-dark shadow-2xs transition hover:bg-white"
+              className="hidden min-w-0 2xl:flex landing-wide:group-data-[landing=true]/site-nav:flex landing-wide:group-data-[landing=true]/site-nav:min-h-11 items-center gap-2 rounded-full border border-border/80 bg-brand-cream/50 px-3.5 py-1.5 text-sm font-medium text-brand-dark shadow-2xs transition hover:bg-white"
             >
               <span className="text-base">{activePet.avatarEmoji}</span>
-              <span className="font-bold">{activePet.name}</span>
-              <span className="text-xs text-brand-dark/60">({activePet.weight} kg)</span>
+              <span className="max-w-32 truncate font-bold">{activePet.name}</span>
+              <span className="shrink-0 text-xs text-brand-dark/60">({activePet.weight} kg)</span>
             </Link>
           )}
 
           {isLoggedIn ? (
             <button
               onClick={logout}
-              className="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm font-bold text-brand-dark transition hover:bg-brand-alert/10 hover:text-brand-alert hover:border-brand-alert/30"
+              className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm font-bold text-brand-dark landing-wide:group-data-[landing=true]/site-nav:min-h-12 landing-wide:group-data-[landing=true]/site-nav:rounded-2xl landing-wide:group-data-[landing=true]/site-nav:text-lg transition hover:bg-brand-alert/10 hover:text-brand-alert hover:border-brand-alert/30"
             >
               <LogOut className="size-4" />
               <span>Log Out</span>
@@ -191,12 +192,12 @@ export default function Navbar() {
         <div className="mobile-nav-clip">
         <div className="max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain border-t border-border/60 bg-white/95 px-6 pb-8 pt-4 backdrop-blur-md">
           {activePet && (
-            <div className="mb-4 flex items-center justify-between rounded-xl bg-brand-cream p-3.5 text-sm">
-              <div className="flex items-center gap-2 font-bold text-brand-dark">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-x-3 rounded-xl bg-brand-cream p-3.5 text-sm">
+              <div className="flex min-w-0 items-center gap-2 font-bold text-brand-dark">
                 <span className="text-xl">{activePet.avatarEmoji}</span>
-                <span>{activePet.name} ({activePet.breed})</span>
+                <span className="wrap-anywhere">{activePet.name} ({activePet.breed})</span>
               </div>
-              <Link to="/meal-tracker" onClick={closeAll} className="font-bold text-brand-sage hover:underline">
+              <Link to="/meal-tracker" onClick={closeAll} className="inline-flex min-h-11 items-center font-bold text-brand-sage hover:underline">
                 View Tracker →
               </Link>
             </div>
@@ -218,7 +219,7 @@ export default function Navbar() {
                     key={link.to}
                     to={link.to}
                     onClick={closeAll}
-                    className="flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm hover:bg-brand-cream/60"
+                    className="flex min-h-11 items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm hover:bg-brand-cream/60"
                   >
                     <span className="text-xl">{link.icon}</span>
                     <span className="font-medium text-brand-dark">{link.label}</span>
