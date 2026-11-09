@@ -130,7 +130,7 @@ export default function MealTrackerPage() {
                 className="flex items-center gap-2 rounded-2xl bg-brand-sage px-6 py-3 text-base font-bold text-white shadow-md hover:bg-brand-sage/90 hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0"
               >
                 <Plus className="size-5" />
-                <span>+ Napakain ako</span>
+                <span>Napakain ako</span>
               </button>
             </div>
           </div>

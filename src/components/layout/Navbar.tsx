@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
-import { ChevronDown, Menu, X, Sparkles, LogOut, Heart, ArrowRight } from 'lucide-react'
+import { Link, NavLink } from 'react-router-dom'
+import { ChevronDown, Menu, X, LogOut } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useApp } from '../../context/AppContext'
 import Button from '../ui/button'
@@ -18,7 +18,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const { isLoggedIn, logout } = useAuth()
   const { activePet } = useApp()
-  const location = useLocation()
+
 
   const closeAll = () => {
     setOpen(false)
@@ -26,19 +26,27 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/50 bg-white/95 backdrop-blur-md transition-all">
-      <nav className="mx-auto flex max-w-[1600px] items-center justify-between px-4 sm:px-8 lg:px-12 py-4">
+    <header className="site-nav sticky top-0 z-50 border-b border-border/50 bg-white/95 backdrop-blur-md"
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') {
+          closeAll()
+          const triggerId = open ? 'explore-trigger' : mobileOpen ? 'mobile-menu-trigger' : null
+          if (triggerId) document.getElementById(triggerId)?.focus()
+        }
+      }}
+    >
+      <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10 py-3">
         {/* Original Logo (Full unclipped with paw + AniMeal) */}
         <Link to="/" onClick={closeAll} className="shrink-0 flex items-center group py-0.5">
           <img
             src="/images/logo.svg"
             alt="AniMeal"
-            className="h-11 sm:h-12 w-auto transition-transform group-hover:scale-[1.02]"
+            className="h-10 sm:h-11 w-auto transition-transform group-hover:scale-[1.02]"
           />
         </Link>
 
         {/* Desktop Navigation Links */}
-        <ul className="hidden items-center gap-8 text-base font-semibold text-brand-dark lg:flex">
+        <ul className="hidden items-center gap-5 text-sm font-semibold text-brand-dark xl:flex">
           <li>
             <NavLink
               to="/"
@@ -56,38 +64,50 @@ export default function Navbar() {
           <li
             className="relative"
             onMouseEnter={() => setOpen(true)}
-            onMouseLeave={() => setOpen(false)}
+            onMouseLeave={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                setOpen(false)
+              }
+            }}
           >
             <button
-              className="flex items-center gap-1.5 transition-colors hover:text-brand-sage focus:outline-none"
-              onClick={() => setOpen((v) => !v)}
+              id="explore-trigger"
+              className="flex items-center gap-1.5 transition-colors hover:text-brand-sage focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-sage"
+              onClick={() => setOpen(true)}
               aria-expanded={open}
+              aria-controls="explore-panel"
             >
               <span>Explore Tools</span>
               <ChevronDown className={`size-4 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
             </button>
 
-            {open && (
-              <div className="absolute left-1/2 top-full z-50 mt-2 w-84 -translate-x-1/2 rounded-2xl border border-border/70 bg-white p-3 shadow-xl ring-1 ring-black/5 animate-scale-in">
-                <div className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-brand-dark/50">
-                  Care Modules
+              <div
+                id="explore-panel"
+                className="nav-dropdown absolute left-1/2 top-full z-50 w-80 -translate-x-1/2 pt-2"
+                data-open={open}
+                inert={!open}
+                onMouseEnter={() => setOpen(true)}
+              >
+                <div className="nav-dropdown-surface rounded-2xl border border-border/70 bg-white p-3 shadow-xl ring-1 ring-black/5">
+                  <div className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-brand-dark/50">
+                    Care Modules
+                  </div>
+                  {exploreLinks.map((link) => (
+                    <Link
+                      key={link.to}
+                      to={link.to}
+                      onClick={closeAll}
+                      className="flex items-center gap-3.5 rounded-xl px-3.5 py-2.5 transition-colors hover:bg-brand-cream/60"
+                    >
+                      <span className="text-2xl shrink-0">{link.icon}</span>
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-brand-dark">{link.label}</p>
+                        <p className="text-xs text-brand-dark/65">{link.desc}</p>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
-                {exploreLinks.map((link) => (
-                  <Link
-                    key={link.to}
-                    to={link.to}
-                    onClick={closeAll}
-                    className="flex items-center gap-3.5 rounded-xl px-3.5 py-2.5 transition-colors hover:bg-brand-cream/60"
-                  >
-                    <span className="text-2xl shrink-0">{link.icon}</span>
-                    <div className="flex-1">
-                      <p className="text-sm font-bold text-brand-dark">{link.label}</p>
-                      <p className="text-xs text-brand-dark/65">{link.desc}</p>
-                    </div>
-                  </Link>
-                ))}
               </div>
-            )}
           </li>
 
           <li>
@@ -120,12 +140,12 @@ export default function Navbar() {
         </ul>
 
         {/* Right Action Area */}
-        <div className="hidden items-center gap-3 sm:flex">
+        <div className="hidden min-w-0 items-center gap-2 xl:flex">
           {/* Active Pet Pill if exists */}
           {activePet && (
             <Link
               to="/meal-tracker"
-              className="flex items-center gap-2 rounded-full border border-border/80 bg-brand-cream/50 px-3.5 py-1.5 text-sm font-medium text-brand-dark shadow-2xs transition hover:bg-white"
+              className="hidden 2xl:flex items-center gap-2 rounded-full border border-border/80 bg-brand-cream/50 px-3.5 py-1.5 text-sm font-medium text-brand-dark shadow-2xs transition hover:bg-white"
             >
               <span className="text-base">{activePet.avatarEmoji}</span>
               <span className="font-bold">{activePet.name}</span>
@@ -143,10 +163,10 @@ export default function Navbar() {
             </button>
           ) : (
             <div className="flex items-center gap-2.5">
-              <Button to="/login" variant="ghost" size="sm" className="font-bold text-brand-dark text-sm sm:text-base px-4 py-2">
+              <Button to="/login" variant="ghost" size="sm" className="font-bold text-brand-dark text-sm px-3 py-2">
                 Sign In
               </Button>
-              <Button to="/login" size="sm" className="font-bold shadow-xs text-sm sm:text-base px-5 py-2">
+              <Button to="/login" size="sm" className="font-bold shadow-xs text-sm px-4 py-2">
                 <span>Get Started</span>
               </Button>
             </div>
@@ -155,18 +175,21 @@ export default function Navbar() {
 
         {/* Mobile menu hamburger button */}
         <button
-          className="flex size-10 items-center justify-center rounded-xl border border-border/80 text-brand-dark lg:hidden hover:bg-brand-cream/50"
+          id="mobile-menu-trigger"
+          className="flex size-11 items-center justify-center rounded-xl border border-border/80 text-brand-dark xl:hidden hover:bg-brand-cream/50"
           onClick={() => setMobileOpen((v) => !v)}
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileOpen}
+          aria-controls="mobile-menu-panel"
         >
           {mobileOpen ? <X className="size-6" /> : <Menu className="size-6" />}
         </button>
       </nav>
 
       {/* Mobile menu dropdown drawer */}
-      {mobileOpen && (
-        <div className="border-t border-border/60 bg-white/95 px-6 pb-8 pt-4 backdrop-blur-md lg:hidden animate-slide-up">
+      <div id="mobile-menu-panel" className="mobile-nav-panel xl:hidden" data-open={mobileOpen} inert={!mobileOpen}>
+        <div className="mobile-nav-clip">
+        <div className="max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain border-t border-border/60 bg-white/95 px-6 pb-8 pt-4 backdrop-blur-md">
           {activePet && (
             <div className="mb-4 flex items-center justify-between rounded-xl bg-brand-cream p-3.5 text-sm">
               <div className="flex items-center gap-2 font-bold text-brand-dark">
@@ -249,7 +272,8 @@ export default function Navbar() {
             )}
           </div>
         </div>
-      )}
+        </div>
+      </div>
     </header>
   )
 }

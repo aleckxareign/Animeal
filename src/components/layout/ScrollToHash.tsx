@@ -6,7 +6,8 @@ export default function ScrollToHash() {
 
   useEffect(() => {
     if (hash) {
-      document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: 'smooth' })
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: reducedMotion ? 'instant' : 'smooth' })
     } else {
       window.scrollTo(0, 0)
     }

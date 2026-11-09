@@ -102,7 +102,7 @@ export default function CalorieDashboard({
             className="flex items-center gap-2 rounded-2xl bg-brand-sage px-5 py-3 text-sm font-bold text-white shadow-md hover:bg-brand-sage/90 hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0"
           >
             <Plus className="h-4 w-4" />
-            <span>+ Napakain ako</span>
+            <span>Napakain ako</span>
           </button>
         </div>
       </div>

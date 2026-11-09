@@ -116,7 +116,7 @@ export default function FeedingHistory({ pet, onOpenFeedModal }: FeedingHistoryP
                 className="mt-4 inline-flex items-center gap-2 rounded-xl bg-brand-sage px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-brand-sage/90 transition"
               >
                 <Sparkles className="h-3.5 w-3.5" />
-                + Napakain ako
+                Napakain ako
               </button>
             </div>
           ) : (

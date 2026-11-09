@@ -8,7 +8,7 @@
 
 @theme {
   --color-brand-dark: #164040;
-  --color-brand-sage: #44632f;
+  --color-brand-sage: rgb(68 99 47 / 0.85);
   --color-brand-cream: #f6f3ec;
   --color-brand-alert: #b5432f;
   --font-display: "TT Ramillas", Georgia, serif;
@@ -71,22 +71,8 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
-@media (min-width: 1024px) {
-  html {
-    font-size: 16.5px;
-  }
-}
-
-@media (min-width: 1440px) {
-  html {
-    font-size: 17.5px;
-  }
-}
-
-@media (min-width: 1920px) {
-  html {
-    font-size: 18.5px;
-  }
+section[id] {
+  scroll-margin-top: 6rem;
 }
 
 body {
@@ -110,11 +96,6 @@ input,
 textarea,
 select {
   font: inherit;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
 }
 
 button {
@@ -144,6 +125,97 @@ button {
 .animate-scale-in { animation: scale-in 0.2s ease-out; }
 
 /* Custom scrollbar */
+.site-nav a,
+.site-nav button {
+  transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.site-nav nav > ul > li > a:not(.rounded-full) {
+  position: relative;
+}
+
+.site-nav nav > ul > li > a:not(.rounded-full)::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -6px;
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms ease;
+}
+
+.site-nav nav > ul > li > a:is(:hover, :focus-visible, [aria-current='page'])::after {
+  transform: scaleX(1);
+}
+
+.nav-dropdown {
+  visibility: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 140ms ease, visibility 0s linear 140ms;
+}
+
+.nav-dropdown-surface {
+  transform: translateY(-6px);
+  transition: transform 180ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.nav-dropdown[data-open='true'] {
+  visibility: visible;
+  pointer-events: auto;
+  opacity: 1;
+  transition-delay: 0s;
+}
+
+.nav-dropdown[data-open='true'] .nav-dropdown-surface {
+  transform: translateY(0);
+}
+
+.mobile-nav-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition: grid-template-rows 220ms ease, opacity 180ms ease, visibility 0s linear 220ms;
+}
+
+.mobile-nav-panel[data-open='true'] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.mobile-nav-clip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (min-width: 80rem) {
+  .mobile-nav-panel { display: none; }
+}
+
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-enter {
+  animation: page-enter 220ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: #16404040; border-radius: 9999px; }
@@ -229,6 +301,10 @@ button {
 }
 
 @layer base {
+  a {
+  color: inherit;
+  text-decoration: none;
+  }
   * {
     @apply border-border outline-ring/50;
   }

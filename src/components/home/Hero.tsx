@@ -1,4 +1,4 @@
-import { CheckCircle2, Play, Sparkles, Heart, ShieldCheck, ArrowRight, Award, Zap, Activity } from 'lucide-react'
+import { CheckCircle2, Play, Sparkles, Heart, ShieldCheck, ArrowRight } from 'lucide-react'
 import Button from '../ui/button'
 import { Badge } from '../ui/badge'
 
@@ -11,57 +11,41 @@ const perks = [
 
 export default function Hero() {
   return (
-    <section className="relative overflow-x-clip bg-gradient-to-b from-brand-cream via-brand-cream/80 to-brand-cream/40 min-h-[calc(100vh-80px)] flex flex-col justify-center py-12 lg:py-24">
-      <div className="mx-auto w-full max-w-[1600px] px-4 sm:px-8 lg:px-12 grid items-center gap-12 lg:grid-cols-12 flex-1">
+    <section className="relative overflow-x-clip bg-gradient-to-b from-brand-cream via-brand-cream/80 to-brand-cream/40 flex flex-col justify-center py-10 sm:py-12 lg:py-16">
+      <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10 grid items-center gap-10 lg:gap-12 lg:grid-cols-12 flex-1">
         
         {/* Left Column (Hero Content) */}
-        <div className="lg:col-span-7 xl:col-span-6 z-10">
+        <div className="min-w-0 lg:col-span-6 z-10">
           <Badge
             variant="outline"
-            className="mb-6 inline-flex items-center gap-2.5 rounded-full border-brand-sage/30 bg-brand-sage/10 px-4.5 py-2 text-sm font-bold text-brand-sage shadow-2xs"
+            className="mb-4 inline-flex items-center gap-2.5 rounded-full border-brand-sage/30 bg-brand-sage/10 px-4.5 py-2 text-xs sm:text-sm font-semibold text-brand-sage shadow-2xs"
           >
             <Sparkles className="size-4 text-brand-sage" />
             AI-Powered Pet Nutrition & Care Platform
           </Badge>
 
-          <h1 className="font-display text-4xl leading-[1.08] font-extrabold sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl text-brand-dark tracking-tight">
-            <span className="block text-brand-sage">Better meals.</span>
+          <h1 className="font-display text-[clamp(2.25rem,4.5vw,3.5rem)] leading-[1.08] font-extrabold text-brand-dark tracking-tight">
+            <span className="block text-brand-sage/70">Better meals.</span>
             <span className="block text-brand-dark">Happier Tails.</span>
           </h1>
 
-          <p className="mt-7 max-w-2xl text-lg text-brand-dark/80 leading-relaxed sm:text-xl lg:text-2xl font-normal">
+          <p className="mt-5 max-w-xl text-base text-brand-dark/80 leading-relaxed sm:text-lg font-normal">
             Make everyday pet care effortless. Estimate scientific calorie budgets with Resting Energy Requirements (RER), compare local Filipino pet food prices, scan packaging labels, and chat with Mealie — all in one synchronized dashboard.
           </p>
 
-          <div className="mt-9 flex flex-wrap items-center gap-4">
-            <Button to="/meal-tracker" size="lg" className="rounded-2xl px-8 font-bold shadow-md h-14 text-base sm:text-lg">
+          <div className="mt-6 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+            <Button to="/meal-tracker" size="lg" className="rounded-xl px-6 font-semibold shadow-sm h-12 text-base">
               <span>Get Started Free</span>
               <ArrowRight className="size-5" />
             </Button>
 
-            <Button to="/#how-it-works" variant="outline" size="lg" className="rounded-2xl px-7 font-bold h-14 text-base sm:text-lg">
+            <Button to="/#how-it-works" variant="outline" size="lg" className="rounded-xl px-6 font-semibold h-12 text-base">
               <Play className="size-4.5 fill-current" />
               <span>How It Works</span>
             </Button>
           </div>
 
-          {/* Quick Metrics Strip */}
-          <div className="mt-12 pt-8 border-t border-brand-dark/15 grid grid-cols-3 gap-6 max-w-xl">
-            <div>
-              <p className="font-display text-3xl sm:text-4xl font-extrabold text-brand-dark">100%</p>
-              <p className="text-sm sm:text-base text-brand-dark/70 font-semibold mt-1">Vet-Grounded RER Math</p>
-            </div>
-            <div>
-              <p className="font-display text-3xl sm:text-4xl font-extrabold text-brand-sage">20+</p>
-              <p className="text-sm sm:text-base text-brand-dark/70 font-semibold mt-1">Local PH Pet Foods</p>
-            </div>
-            <div>
-              <p className="font-display text-3xl sm:text-4xl font-extrabold text-brand-dark">24/7</p>
-              <p className="text-sm sm:text-base text-brand-dark/70 font-semibold mt-1">Mealie AI Assistant</p>
-            </div>
-          </div>
-
-          <div className="mt-7 flex flex-wrap items-center gap-6 text-sm text-brand-dark/70 font-medium">
+          <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-brand-dark/70 font-medium">
             <div className="flex items-center gap-2">
               <ShieldCheck className="size-5 text-brand-sage" />
               <span>Zero setup fees • Offline ready</span>
@@ -74,12 +58,12 @@ export default function Hero() {
         </div>
 
         {/* Right Column: Hero Visual Showcase */}
-        <div className="lg:col-span-5 xl:col-span-6 flex flex-col items-center justify-center relative">
-          <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-lg xl:max-w-xl aspect-square flex items-center justify-center">
+        <div className="min-w-0 lg:col-span-6 flex flex-col items-center justify-center relative">
+          <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-lg aspect-square flex items-center justify-center">
             
             {/* Organic Background Blob */}
             <div
-              className="absolute inset-0 bg-brand-sage/85 shadow-2xl transition-transform duration-700 hover:scale-[1.02]"
+              className="absolute inset-0 bg-brand-sage/70 shadow-2xl transition-transform duration-700 hover:scale-[1.02]"
               style={{
                 maskImage: "url('/images/hero-blob.svg')",
                 maskSize: '100% 100%',
@@ -106,7 +90,7 @@ export default function Hero() {
             />
 
             {/* Floating Perks Card (Shown floating only on xl+ screens where there is ample margin) */}
-            <div className="hidden xl:block w-76 rounded-2xl border border-white/50 bg-white/95 p-5 shadow-2xl backdrop-blur-md absolute -right-6 -top-3 z-20 transition-transform duration-300 hover:-translate-y-1">
+            <div className="hidden 2xl:block w-76 rounded-2xl border border-white/50 bg-white/95 p-5 shadow-2xl backdrop-blur-md absolute -right-30 -top-12 z-20 transition-transform duration-300 hover:-translate-y-1">
               <div className="mb-3.5 flex items-center gap-3">
                 <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-sage/15 text-brand-sage">
                   <Sparkles className="size-5" />
@@ -130,7 +114,7 @@ export default function Hero() {
             </div>
 
             {/* Floating Live Metric Card (Shown floating only on xl+ screens) */}
-            <div className="hidden xl:block w-80 rounded-2xl border border-white/50 bg-white/95 p-5 shadow-2xl backdrop-blur-md absolute -bottom-6 -left-4 z-20 transition-transform duration-300 hover:translate-y-[-2px]">
+            <div className="hidden 2xl:block w-80 rounded-2xl border border-white/50 bg-white/95 p-5 shadow-2xl backdrop-blur-md absolute -bottom-6 -left-4 z-20 transition-transform duration-300 hover:translate-y-[-2px]">
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2.5">
                   <span className="flex size-8 items-center justify-center rounded-full bg-amber-100 text-base">
@@ -161,7 +145,7 @@ export default function Hero() {
           </div>
 
           {/* Mobile & Tablet Interactive Cards Showcase (< xl screens: cleanly stacked with zero collision) */}
-          <div className="xl:hidden w-full max-w-md sm:max-w-xl grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 z-10">
+          <div className="2xl:hidden w-full max-w-md sm:max-w-xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 mt-6 z-10">
             {/* Live Metric Card */}
             <div className="rounded-2xl border border-border/70 bg-white/95 p-4.5 shadow-md backdrop-blur-md">
               <div className="flex items-center justify-between text-sm">

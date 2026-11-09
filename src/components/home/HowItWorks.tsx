@@ -1,13 +1,12 @@
-import { Fragment } from 'react'
-import { ChevronRight, CheckCircle2, Droplets } from 'lucide-react'
+import { CheckCircle2, Droplets } from 'lucide-react'
 import SectionHeading from '../ui/SectionHeading'
 import PhoneFrame from '../ui/PhoneFrame'
 
 const steps = [
   {
     number: '01',
-    title: "Create Your Pet's Profile",
-    description: "Add your pet's species, breed, age, and weight to calculate their daily calorie needs.",
+    title: 'Set up your pet',
+    description: "Add your pet's details to get a personalized daily calorie target.",
     renderScreen: () => (
       <div className="flex h-full flex-col bg-brand-cream/40 p-3 text-left text-xs">
         <div className="rounded-xl bg-white p-3 text-center shadow-xs">
@@ -35,8 +34,8 @@ const steps = [
   },
   {
     number: '02',
-    title: 'Explore the Tools',
-    description: 'Discover verified food, scan packaging labels, and log meals with smart portion units.',
+    title: 'Choose food and log a meal',
+    description: 'Compare pet food or scan a label, then record what your pet ate.',
     renderScreen: () => (
       <div className="flex h-full flex-col bg-brand-cream/40 p-3 text-left text-xs">
         <div className="flex items-center gap-1.5 rounded-lg bg-white px-2.5 py-1.5 text-[10px] text-brand-dark/60 shadow-xs border border-border/40">
@@ -64,8 +63,8 @@ const steps = [
   },
   {
     number: '03',
-    title: 'Track their Well-being',
-    description: 'Review feeding history, monitor hydration and weight, and stay in sync with family.',
+    title: 'Stay on top of their care',
+    description: 'Review feeding history, track hydration and weight, and share care reminders.',
     renderScreen: () => (
       <div className="flex h-full flex-col bg-brand-cream/40 p-3 text-left text-xs">
         <div className="flex items-center justify-between rounded-xl bg-white p-2.5 shadow-xs border border-border/40">
@@ -97,32 +96,34 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="bg-brand-cream py-20 sm:py-28">
-      <div className="mx-auto max-w-[1600px] px-4 sm:px-8 lg:px-12">
-        {/* Centered Top Heading */}
-        <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
+    <section id="how-it-works" className="bg-brand-cream py-12 sm:py-16 lg:py-20">
+      <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
           <SectionHeading
             eyebrow="How it works"
-            title="Three simple steps to better pet care."
-            subtitle="Get started with Animeal by setting up your pet's profile, exploring the tools you need, and keeping track of their overall nutrition and wellness in one synchronized dashboard."
+            title="A healthier routine starts with one meal."
+            subtitle="Set up your pet, log what they eat, and keep their care on track."
           />
         </div>
 
-        {/* 3-Column Responsive Interactive Step Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-14 justify-items-center">
+        <div className="relative grid grid-cols-1 gap-10 justify-items-center lg:grid-cols-3 lg:gap-8">
+          <div aria-hidden="true" className="pointer-events-none absolute left-[16.66%] right-[16.66%] top-5 hidden h-px bg-brand-sage/25 lg:block" />
           {steps.map((step, index) => (
-            <div key={step.number} className="w-full max-w-sm flex flex-col items-center text-center">
+            <div key={step.number} className="relative z-10 flex w-full max-w-sm flex-col items-center text-center">
+              {index < steps.length - 1 && (
+                <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-full h-12 w-px -translate-x-1/2 bg-brand-sage/25 lg:hidden" />
+              )}
               <div className="relative">
-                <span className="absolute -left-3 -top-3 z-30 flex size-12 items-center justify-center rounded-2xl bg-brand-sage text-xl font-extrabold text-white shadow-lg ring-4 ring-brand-cream font-mono">
+                <span className="absolute left-1/2 -top-3 z-30 flex size-10 -translate-x-1/2 items-center justify-center rounded-2xl bg-brand-sage text-base font-extrabold text-white shadow-lg ring-4 ring-brand-cream font-mono">
                   {step.number}
                 </span>
                 <PhoneFrame>{step.renderScreen()}</PhoneFrame>
               </div>
 
-              <h3 className="mt-8 font-bold text-brand-dark text-xl sm:text-2xl tracking-tight">
+              <h3 className="mt-6 font-bold text-brand-dark text-lg sm:text-xl tracking-tight">
                 {step.title}
               </h3>
-              <p className="mt-3 text-base sm:text-lg text-brand-dark/75 leading-relaxed max-w-xs">
+              <p className="mt-2 text-base text-brand-dark/75 leading-relaxed max-w-xs">
                 {step.description}
               </p>
             </div>
