@@ -109,7 +109,51 @@ export default function AskMealiePage() {
       setMessages((prev) => [...prev, userMsg])
       setIsThinking(true)
 
-      // 1. Try Gemini API directly if key is configured
+      const chatHistory = messages.map((m) => ({
+        role: (m.role === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
+        text: m.content,
+        timestamp: Date.now(),
+      }))
+
+      // 1. Try server-side Gemini AI proxy first (keeps API key secure on server)
+      try {
+        const proxyRes = await api.chatGeminiProxy(
+          trimmed,
+          chatHistory,
+          activePet || undefined
+        )
+
+        if (proxyRes?.reply) {
+          const isEmergency =
+            proxyRes.reply.toLowerCase().includes('emergency') ||
+            proxyRes.reply.toLowerCase().includes('poison') ||
+            proxyRes.reply.toLowerCase().includes('paws')
+
+          const mealieMsg: ExtendedChatMessage = {
+            id: generateId(),
+            role: 'mealie',
+            content: proxyRes.reply,
+            timestamp: proxyRes.timestamp || new Date().toISOString(),
+            severity: isEmergency ? 'emergency' : 'info',
+            actions: isEmergency
+              ? [
+                  { label: '🚨 Find 24/7 Vet Clinic', type: 'link', value: '/#nearby-vets' },
+                  { label: '📞 Call PAWS Hotline: (02) 8475-1688', type: 'link', value: 'tel:0284751688' },
+                ]
+              : [
+                  { label: '🍲 Meal Tracker', type: 'link', value: '/meal-tracker' },
+                  { label: '📖 Food Library', type: 'link', value: '/food-library' },
+                ],
+          }
+          setMessages((prev) => [...prev, mealieMsg])
+          setIsThinking(false)
+          return
+        }
+      } catch {
+        // Fallback to client-side direct or local engine
+      }
+
+      // 2. Try client-side direct Gemini API if key is configured in browser env
       if (import.meta.env.VITE_GEMINI_API_KEY) {
         try {
           const petProfile = activePet
@@ -121,12 +165,6 @@ export default function AskMealiePage() {
                 weightKg: activePet.weight || 10,
               }
             : undefined
-
-          const chatHistory = messages.map((m) => ({
-            role: (m.role === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
-            text: m.content,
-            timestamp: Date.now(),
-          }))
 
           const geminiText = await askMealie(chatHistory, trimmed, petProfile)
           const isEmergency =
@@ -158,7 +196,7 @@ export default function AskMealiePage() {
         }
       }
 
-      // 2. Try calling backend API
+      // 3. Try calling backend rule-based API
       try {
         const res = await api.chatMealie(trimmed, activePet || undefined)
         const mealieMsg: ExtendedChatMessage = {
@@ -171,7 +209,7 @@ export default function AskMealiePage() {
         }
         setMessages((prev) => [...prev, mealieMsg])
       } catch {
-        // 3. Fallback to local rule engine
+        // 4. Fallback to local rule engine
         const response = generateMealieAnswer(trimmed, activePet)
         const mealieMsg: ExtendedChatMessage = {
           id: generateId(),

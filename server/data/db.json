@@ -13,9 +13,93 @@
       "dailyCalorieTarget": 720,
       "waterGoal": 600,
       "createdAt": "2026-11-03T16:03:12.465Z"
+    },
+    {
+      "id": "mw1lft9bod1ssjd",
+      "name": "luna",
+      "species": "dog",
+      "breed": "Bulldog",
+      "weight": 50,
+      "age": 10,
+      "neutered": true,
+      "lifeStage": "senior",
+      "avatarEmoji": "🐱",
+      "dailyCalorieTarget": 1843,
+      "waterGoal": 2500,
+      "createdAt": "2026-11-04T04:05:20.735Z"
+    },
+    {
+      "id": "mw1lmwh4vs1hmdk",
+      "name": "Milo",
+      "species": "cat",
+      "breed": "Puspin (Pusang Pinoy)",
+      "weight": 5,
+      "age": 1,
+      "neutered": true,
+      "lifeStage": "adult",
+      "avatarEmoji": "🐱",
+      "dailyCalorieTarget": 281,
+      "waterGoal": 250,
+      "createdAt": "2026-11-04T04:10:51.496Z"
+    },
+    {
+      "id": "mw1lyfsqvso9smi",
+      "name": "Milo",
+      "species": "cat",
+      "breed": "german sherpherd",
+      "weight": 5,
+      "age": 1,
+      "neutered": true,
+      "lifeStage": "adult",
+      "avatarEmoji": "🐱",
+      "dailyCalorieTarget": 281,
+      "waterGoal": 250,
+      "createdAt": "2026-11-04T04:19:49.754Z"
+    },
+    {
+      "id": "mw1m2gli9hu4xsu",
+      "name": "Milo",
+      "species": "cat",
+      "breed": "german sheperd",
+      "weight": 50,
+      "age": 10,
+      "neutered": true,
+      "lifeStage": "adult",
+      "avatarEmoji": "🐱",
+      "dailyCalorieTarget": 1579,
+      "waterGoal": 2500,
+      "createdAt": "2026-11-04T04:22:57.414Z"
     }
   ],
   "feedings": [
+    {
+      "petId": "sample-bruno",
+      "foodId": "dog-monge",
+      "foodName": "Monge Natural Superpremium Adult",
+      "portion": 50,
+      "unit": "g",
+      "calories": 190,
+      "protein": 14,
+      "fat": 7,
+      "fiber": 2,
+      "fedBy": "Maria",
+      "id": "mw1m4c60tyeu1bh",
+      "timestamp": "2026-11-04T04:24:24.961Z"
+    },
+    {
+      "petId": "sample-bruno",
+      "foodId": "dog-rc-med",
+      "foodName": "Royal Canin Medium Adult",
+      "portion": 50,
+      "unit": "g",
+      "calories": 189,
+      "protein": 13,
+      "fat": 7,
+      "fiber": 2,
+      "fedBy": "Maria",
+      "id": "mw1lns4eykecx1c",
+      "timestamp": "2026-11-04T04:11:32.504Z"
+    },
     {
       "id": "feed-1",
       "petId": "sample-bruno",
@@ -28,7 +112,8 @@
       "fat": 18,
       "fiber": 9,
       "fedBy": "Maria",
-      "timestamp": "2026-11-03T16:03:12.468Z"
+      "timestamp": "2026-11-03T16:03:12.468Z",
+      "undone": true
     }
   ],
   "waterLogs": [

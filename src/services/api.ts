@@ -122,4 +122,26 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ message, petContext }),
     }),
+
+  // Server-side Gemini AI Chat Proxy (protects API keys)
+  chatGeminiProxy: (
+    message: string,
+    history?: { role: string; text?: string; content?: string }[],
+    pet?: Partial<Pet>
+  ) =>
+    request<{
+      reply: string
+      role: 'mealie'
+      timestamp: string
+    }>('/ai/chat', {
+      method: 'POST',
+      body: JSON.stringify({ message, history, pet }),
+    }),
+
+  // Server-side Gemini Multimodal Scanner Proxy
+  scanLabelProxy: (imageBase64: string, mimeType = 'image/jpeg') =>
+    request<Record<string, unknown>>('/ai/scan', {
+      method: 'POST',
+      body: JSON.stringify({ imageBase64, mimeType }),
+    }),
 }

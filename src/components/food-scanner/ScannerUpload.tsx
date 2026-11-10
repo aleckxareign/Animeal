@@ -11,6 +11,7 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import type { Species, FoodCategory, ScanResult } from '../../types'
+import { api } from '../../services/api'
 
 export type ScannedFoodData = ScanResult & {
   species: Species
@@ -123,10 +124,36 @@ export default function ScannerUpload({ onStartScan }: ScannerUploadProps) {
     setUploadError(null)
 
     const reader = new FileReader()
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       const dataUrl = e.target?.result as string
 
-      // Simulated OCR extraction from uploaded image
+      // 1. Try real server-side Gemini AI vision extraction
+      try {
+        const scanRes = await api.scanLabelProxy(dataUrl, file.type)
+        if (scanRes && (scanRes.productName || scanRes.brand)) {
+          const scannedData: ScannedFoodData = {
+            productName: String(scanRes.productName || file.name.replace(/\.[^/.]+$/, '')),
+            brand: String(scanRes.brand || 'Detected Brand'),
+            species: 'dog',
+            category: 'dry',
+            calories: typeof scanRes.caloriesPer100g === 'number' ? scanRes.caloriesPer100g : 350,
+            protein: typeof scanRes.protein === 'number' ? scanRes.protein : 24,
+            fat: typeof scanRes.fat === 'number' ? scanRes.fat : 12,
+            fiber: typeof scanRes.fiber === 'number' ? scanRes.fiber : 4,
+            moisture: typeof scanRes.moisture === 'number' ? scanRes.moisture : 10,
+            packageWeight: typeof scanRes.packageWeight === 'number' ? scanRes.packageWeight : 1000,
+            price: typeof scanRes.price === 'number' ? scanRes.price : 280,
+            confidence: (scanRes.confidence as 'high' | 'medium' | 'low') || 'high',
+            imageUrl: dataUrl,
+          }
+          onStartScan(scannedData, dataUrl)
+          return
+        }
+      } catch {
+        // Fallback to simulated extraction if server AI proxy is offline
+      }
+
+      // 2. Simulated OCR extraction from uploaded image
       const simulatedData: ScannedFoodData = {
         productName: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ') || 'Scanned Pet Food',
         brand: 'Detected Brand',

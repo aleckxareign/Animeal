@@ -24,6 +24,9 @@ import {
 import { isToday } from '../utils/formatters'
 import { getFoodById, foods as builtinFoods } from '../data/foods'
 import { api } from '../services/api'
+import { isSupabaseConfigured } from '../lib/supabase'
+import { supabaseDb } from '../services/supabase-db'
+import { useAuth } from './AuthContext'
 
 // ───────── State shape ─────────
 type AppState = {
@@ -88,19 +91,52 @@ const AppContext = createContext<AppContextType | null>(null)
 
 // ───────── Provider ─────────
 export function AppProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth()
   const [state, setState] = useState<AppState>(() =>
     loadFromStorage('app-state', defaultState),
   )
 
-  // Persist on every state change
+  // Persist on every state change to local storage
   useEffect(() => {
     saveToStorage('app-state', state)
   }, [state])
 
-  // Initial sync with backend API if available
+  // Sync with Supabase (Primary) or Express backend (Secondary)
   useEffect(() => {
     let cancelled = false
-    async function syncBackend() {
+
+    async function syncData() {
+      // 1. If Supabase is configured and a real authenticated user is signed in
+      if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+        try {
+          const [dbPets, dbFeedings, dbFoods, dbWater, dbWeight, dbTasks] = await Promise.all([
+            supabaseDb.getPets(user.id),
+            supabaseDb.getFeedings(user.id),
+            supabaseDb.getFoods(user.id),
+            supabaseDb.getHydrationLogs(user.id),
+            supabaseDb.getWeightLogs(user.id),
+            supabaseDb.getCareTasks(user.id),
+          ])
+
+          if (cancelled) return
+
+          setState((prev) => ({
+            ...prev,
+            pets: dbPets.length > 0 ? dbPets : prev.pets,
+            activePetId: prev.activePetId || dbPets[0]?.id || prev.pets[0]?.id || null,
+            feedingLog: dbFeedings.length > 0 ? dbFeedings : prev.feedingLog,
+            customFoods: dbFoods.filter((f) => f.isCustom),
+            waterLogs: dbWater.length > 0 ? dbWater : prev.waterLogs,
+            weightLogs: dbWeight.length > 0 ? dbWeight : prev.weightLogs,
+            tasks: dbTasks.length > 0 ? dbTasks : prev.tasks,
+          }))
+          return
+        } catch (err) {
+          console.warn('Supabase initial fetch fallback to local/express:', err)
+        }
+      }
+
+      // 2. Fallback to Express backend if available
       try {
         const [backendPets, backendHousehold, backendTasks, backendFeedings] = await Promise.all([
           api.getPets().catch(() => [] as Pet[]),
@@ -143,11 +179,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
         // Fallback to local storage state seamlessly
       }
     }
-    syncBackend()
+
+    syncData()
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [user?.id])
 
   const activePet =
     state.pets.find((p) => p.id === state.activePetId) ?? state.pets[0] ?? null
@@ -169,15 +206,32 @@ export function AppProvider({ children }: { children: ReactNode }) {
         waterGoal: calculateWaterGoal(data.weight),
         createdAt: new Date().toISOString(),
       }
+
       setState((s) => ({
         ...s,
         pets: [...s.pets, pet],
         activePetId: s.pets.length === 0 ? pet.id : s.activePetId,
       }))
+
+      // Persist to Supabase if logged in
+      if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+        supabaseDb.createPet(user.id, pet).then((created) => {
+          if (created) {
+            // Replace temporary client ID with Supabase UUID
+            setState((s) => ({
+              ...s,
+              pets: s.pets.map((p) => (p.id === pet.id ? created : p)),
+              activePetId: s.activePetId === pet.id ? created.id : s.activePetId,
+            }))
+          }
+        }).catch(() => {})
+      }
+
+      // Persist to Express backend
       api.createPet(data).catch(() => {})
       return pet
     },
-    [],
+    [user?.id],
   )
 
   const updatePet = useCallback((id: string, data: Partial<Pet>) => {
@@ -199,21 +253,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
         return updated
       }),
     }))
+
+    if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+      supabaseDb.updatePet(id, data).catch(() => {})
+    }
     api.updatePet(id, data).catch(() => {})
-  }, [])
+  }, [user?.id])
 
   const removePet = useCallback((id: string) => {
     setState((s) => ({
       ...s,
       pets: s.pets.filter((p) => p.id !== id),
-      activePetId: s.activePetId === id ? (s.pets[0]?.id ?? null) : s.activePetId,
+      activePetId: s.activePetId === id ? (s.pets.filter(p => p.id !== id)[0]?.id ?? null) : s.activePetId,
       feedingLog: s.feedingLog.filter((f) => f.petId !== id),
       waterLogs: s.waterLogs.filter((w) => w.petId !== id),
       weightLogs: s.weightLogs.filter((w) => w.petId !== id),
       tasks: s.tasks.filter((t) => t.petId !== id),
     }))
+
+    if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+      supabaseDb.deletePet(id).catch(() => {})
+    }
     api.deletePet(id).catch(() => {})
-  }, [])
+  }, [user?.id])
 
   const setActivePet = useCallback((id: string) => {
     setState((s) => ({ ...s, activePetId: id }))
@@ -248,13 +310,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
         fiber: data.fiber ?? (food ? Math.round((food.fiber * portionGrams) / 100) : 0),
         timestamp: new Date().toISOString(),
       }
+
       setState((s) => ({
         ...s,
         feedingLog: [entry, ...s.feedingLog],
       }))
+
+      if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+        supabaseDb.addFeeding(user.id, entry).then((saved) => {
+          if (saved) {
+            setState((s) => ({
+              ...s,
+              feedingLog: s.feedingLog.map((f) => (f.id === entry.id ? saved : f)),
+            }))
+          }
+        }).catch(() => {})
+      }
+
       api.logFeeding(entry).catch(() => {})
     },
-    [],
+    [user?.id],
   )
 
   const undoFeeding = useCallback((id: string) => {
@@ -264,8 +339,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
         f.id === id ? { ...f, undone: true } : f,
       ),
     }))
+
+    if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+      supabaseDb.deleteFeeding(id).catch(() => {})
+    }
     api.undoFeeding(id).catch(() => {})
-  }, [])
+  }, [user?.id])
 
   const getTodayFeedings = useCallback(
     (petId: string) =>
@@ -283,15 +362,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // ── Water actions ──
   const logWater = useCallback((petId: string, amount: number) => {
+    const entry = { id: generateId(), petId, amount, timestamp: new Date().toISOString() }
     setState((s) => ({
       ...s,
-      waterLogs: [
-        { id: generateId(), petId, amount, timestamp: new Date().toISOString() },
-        ...s.waterLogs,
-      ],
+      waterLogs: [entry, ...s.waterLogs],
     }))
+
+    if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+      supabaseDb.addHydrationLog(user.id, petId, amount).then((saved) => {
+        if (saved) {
+          setState((s) => ({
+            ...s,
+            waterLogs: s.waterLogs.map((w) => (w.id === entry.id ? saved : w)),
+          }))
+        }
+      }).catch(() => {})
+    }
+
     api.logWater(petId, amount).catch(() => {})
-  }, [])
+  }, [user?.id])
 
   const getTodayWater = useCallback(
     (petId: string) =>
@@ -305,6 +394,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const logWeight = useCallback(
     (petId: string, weight: number, notes?: string, date?: string) => {
       const logDate = date || new Date().toISOString()
+      const newLog = {
+        id: generateId(),
+        petId,
+        weight,
+        date: logDate,
+        notes,
+      }
+
       setState((s) => ({
         ...s,
         pets: s.pets.map((p) => {
@@ -321,20 +418,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
             waterGoal: calculateWaterGoal(weight),
           }
         }),
-        weightLogs: [
-          {
-            id: generateId(),
-            petId,
-            weight,
-            date: logDate,
-            notes,
-          },
-          ...s.weightLogs,
-        ],
+        weightLogs: [newLog, ...s.weightLogs],
       }))
+
+      if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+        supabaseDb.addWeightLog(user.id, petId, weight, notes, logDate).then((saved) => {
+          if (saved) {
+            setState((s) => ({
+              ...s,
+              weightLogs: s.weightLogs.map((w) => (w.id === newLog.id ? saved : w)),
+            }))
+          }
+        }).catch(() => {})
+      }
+
       api.logWeight(petId, weight, notes, logDate).catch(() => {})
     },
-    [],
+    [user?.id],
   )
 
   const removeWeightLog = useCallback((id: string) => {
@@ -342,7 +442,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ...s,
       weightLogs: s.weightLogs.filter((w) => w.id !== id),
     }))
-  }, [])
+
+    if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+      supabaseDb.removeWeightLog(id).catch(() => {})
+    }
+  }, [user?.id])
 
   const getWeightHistory = useCallback(
     (petId: string) =>
@@ -365,9 +469,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
         ...s,
         tasks: [task, ...s.tasks],
       }))
+
+      if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+        supabaseDb.addCareTask(user.id, task).then((saved) => {
+          if (saved) {
+            setState((s) => ({
+              ...s,
+              tasks: s.tasks.map((t) => (t.id === task.id ? saved : t)),
+            }))
+          }
+        }).catch(() => {})
+      }
+
       api.createTask(task).catch(() => {})
     },
-    [],
+    [user?.id],
   )
 
   const completeTask = useCallback((id: string, completedBy?: string) => {
@@ -384,8 +500,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
           : t,
       ),
     }))
+
+    if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+      supabaseDb.updateCareTask(id, { completed: true, completedBy: completedBy ?? 'Me' }).catch(() => {})
+    }
+
     api.completeTask(id, completedBy).catch(() => {})
-  }, [])
+  }, [user?.id])
 
   const snoozeTask = useCallback((id: string, until: string) => {
     setState((s) => ({
@@ -394,12 +515,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
         t.id === id ? { ...t, snoozedUntil: until } : t,
       ),
     }))
-  }, [])
+
+    if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+      supabaseDb.updateCareTask(id, { snoozedUntil: until }).catch(() => {})
+    }
+  }, [user?.id])
 
   const removeTask = useCallback((id: string) => {
     setState((s) => ({ ...s, tasks: s.tasks.filter((t) => t.id !== id) }))
+
+    if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+      supabaseDb.deleteCareTask(id).catch(() => {})
+    }
+
     api.deleteTask(id).catch(() => {})
-  }, [])
+  }, [user?.id])
 
   const getPendingTasks = useCallback(
     (petId: string) =>
@@ -440,15 +570,30 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // ── Custom food actions ──
   const addCustomFood = useCallback(
     (food: Omit<FoodItem, 'id' | 'verified' | 'isCustom'>) => {
+      const customFoodItem: FoodItem = {
+        ...food,
+        id: generateId(),
+        verified: false,
+        isCustom: true,
+      }
+
       setState((s) => ({
         ...s,
-        customFoods: [
-          ...s.customFoods,
-          { ...food, id: generateId(), verified: false, isCustom: true },
-        ],
+        customFoods: [...s.customFoods, customFoodItem],
       }))
+
+      if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+        supabaseDb.addCustomFood(user.id, food).then((saved) => {
+          if (saved) {
+            setState((s) => ({
+              ...s,
+              customFoods: s.customFoods.map((f) => (f.id === customFoodItem.id ? saved : f)),
+            }))
+          }
+        }).catch(() => {})
+      }
     },
-    [],
+    [user?.id],
   )
 
   const getAllFoods = useCallback((): FoodItem[] => {

@@ -1,8 +1,10 @@
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { GoogleGenAI } from '@google/genai'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -11,7 +13,7 @@ const app = express()
 const PORT = process.env.PORT || 3001
 
 app.use(cors())
-app.use(express.json())
+app.use(express.json({ limit: '15mb' }))
 
 // Database file path
 const DATA_DIR = path.join(__dirname, 'data')
@@ -155,6 +157,19 @@ function calculateDailyCalories(weightKg, species, lifeStage, neutered) {
 // ─────────────────────────────────────────────────────────
 // API ROUTES
 // ─────────────────────────────────────────────────────────
+
+// Root info route
+app.get('/', (req, res) => {
+  res.send(`
+    <html>
+      <body style="font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 90vh; background: #f6f3ec; color: #164040;">
+        <h1>🐾 AniMeal Backend API is Running</h1>
+        <p>This is the backend server (port 3001). To view the actual website, open:</p>
+        <p><a href="http://localhost:5173" style="font-size: 1.25rem; font-weight: bold; color: #44632f;">👉 http://localhost:5173</a></p>
+      </body>
+    </html>
+  `)
+})
 
 // Health Check
 app.get('/api/health', (req, res) => {
@@ -447,6 +462,142 @@ app.post('/api/mealie/chat', (req, res) => {
     ],
     timestamp: new Date().toISOString(),
   })
+})
+
+// ── 7. SERVER-SIDE GEMINI AI PROXY ──
+const GEMINI_KEY = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY
+
+function getGeminiClient() {
+  if (!GEMINI_KEY) return null
+  return new GoogleGenAI({ apiKey: GEMINI_KEY })
+}
+
+function buildServerMealiePrompt(pet) {
+  const petCtx = pet
+    ? `\nActive pet profile:\n- Name: ${pet.name || 'Pet'}\n- Species: ${pet.species || 'dog'}\n- Breed: ${pet.breed || 'Mixed'}\n- Age: ${pet.age ? `${pet.age} years` : '1 year'}\n- Weight: ${pet.weight || pet.weightKg || '5'} kg\nAlways tailor advice to this pet's exact profile.`
+    : '\nNo pet profile is active. Ask the user about their pet when relevant.'
+
+  return `You are **Mealie**, the friendly AI pet nutrition & care assistant for **AniMeal** — a Filipino pet-care platform.
+
+LANGUAGE RULES:
+• Respond in natural **Taglish** (conversational mixed Tagalog and English).
+• If the user queries in pure English, reply in friendly English with Filipino hospitality.
+• Keep responses concise (under 200 words unless in-depth breakdown is explicitly requested).
+
+CRITICAL PET SAFETY GUARDRAILS (STRICT):
+1. TOXIC SUBSTANCES: Immediately flag and alert on: chocolate/cacao, grapes, raisins, onions (sibuyas), garlic (bawang), chives, xylitol (artificial sweetener), macadamia nuts, avocado, alcohol, coffee/caffeine, cooked bones, raw yeast dough, paracetamol/biogesic/ibuprofen.
+   Cats additionally: lilies (deadly!), raw fish (thiaminase), cow's milk (lactose intolerance).
+2. EMERGENCY: If user describes poisoning symptoms or severe distress, urge them to visit a veterinarian IMMEDIATELY and mention the PAWS Emergency line: (02) 8475-1688.
+3. NEVER prescribe drug dosages or substitute for veterinary diagnoses.
+${petCtx}`
+}
+
+app.post('/api/ai/chat', async (req, res) => {
+  const { message, history = [], pet } = req.body
+  const ai = getGeminiClient()
+
+  if (!ai) {
+    return res.status(503).json({
+      error: 'GEMINI_API_KEY is not configured on the backend server. Falling back to local assistant.',
+      fallback: true,
+    })
+  }
+
+  try {
+    const contents = history.map((m) => ({
+      role: m.role === 'assistant' || m.role === 'mealie' ? 'model' : 'user',
+      parts: [{ text: m.text || m.content || '' }],
+    }))
+
+    contents.push({
+      role: 'user',
+      parts: [{ text: message }],
+    })
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.8-flash',
+      contents,
+      config: {
+        systemInstruction: buildServerMealiePrompt(pet),
+        temperature: 0.7,
+        topP: 0.9,
+        maxOutputTokens: 1024,
+      },
+    })
+
+    const reply = response.text || 'Pasensya na, hindi ko nakuha ang sagot. Subukan mo ulit!'
+    res.json({ reply, role: 'mealie', timestamp: new Date().toISOString() })
+  } catch (err) {
+    console.error('Server Gemini error:', err)
+    res.status(500).json({
+      error: err.message || 'Gemini API call failed',
+      fallback: true,
+    })
+  }
+})
+
+app.post('/api/ai/scan', async (req, res) => {
+  const { imageBase64, mimeType = 'image/jpeg' } = req.body
+  const ai = getGeminiClient()
+
+  if (!ai) {
+    return res.status(503).json({
+      error: 'GEMINI_API_KEY is not configured on the backend server.',
+    })
+  }
+
+  if (!imageBase64) {
+    return res.status(400).json({ error: 'Missing imageBase64 in request body' })
+  }
+
+  try {
+    const cleanBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, '')
+    const prompt = `You are an expert veterinary nutritionist AI. Analyze this pet food packaging photo.
+Extract the guaranteed analysis and details into ONLY a valid raw JSON object (no markdown, no backticks, no code fence):
+
+{
+  "brand": "<brand name or 'Unknown'>",
+  "productName": "<product name or 'Unknown Pet Food'>",
+  "caloriesPer100g": <number in kcal or null>,
+  "protein": <crude protein percentage as number or null>,
+  "fat": <crude fat percentage as number or null>,
+  "fiber": <crude fiber percentage as number or null>,
+  "moisture": <moisture percentage as number or null>,
+  "packageWeight": <weight in grams as number or null>,
+  "price": <price in PHP or null>,
+  "confidence": "<high|medium|low>",
+  "suitability": "<safe|caution|unsafe>",
+  "suitabilityNote": "<one sentence advice in Taglish>"
+}`
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.8-flash',
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            { text: prompt },
+            {
+              inlineData: {
+                data: cleanBase64,
+                mimeType,
+              },
+            },
+          ],
+        },
+      ],
+      config: {
+        responseMimeType: 'application/json',
+      },
+    })
+
+    const text = response.text || '{}'
+    const parsed = JSON.parse(text)
+    res.json(parsed)
+  } catch (err) {
+    console.error('Server Gemini scan error:', err)
+    res.status(500).json({ error: err.message || 'Failed to scan image with Gemini' })
+  }
 })
 
 // Start Express Server

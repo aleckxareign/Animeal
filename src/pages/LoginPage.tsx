@@ -2,30 +2,61 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Sparkles, ArrowRight, ShieldCheck, Heart } from 'lucide-react'
+import { isSupabaseConfigured } from '../lib/supabase'
+import { Sparkles, ArrowRight, ShieldCheck, Heart, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react'
 
 export default function LoginPage() {
-  const { isLoggedIn, login } = useAuth()
+  const { isLoggedIn, signIn, signUp, demoLogin } = useAuth()
   const location = useLocation()
   const from =
     (location.state as { from?: string } | null)?.from ?? '/meal-tracker'
 
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin')
+  const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   if (isLoggedIn) return <Navigate to={from} replace />
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    login()
+    setErrorMessage(null)
+    setSuccessMessage(null)
+    setIsSubmitting(true)
+
+    try {
+      if (mode === 'signin') {
+        const { error } = await signIn(email, password)
+        if (error) {
+          setErrorMessage(error.message || 'Invalid email or password. Please try again.')
+        }
+      } else {
+        const { error } = await signUp(email, password, fullName)
+        if (error) {
+          setErrorMessage(error.message || 'Failed to create account. Please try again.')
+        } else {
+          setSuccessMessage(
+            'Account created successfully! Check your email inbox to confirm your account (or sign in if email confirmation is disabled).'
+          )
+        }
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'An unexpected error occurred.'
+      setErrorMessage(msg)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   function handleDemoLogin() {
-    login()
+    demoLogin()
   }
 
   return (
-    <section className="flex min-h-[80vh] items-center bg-brand-cream/40 py-12">
+    <section className="flex min-h-[85vh] items-center bg-brand-cream/40 py-12">
       <div className="mx-auto w-full max-w-md px-4 sm:px-6">
         <div className="overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-brand-dark/5">
           {/* Header Banner */}
@@ -35,11 +66,47 @@ export default function LoginPage() {
               Pet Nutrition Platform
             </div>
             <h1 className="font-display mt-3 text-2xl font-bold sm:text-3xl text-brand-cream">
-              Welcome to AniMeal
+              {mode === 'signin' ? 'Welcome to AniMeal' : 'Join AniMeal Today'}
             </h1>
             <p className="mt-1.5 text-xs text-brand-cream/70 sm:text-sm">
-              Sign in to manage meals, nutrition, health records, and chat with Mealie.
+              {mode === 'signin'
+                ? 'Sign in to manage meals, nutrition, health records, and chat with Mealie.'
+                : 'Create an account to track your pets’ daily nutrition and veterinary milestones.'}
             </p>
+
+            {/* Mode Toggle Tabs */}
+            <div className="mt-5 grid grid-cols-2 rounded-xl bg-white/10 p-1 text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('signin')
+                  setErrorMessage(null)
+                  setSuccessMessage(null)
+                }}
+                className={`rounded-lg py-2 transition ${
+                  mode === 'signin'
+                    ? 'bg-white text-brand-dark shadow-sm'
+                    : 'text-brand-cream/70 hover:text-white'
+                }`}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('signup')
+                  setErrorMessage(null)
+                  setSuccessMessage(null)
+                }}
+                className={`rounded-lg py-2 transition ${
+                  mode === 'signup'
+                    ? 'bg-white text-brand-dark shadow-sm'
+                    : 'text-brand-cream/70 hover:text-white'
+                }`}
+              >
+                Create Account
+              </button>
+            </div>
           </div>
 
           <div className="p-6 sm:p-8">
@@ -61,13 +128,51 @@ export default function LoginPage() {
             <div className="relative my-6 text-center">
               <hr className="border-brand-dark/10" />
               <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-xs font-medium text-brand-dark/40">
-                or sign in with email
+                {mode === 'signin' ? 'or sign in with email' : 'or register with email'}
               </span>
             </div>
 
+            {/* Error & Success Feedback Alerts */}
+            {errorMessage && (
+              <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-brand-alert/30 bg-brand-alert/10 p-3 text-xs text-brand-alert">
+                <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+
+            {successMessage && (
+              <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-brand-sage/30 bg-brand-sage/10 p-3 text-xs text-brand-sage">
+                <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" />
+                <span>{successMessage}</span>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
+              {mode === 'signup' && (
+                <div>
+                  <label
+                    htmlFor="fullName"
+                    className="mb-1 block text-xs font-bold uppercase tracking-wider text-brand-dark/70"
+                  >
+                    Your Full Name
+                  </label>
+                  <input
+                    id="fullName"
+                    type="text"
+                    placeholder="e.g. Maria Santos"
+                    required
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="w-full rounded-xl border border-brand-dark/15 bg-brand-cream/20 px-3.5 py-2.5 text-sm text-brand-dark placeholder:text-brand-dark/30 focus:border-brand-sage focus:outline-none focus:ring-2 focus:ring-brand-sage/20"
+                  />
+                </div>
+              )}
+
               <div>
-                <label htmlFor="email" className="mb-1 block text-xs font-bold uppercase tracking-wider text-brand-dark/70">
+                <label
+                  htmlFor="email"
+                  className="mb-1 block text-xs font-bold uppercase tracking-wider text-brand-dark/70"
+                >
                   Email Address
                 </label>
                 <input
@@ -82,14 +187,18 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <label htmlFor="password" className="mb-1 block text-xs font-bold uppercase tracking-wider text-brand-dark/70">
+                <label
+                  htmlFor="password"
+                  className="mb-1 block text-xs font-bold uppercase tracking-wider text-brand-dark/70"
+                >
                   Password
                 </label>
                 <input
                   id="password"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder="At least 6 characters"
                   required
+                  minLength={6}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full rounded-xl border border-brand-dark/15 bg-brand-cream/20 px-3.5 py-2.5 text-sm text-brand-dark placeholder:text-brand-dark/30 focus:border-brand-sage focus:outline-none focus:ring-2 focus:ring-brand-sage/20"
@@ -98,15 +207,29 @@ export default function LoginPage() {
 
               <button
                 type="submit"
-                className="w-full rounded-xl bg-brand-dark px-4 py-3 text-sm font-bold text-white shadow-md transition hover:bg-brand-dark/90"
+                disabled={isSubmitting}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-dark px-4 py-3 text-sm font-bold text-white shadow-md transition hover:bg-brand-dark/90 disabled:opacity-60"
               >
-                Sign In
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin text-white" />
+                    <span>Processing...</span>
+                  </>
+                ) : mode === 'signin' ? (
+                  'Sign In'
+                ) : (
+                  'Create Account'
+                )}
               </button>
             </form>
 
             <div className="mt-6 flex items-center justify-center gap-2 text-xs text-brand-dark/50">
               <ShieldCheck className="h-3.5 w-3.5 text-brand-sage" />
-              <span>Offline-ready browser storage enabled</span>
+              <span>
+                {isSupabaseConfigured
+                  ? 'Secured with Supabase Auth & PostgreSQL RLS'
+                  : 'Offline-ready browser storage enabled'}
+              </span>
             </div>
           </div>
         </div>
