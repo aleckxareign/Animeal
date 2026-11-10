@@ -10,7 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-brand-sage text-white shadow-sm hover:bg-brand-sage/90 active:scale-[0.98]",
+          "bg-brand-dark text-white shadow-sm hover:bg-brand-sage/90 active:scale-[0.98]",
         primary:
           "bg-brand-sage text-white shadow-sm hover:bg-brand-sage/90 active:scale-[0.98]",
         secondary:

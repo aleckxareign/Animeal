@@ -53,6 +53,70 @@ const defaultState: AppState = {
   customFoods: [],
 }
 
+const previewDate = new Date()
+const previewFeedingTime = new Date(previewDate)
+previewFeedingTime.setHours(8, 30, 0, 0)
+const previewState: AppState = {
+  pets: [{
+    id: 'preview-bruno',
+    name: 'Bruno',
+    species: 'dog',
+    breed: 'Golden Retriever',
+    weight: 12,
+    age: 24,
+    neutered: true,
+    lifeStage: 'adult',
+    avatarEmoji: '🐕',
+    dailyCalorieTarget: 720,
+    waterGoal: 600,
+    createdAt: previewDate.toISOString(),
+  }],
+  activePetId: 'preview-bruno',
+  feedingLog: [{
+    id: 'preview-feeding',
+    petId: 'preview-bruno',
+    foodId: 'dog-ped-adult',
+    foodName: 'Pedigree Adult Chicken & Vegetables',
+    portion: 156,
+    unit: 'g',
+    calories: 540,
+    protein: 38,
+    fat: 18,
+    fiber: 9,
+    fedBy: 'Maria',
+    timestamp: previewFeedingTime.toISOString(),
+  }],
+  waterLogs: [{
+    id: 'preview-water',
+    petId: 'preview-bruno',
+    amount: 450,
+    timestamp: previewDate.toISOString(),
+  }],
+  weightLogs: [{
+    id: 'preview-weight',
+    petId: 'preview-bruno',
+    weight: 12.4,
+    date: previewDate.toISOString().slice(0, 10),
+    notes: 'Healthy active weight',
+  }],
+  tasks: [{
+    id: 'preview-deworming',
+    petId: 'preview-bruno',
+    type: 'deworming',
+    title: 'Deworming Booster',
+    frequency: 'monthly',
+    time: '09:00',
+    dueDate: new Date(previewDate.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+    completed: false,
+    createdAt: previewDate.toISOString(),
+  }],
+  household: [
+    { id: 'preview-owner', name: 'Me', color: '#44632f', isOwner: true },
+    { id: 'preview-maria', name: 'Maria', color: '#164040', isOwner: false },
+  ],
+  customFoods: [],
+}
+
 // ───────── Context type ─────────
 type AppContextType = AppState & {
   activePet: Pet | null
@@ -90,19 +154,21 @@ type AppContextType = AppState & {
 const AppContext = createContext<AppContextType | null>(null)
 
 // ───────── Provider ─────────
-export function AppProvider({ children }: { children: ReactNode }) {
+export function AppProvider({ children, preview = false }: { children: ReactNode; preview?: boolean }) {
   const { user } = useAuth()
   const [state, setState] = useState<AppState>(() =>
-    loadFromStorage('app-state', defaultState),
+    preview ? previewState : loadFromStorage('app-state', defaultState),
   )
 
   // Persist on every state change to local storage
   useEffect(() => {
+    if (preview) return
     saveToStorage('app-state', state)
-  }, [state])
+  }, [state, preview])
 
   // Sync with Supabase (Primary) or Express backend (Secondary)
   useEffect(() => {
+    if (preview) return
     let cancelled = false
 
     async function syncData() {
@@ -184,7 +250,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true
     }
-  }, [user?.id])
+  }, [user?.id, preview])
 
   const activePet =
     state.pets.find((p) => p.id === state.activePetId) ?? state.pets[0] ?? null

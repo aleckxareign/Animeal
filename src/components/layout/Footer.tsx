@@ -19,19 +19,30 @@ const more = [
 
 export default function Footer() {
   return (
-    <footer className="bg-brand-dark text-white">
-      <div className="mx-auto grid max-w-[1600px] gap-12 px-4 sm:px-8 lg:px-12 py-16 md:grid-cols-[2.5fr_1fr_1fr]">
-        {/* Brand and social links */}
+    <footer className="relative overflow-hidden bg-brand-dark text-white">
+
+      {/* Decorative Footer Watermark */}
+      <img
+        src="/images/footer-logo.svg"
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-10 -right-2 w-64 select-none opacity-50 sm:w-80 lg:w-[375px]"
+      />
+
+      {/* Main Footer Content */}
+      <div className="relative z-9 mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-8 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr] lg:px-10">
+
+        {/* Brand and Social Links */}
         <div>
-          <Link to="/" className="inline-flex items-center group py-0.5">
+          <Link to="/" className="group inline-flex items-center py-0.5">
             <img
               src="/images/logo-white.svg"
               alt="AniMeal"
-              className="h-11 sm:h-12 w-auto transition-transform group-hover:scale-[1.02]"
+              className="h-14 w-auto transition-transform group-hover:scale-[1.02] sm:h-16"
             />
           </Link>
 
-          <p className="mt-4 max-w-md text-base text-white/80 leading-relaxed">
+          <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/80">
             Helping Filipino pet parents make smarter choices for their pets'
             nutrition, health, and happiness.
           </p>
@@ -71,13 +82,19 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Explore links */}
+        {/* Explore Links */}
         <div>
-          <h3 className="mb-4 font-bold text-base sm:text-lg text-brand-cream uppercase tracking-wider">Explore</h3>
-          <ul className="space-y-3 text-base text-white/80">
+          <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-brand-cream sm:text-sm">
+            Explore
+          </h3>
+
+          <ul className="space-y-2 text-sm text-white/80">
             {explore.map((l) => (
               <li key={l.label}>
-                <Link to={l.to} className="transition hover:text-white hover:underline">
+                <Link
+                  to={l.to}
+                  className="transition hover:text-white hover:underline"
+                >
                   {l.label}
                 </Link>
               </li>
@@ -85,13 +102,19 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* More links */}
+        {/* More Links */}
         <div>
-          <h3 className="mb-4 font-bold text-base sm:text-lg text-brand-cream uppercase tracking-wider">More</h3>
-          <ul className="space-y-3 text-base text-white/80">
+          <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-brand-cream sm:text-sm">
+            More
+          </h3>
+
+          <ul className="space-y-2 text-sm text-white/80">
             {more.map((l) => (
               <li key={l.label}>
-                <Link to={l.to} className="transition hover:text-white hover:underline">
+                <Link
+                  to={l.to}
+                  className="transition hover:text-white hover:underline"
+                >
                   {l.label}
                 </Link>
               </li>
@@ -101,10 +124,13 @@ export default function Footer() {
       </div>
 
       {/* Copyright */}
-      <div className="border-t border-white/15">
-        <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-3 px-4 sm:px-8 lg:px-12 py-5 text-sm text-white/70">
-          <p>© {new Date().getFullYear()} Animeal. All Rights Reserved</p>
-          <p className="flex items-center gap-3">
+      <div className="relative z-10 border-t border-white/15">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-sm text-white/70 sm:px-8 lg:px-10">
+          <p>
+            © {new Date().getFullYear()} Animeal. All Rights Reserved
+          </p>
+
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <span>Privacy Policy</span>
             <span>•</span>
             <span>Terms of Use</span>
