@@ -5,6 +5,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { GoogleGenAI } from '@google/genai'
+import helmet from 'helmet'
+import rateLimit from 'express-rate-limit'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -12,12 +14,133 @@ const __dirname = path.dirname(__filename)
 const app = express()
 const PORT = process.env.PORT || 3001
 
-app.use(cors())
-app.use(express.json({ limit: '15mb' }))
+// ── 1. SECURITY HEADERS (Helmet) ──
+const isProduction = process.env.NODE_ENV === 'production'
+
+app.use(
+  helmet({
+    // Enable CSP only in production (Vite HMR needs loosened rules in dev)
+    contentSecurityPolicy: isProduction
+      ? {
+          directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            imgSrc: ["'self'", 'data:', 'https:'],
+            connectSrc: ["'self'", 'https://*.supabase.co', 'https://generativelanguage.googleapis.com'],
+            fontSrc: ["'self'", 'https:', 'data:'],
+            objectSrc: ["'none'"],
+            upgradeInsecureRequests: [],
+          },
+        }
+      : false,
+    crossOriginEmbedderPolicy: false,
+    // Enforce HSTS in production
+    strictTransportSecurity: isProduction
+      ? { maxAge: 31536000, includeSubDomains: true }
+      : false,
+  })
+)
+
+// ── Disable X-Powered-By to avoid fingerprinting ──
+app.disable('x-powered-by')
+
+// ── 2. CORS STRICT ORIGIN RESTRICTION ──
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:3000',
+  process.env.FRONTEND_URL,
+].filter(Boolean)
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile curl, internal health checks)
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true)
+      }
+      return callback(new Error('CORS policy: Access blocked from unauthorized origin.'))
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+)
+
+// ── 3. RATE LIMITING ──
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200, // 200 requests per window
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please try again in 15 minutes.' },
+})
+
+const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 30, // 30 AI requests per 15 minutes
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: 'Masyadong mabilis ang AI requests! Paki-subukan ulit makalipas ang ilang minuto.',
+    fallback: true,
+  },
+})
+
+app.use('/api', generalLimiter)
+app.use('/api/ai', aiLimiter)
+
+app.use(express.json({ limit: '10mb' }))
+
+// ── 4. Secure Cookies helper (used if session cookies ever needed) ──
+// Sessions are JWT-based via Supabase; cookies are set by Supabase client-side.
+// If you ever set server-side cookies, always use:
+// res.cookie('name', value, { httpOnly: true, secure: isProduction, sameSite: 'strict' })
+
+// ── 5. Disable debug-mode info leakage ──
+if (!isProduction) {
+  console.info('⚠️  Running in DEVELOPMENT mode. Set NODE_ENV=production before deploying.')
+}
 
 // Database file path
 const DATA_DIR = path.join(__dirname, 'data')
 const DB_FILE = path.join(DATA_DIR, 'db.json')
+
+// ── 6. INPUT SANITIZATION HELPERS ──
+/**
+ * Strip HTML tags and control characters from a string to prevent XSS/injection.
+ * Since Express JSON bodies go into a JSON file (not SQL), the main risk is stored XSS
+ * if any value is later rendered via innerHTML. Strip tags as a defence-in-depth measure.
+ */
+function sanitizeString(value, maxLen = 500) {
+  if (typeof value !== 'string') return value
+  return value
+    .replace(/<[^>]*>/g, '')          // strip HTML tags
+    .replace(/[^\x09\x0A\x0D\x20-\uFFFF]/g, '') // strip control chars
+    .trim()
+    .slice(0, maxLen)
+}
+
+function sanitizePet(pet) {
+  if (!pet || typeof pet !== 'object') return pet
+  return {
+    ...pet,
+    name: sanitizeString(pet.name, 100),
+    breed: sanitizeString(pet.breed, 100),
+    notes: sanitizeString(pet.notes, 1000),
+  }
+}
+
+function sanitizeFeeding(feeding) {
+  if (!feeding || typeof feeding !== 'object') return feeding
+  return {
+    ...feeding,
+    foodName: sanitizeString(feeding.foodName, 200),
+    fedBy: sanitizeString(feeding.fedBy, 100),
+    notes: sanitizeString(feeding.notes, 500),
+  }
+}
 
 // Ensure data directory exists
 if (!fs.existsSync(DATA_DIR)) {
@@ -494,6 +617,15 @@ ${petCtx}`
 
 app.post('/api/ai/chat', async (req, res) => {
   const { message, history = [], pet } = req.body
+
+  // Input Sanitization & Validation
+  if (!message || typeof message !== 'string' || message.trim().length === 0) {
+    return res.status(400).json({ error: 'Message cannot be empty.' })
+  }
+  if (message.length > 2000) {
+    return res.status(400).json({ error: 'Message is too long (maximum 2,000 characters).' })
+  }
+
   const ai = getGeminiClient()
 
   if (!ai) {
@@ -538,17 +670,23 @@ app.post('/api/ai/chat', async (req, res) => {
 
 app.post('/api/ai/scan', async (req, res) => {
   const { imageBase64, mimeType = 'image/jpeg' } = req.body
+
+  if (!imageBase64 || typeof imageBase64 !== 'string') {
+    return res.status(400).json({ error: 'Missing or invalid imageBase64 in request body.' })
+  }
+
+  // Allowed MIME types whitelist
+  const allowedMime = ['image/jpeg', 'image/png', 'image/webp']
+  if (!allowedMime.includes(mimeType)) {
+    return res.status(400).json({ error: 'Unsupported file format. Please upload JPG, PNG, or WebP.' })
+  }
+
+  // Size cap verification (base64 string length <= ~14MB equates to ~10MB file)
+  if (imageBase64.length > 14 * 1024 * 1024) {
+    return res.status(413).json({ error: 'Image exceeds maximum 10MB file upload limit.' })
+  }
+
   const ai = getGeminiClient()
-
-  if (!ai) {
-    return res.status(503).json({
-      error: 'GEMINI_API_KEY is not configured on the backend server.',
-    })
-  }
-
-  if (!imageBase64) {
-    return res.status(400).json({ error: 'Missing imageBase64 in request body' })
-  }
 
   try {
     const cleanBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, '')
@@ -598,6 +736,14 @@ Extract the guaranteed analysis and details into ONLY a valid raw JSON object (n
     console.error('Server Gemini scan error:', err)
     res.status(500).json({ error: err.message || 'Failed to scan image with Gemini' })
   }
+})
+
+// Global error handling middleware (avoids leaking stack traces in production)
+app.use((err, req, res, _next) => {
+  console.error('API Error:', err.message)
+  res.status(err.status || 500).json({
+    error: process.env.NODE_ENV === 'production' ? 'An unexpected server error occurred.' : err.message,
+  })
 })
 
 // Start Express Server

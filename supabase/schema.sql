@@ -24,10 +24,16 @@ BEGIN
   INSERT INTO public.profiles (id, email, full_name, avatar_url)
   VALUES (
     NEW.id,
-    NEW.email,
-    NEW.raw_user_meta_data->>'full_name',
-    NEW.raw_user_meta_data->>'avatar_url'
-  );
+    COALESCE(NEW.email, ''),
+    COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(COALESCE(NEW.email, ''), '@', 1), 'Pet Parent'),
+    COALESCE(NEW.raw_user_meta_data->>'avatar_url', '')
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    email = EXCLUDED.email,
+    full_name = COALESCE(EXCLUDED.full_name, public.profiles.full_name),
+    avatar_url = COALESCE(EXCLUDED.avatar_url, public.profiles.avatar_url);
+  RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -134,6 +140,46 @@ CREATE TABLE IF NOT EXISTS public.weight_logs (
   logged_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- 9. Shared Household Members Table
+CREATE TABLE IF NOT EXISTS public.household_members (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  color TEXT DEFAULT '#44632f',
+  is_owner BOOLEAN DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 10. Ask Mealie AI Chat Conversations Table
+CREATE TABLE IF NOT EXISTS public.chat_conversations (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  pet_id UUID REFERENCES public.pets(id) ON DELETE SET NULL,
+  title TEXT NOT NULL DEFAULT 'Chat with Mealie',
+  messages JSONB NOT NULL DEFAULT '[]'::jsonb,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 11. Veterinary Clinics Directory Table
+CREATE TABLE IF NOT EXISTS public.vets (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  address TEXT NOT NULL,
+  city TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  distance TEXT DEFAULT '2.0 km',
+  latitude NUMERIC(9, 6),
+  longitude NUMERIC(9, 6),
+  emergency BOOLEAN DEFAULT false,
+  open_now BOOLEAN DEFAULT true,
+  hours TEXT DEFAULT '8:00 AM – 8:00 PM',
+  services TEXT[] DEFAULT '{"General Checkup", "Vaccination"}',
+  rating NUMERIC(3, 1) DEFAULT 4.8,
+  verified BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- ==============================================================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
 -- Ensures users can only view and update their own pets and logs
@@ -146,10 +192,16 @@ ALTER TABLE public.foods ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.care_tasks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.hydration_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.weight_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.household_members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.chat_conversations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.vets ENABLE ROW LEVEL SECURITY;
 
--- Profiles: Users can view and edit their own profile
+-- Profiles: Users can view, insert, and edit their own profile
 CREATE POLICY "Users can view own profile" ON public.profiles
   FOR SELECT USING (auth.uid() = id);
+
+CREATE POLICY "Users can insert own profile" ON public.profiles
+  FOR INSERT WITH CHECK (auth.uid() = id);
 
 CREATE POLICY "Users can update own profile" ON public.profiles
   FOR UPDATE USING (auth.uid() = id);
@@ -190,4 +242,16 @@ CREATE POLICY "Users can manage hydration" ON public.hydration_logs
 
 CREATE POLICY "Users can manage weight logs" ON public.weight_logs
   FOR ALL USING (auth.uid() = user_id);
+
+-- Household Members: Users can manage their own household roster
+CREATE POLICY "Users can manage household members" ON public.household_members
+  FOR ALL USING (auth.uid() = user_id);
+
+-- Chat Conversations: Users can view and manage their Mealie chat sessions
+CREATE POLICY "Users can manage chat conversations" ON public.chat_conversations
+  FOR ALL USING (auth.uid() = user_id);
+
+-- Vets Directory: Globally readable directory
+CREATE POLICY "Anyone can view vets directory" ON public.vets
+  FOR SELECT USING (true);
 

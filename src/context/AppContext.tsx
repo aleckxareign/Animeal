@@ -139,6 +139,7 @@ type AppContextType = AppState & {
   getWeightHistory: (petId: string) => WeightLog[]
   // Task actions
   addTask: (task: Omit<ScheduleTask, 'id' | 'completed' | 'createdAt'>) => void
+  updateTask: (id: string, updates: Partial<ScheduleTask>) => void
   completeTask: (id: string, completedBy?: string) => void
   snoozeTask: (id: string, until: string) => void
   removeTask: (id: string) => void
@@ -175,13 +176,14 @@ export function AppProvider({ children, preview = false }: { children: ReactNode
       // 1. If Supabase is configured and a real authenticated user is signed in
       if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
         try {
-          const [dbPets, dbFeedings, dbFoods, dbWater, dbWeight, dbTasks] = await Promise.all([
+          const [dbPets, dbFeedings, dbFoods, dbWater, dbWeight, dbTasks, dbHousehold] = await Promise.all([
             supabaseDb.getPets(user.id),
             supabaseDb.getFeedings(user.id),
             supabaseDb.getFoods(user.id),
             supabaseDb.getHydrationLogs(user.id),
             supabaseDb.getWeightLogs(user.id),
             supabaseDb.getCareTasks(user.id),
+            supabaseDb.getHouseholdMembers(user.id),
           ])
 
           if (cancelled) return
@@ -195,6 +197,13 @@ export function AppProvider({ children, preview = false }: { children: ReactNode
             waterLogs: dbWater.length > 0 ? dbWater : prev.waterLogs,
             weightLogs: dbWeight.length > 0 ? dbWeight : prev.weightLogs,
             tasks: dbTasks.length > 0 ? dbTasks : prev.tasks,
+            household:
+              dbHousehold.length > 0
+                ? [
+                    prev.household.find((h) => h.isOwner) || { id: 'owner', name: user?.fullName || 'Me', color: '#44632f', isOwner: true },
+                    ...dbHousehold.filter((h) => !h.isOwner),
+                  ]
+                : prev.household,
           }))
           return
         } catch (err) {
@@ -552,6 +561,17 @@ export function AppProvider({ children, preview = false }: { children: ReactNode
     [user?.id],
   )
 
+  const updateTask = useCallback((id: string, updates: Partial<ScheduleTask>) => {
+    setState((s) => ({
+      ...s,
+      tasks: s.tasks.map((t) => (t.id === id ? { ...t, ...updates } : t)),
+    }))
+
+    if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+      supabaseDb.updateCareTask(id, updates as any).catch(() => {})
+    }
+  }, [user?.id])
+
   const completeTask = useCallback((id: string, completedBy?: string) => {
     setState((s) => ({
       ...s,
@@ -611,27 +631,43 @@ export function AppProvider({ children, preview = false }: { children: ReactNode
   // ── Household actions ──
   const addMember = useCallback((name: string) => {
     const colors = ['#44632f', '#164040', '#b5432f', '#8b6914', '#6b21a8', '#0e7490']
+    const memberColor = colors[state.household.length % colors.length]
+    const tempMember = {
+      id: generateId(),
+      name,
+      color: memberColor,
+      isOwner: false,
+    }
+
     setState((s) => ({
       ...s,
-      household: [
-        ...s.household,
-        {
-          id: generateId(),
-          name,
-          color: colors[s.household.length % colors.length],
-          isOwner: false,
-        },
-      ],
+      household: [...s.household, tempMember],
     }))
+
+    if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+      supabaseDb.addHouseholdMember(user.id, name, memberColor, false).then((created) => {
+        if (created) {
+          setState((s) => ({
+            ...s,
+            household: s.household.map((h) => (h.id === tempMember.id ? created : h)),
+          }))
+        }
+      }).catch(() => {})
+    }
+
     api.addHouseholdMember(name).catch(() => {})
-  }, [])
+  }, [state.household.length, user?.id])
 
   const removeMember = useCallback((id: string) => {
     setState((s) => ({
       ...s,
       household: s.household.filter((m) => m.id !== id || m.isOwner),
     }))
-  }, [])
+
+    if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+      supabaseDb.removeHouseholdMember(id).catch(() => {})
+    }
+  }, [user?.id])
 
   // ── Custom food actions ──
   const addCustomFood = useCallback(
@@ -685,6 +721,7 @@ export function AppProvider({ children, preview = false }: { children: ReactNode
         removeWeightLog,
         getWeightHistory,
         addTask,
+        updateTask,
         completeTask,
         snoozeTask,
         removeTask,

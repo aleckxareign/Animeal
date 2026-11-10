@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import type { ReactNode } from 'react'
 import type { User, Session } from '@supabase/supabase-js'
-import { isSupabaseConfigured } from '../lib/supabase'
+import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import { supabaseAuth } from '../services/supabase-auth'
 
 export type AuthUser = {
@@ -20,8 +20,10 @@ type AuthContextType = {
   login: () => void
   logout: () => Promise<void>
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>
-  signUp: (email: string, password: string, fullName?: string) => Promise<{ error: Error | null }>
+  signUp: (email: string, password: string, fullName?: string) => Promise<{ error: Error | null; needsEmailConfirmation?: boolean }>
+  signInWithGoogle: () => Promise<{ error: Error | null }>
   demoLogin: () => void
+  updateProfile: (updates: { fullName?: string; avatarUrl?: string }) => Promise<{ error: Error | null }>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -57,9 +59,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               email: activeSession.user.email || '',
               fullName:
                 activeSession.user.user_metadata?.full_name ||
+                activeSession.user.user_metadata?.name ||
                 activeSession.user.email?.split('@')[0] ||
                 'Pet Parent',
-              avatarUrl: activeSession.user.user_metadata?.avatar_url,
+              avatarUrl:
+                activeSession.user.user_metadata?.avatar_url ||
+                activeSession.user.user_metadata?.picture,
             })
           } else if (localStorage.getItem('animeal-demo-session') === 'true') {
             setUser(DEMO_USER)
@@ -93,9 +98,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           email: authUser.email || '',
           fullName:
             authUser.user_metadata?.full_name ||
+            authUser.user_metadata?.name ||
             authUser.email?.split('@')[0] ||
             'Pet Parent',
-          avatarUrl: authUser.user_metadata?.avatar_url,
+          avatarUrl:
+            authUser.user_metadata?.avatar_url ||
+            authUser.user_metadata?.picture,
         })
         localStorage.removeItem('animeal-demo-session')
       } else if (localStorage.getItem('animeal-demo-session') === 'true') {
@@ -135,7 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true)
     const res = await supabaseAuth.signUp(email, password, fullName)
     setLoading(false)
-    if (!res.error && res.user) {
+    if (!res.error && res.user && res.session) {
       setSession(res.session)
       setRawUser(res.user)
       setUser({
@@ -146,7 +154,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       localStorage.setItem('animeal-logged-in', 'true')
     }
-    return { error: res.error }
+    return { error: res.error, needsEmailConfirmation: !res.session && !res.error }
+  }, [])
+
+  const signInWithGoogle = useCallback(async () => {
+    setLoading(true)
+    const res = await supabaseAuth.signInWithGoogle()
+    if (res.error) {
+      setLoading(false)
+      return { error: res.error }
+    }
+    // Browser redirects to Google consent page on success
+    return { error: null }
   }, [])
 
   const demoLogin = useCallback(() => {
@@ -168,6 +187,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabaseAuth.signOut()
   }, [])
 
+  const updateProfile = useCallback(async (updates: { fullName?: string; avatarUrl?: string }) => {
+    try {
+      setUser((prev) => {
+        if (!prev) return null
+        return {
+          ...prev,
+          fullName: updates.fullName !== undefined ? updates.fullName : prev.fullName,
+          avatarUrl: updates.avatarUrl !== undefined ? updates.avatarUrl : prev.avatarUrl,
+        }
+      })
+
+      if (isSupabaseConfigured && supabase) {
+        const { error } = await supabase.auth.updateUser({
+          data: {
+            full_name: updates.fullName,
+            avatar_url: updates.avatarUrl,
+          },
+        })
+        if (error) return { error }
+      }
+      return { error: null }
+    } catch (err: unknown) {
+      return { error: err instanceof Error ? err : new Error(String(err)) }
+    }
+  }, [])
+
   const isLoggedIn = Boolean(user)
 
   return (
@@ -182,7 +227,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         signIn,
         signUp,
+        signInWithGoogle,
         demoLogin,
+        updateProfile,
       }}
     >
       {children}

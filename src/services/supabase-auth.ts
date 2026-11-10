@@ -75,6 +75,35 @@ export const supabaseAuth = {
   },
 
   /**
+   * Sign in or Sign up with Google OAuth via Supabase
+   * Works for both existing users (Sign In) and new users (Sign Up)
+   */
+  async signInWithGoogle(): Promise<{ error: AuthError | Error | null }> {
+    if (!isSupabaseConfigured) {
+      return {
+        error: new Error(
+          'Supabase is not configured yet. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env'
+        ),
+      }
+    }
+
+    const redirectTo = `${window.location.origin}/`
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    })
+
+    return { error }
+  },
+
+  /**
    * Sign out the active user session
    */
   async signOut(): Promise<{ error: Error | null }> {

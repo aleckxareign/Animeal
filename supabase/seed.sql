@@ -345,3 +345,138 @@ INSERT INTO public.foods (
 )
 ON CONFLICT DO NOTHING;
 
+-- 2. Insert Philippine Veterinary Clinics Directory
+INSERT INTO public.vets (
+  name,
+  address,
+  city,
+  phone,
+  distance,
+  emergency,
+  open_now,
+  hours,
+  services,
+  rating
+) VALUES
+(
+  'VetLink Animal Clinic',
+  '123 Katipunan Ave, Loyola Heights',
+  'Quezon City',
+  '(02) 8426-1234',
+  '1.2 km',
+  true,
+  true,
+  '8:00 AM – 10:00 PM',
+  ARRAY['Surgery', 'Vaccination', 'Dental', 'Emergency'],
+  4.8
+),
+(
+  'Paws & Claws Veterinary Center',
+  '456 Tomas Morato Ave, South Triangle',
+  'Quezon City',
+  '(02) 8332-5678',
+  '2.5 km',
+  false,
+  true,
+  '9:00 AM – 6:00 PM',
+  ARRAY['Vaccination', 'Grooming', 'Dental'],
+  4.5
+),
+(
+  'Animal House Veterinary Clinic',
+  '789 Shaw Blvd, Pleasant Hills',
+  'Mandaluyong',
+  '(02) 8534-9012',
+  '3.8 km',
+  true,
+  true,
+  'Open 24 hours',
+  ARRAY['Emergency', 'Surgery', 'ICU', 'Laboratory'],
+  4.9
+),
+(
+  'Happy Tails Pet Clinic',
+  '321 Marcos Highway, Santolan',
+  'Pasig',
+  '(02) 8645-3456',
+  '4.1 km',
+  false,
+  false,
+  '8:00 AM – 5:00 PM',
+  ARRAY['Vaccination', 'Deworming', 'Spay/Neuter'],
+  4.3
+),
+(
+  'Dr. Pet Veterinary Hospital',
+  '654 Ortigas Ave Extension',
+  'Cainta',
+  '(02) 8682-7890',
+  '5.3 km',
+  true,
+  true,
+  'Open 24 hours',
+  ARRAY['Emergency', 'Surgery', 'Boarding', 'Vaccination'],
+  4.7
+),
+(
+  'Furever Friends Vet Clinic',
+  '987 Commonwealth Ave, Batasan Hills',
+  'Quezon City',
+  '(02) 8926-0123',
+  '5.8 km',
+  false,
+  true,
+  '9:00 AM – 7:00 PM',
+  ARRAY['Vaccination', 'Grooming', 'Dental', 'Laboratory'],
+  4.4
+),
+(
+  'Pet Care Wellness Center',
+  '147 Makati Ave, Poblacion',
+  'Makati',
+  '(02) 8856-4567',
+  '6.2 km',
+  true,
+  true,
+  '7:00 AM – 11:00 PM',
+  ARRAY['Emergency', 'Vaccination', 'Dermatology', 'Surgery'],
+  4.6
+),
+(
+  'Whiskers & Wags Animal Hospital',
+  '258 Alabang-Zapote Rd, Almanza',
+  'Las Piñas',
+  '(02) 8801-8901',
+  '12.5 km',
+  false,
+  true,
+  '8:00 AM – 6:00 PM',
+  ARRAY['Vaccination', 'Spay/Neuter', 'X-Ray'],
+  4.2
+),
+(
+  'Metro Vet Specialists',
+  '369 Quezon Ave, Brgy. Paltok',
+  'Quezon City',
+  '(02) 8712-2345',
+  '3.0 km',
+  true,
+  false,
+  '8:00 AM – 8:00 PM',
+  ARRAY['Surgery', 'Oncology', 'Cardiology', 'Emergency'],
+  4.8
+),
+(
+  'Buddy Animal Clinic',
+  '42 Gen. Luna St, Brgy. Kapitolyo',
+  'Pasig',
+  '(02) 8637-6789',
+  '4.7 km',
+  false,
+  true,
+  '9:00 AM – 5:00 PM',
+  ARRAY['Vaccination', 'Deworming', 'Grooming'],
+  4.1
+)
+ON CONFLICT DO NOTHING;
+

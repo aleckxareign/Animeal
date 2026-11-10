@@ -115,6 +115,7 @@ export type ScheduleTask = {
   completedAt?: string
   snoozedUntil?: string
   createdAt: string
+  assignedTo?: string
 }
 
 // ===== Household types =====
@@ -123,6 +124,19 @@ export type HouseholdMember = {
   name: string
   color: string
   isOwner: boolean
+  role?: 'owner' | 'admin' | 'caregiver' | 'sitter'
+  email?: string
+  status?: 'active' | 'invited'
+  avatarUrl?: string
+}
+
+export type HouseholdInvitation = {
+  id: string
+  email: string
+  role: 'admin' | 'caregiver' | 'sitter'
+  invitedAt: string
+  invitedBy: string
+  status: 'pending' | 'accepted' | 'declined'
 }
 
 // ===== Chat types =====
@@ -142,17 +156,21 @@ export type ChatAction = {
 
 // ===== Vet types =====
 export type Vet = {
-  id: number
+  id: number | string
   name: string
   address: string
   city: string
   phone: string
   distance: string
+  distanceKm?: number
+  latitude?: number
+  longitude?: number
   emergency: boolean
   openNow: boolean
   hours?: string
   services?: string[]
   rating?: number
+  verified?: boolean
 }
 
 // ─── Pet Profile (used for AI context) ─────────────────────────

@@ -7,6 +7,8 @@ import type {
   WeightLog,
   ScheduleTask,
   PortionUnit,
+  HouseholdMember,
+  Vet,
 } from '../types'
 
 /**
@@ -605,6 +607,208 @@ export const supabaseDb = {
       return true
     } catch (err) {
       console.error('Failed to delete care task from Supabase:', err)
+      return false
+    }
+  },
+
+  // =========================================================================
+  // 7. SHARED HOUSEHOLD MEMBERS
+  // =========================================================================
+
+  async getHouseholdMembers(userId: string): Promise<HouseholdMember[]> {
+    if (!isSupabaseConfigured || !userId) return []
+    try {
+      const { data, error } = await supabase
+        .from('household_members')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: true })
+
+      if (error) throw error
+      if (!data) return []
+
+      return data.map((row) => ({
+        id: row.id,
+        name: row.name,
+        color: row.color || '#44632f',
+        isOwner: Boolean(row.is_owner),
+      }))
+    } catch (err) {
+      console.error('Failed to load household members from Supabase:', err)
+      return []
+    }
+  },
+
+  async addHouseholdMember(
+    userId: string,
+    name: string,
+    color = '#44632f',
+    isOwner = false
+  ): Promise<HouseholdMember | null> {
+    if (!isSupabaseConfigured || !userId) return null
+    try {
+      const { data, error } = await supabase
+        .from('household_members')
+        .insert({
+          user_id: userId,
+          name,
+          color,
+          is_owner: isOwner,
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+      if (!data) return null
+
+      return {
+        id: data.id,
+        name: data.name,
+        color: data.color,
+        isOwner: data.is_owner,
+      }
+    } catch (err) {
+      console.error('Failed to add household member in Supabase:', err)
+      return null
+    }
+  },
+
+  async removeHouseholdMember(id: string): Promise<boolean> {
+    if (!isSupabaseConfigured || !id) return false
+    try {
+      const { error } = await supabase.from('household_members').delete().eq('id', id)
+      if (error) throw error
+      return true
+    } catch (err) {
+      console.error('Failed to remove household member from Supabase:', err)
+      return false
+    }
+  },
+
+  // =========================================================================
+  // 8. ASK MEALIE AI CHAT CONVERSATIONS
+  // =========================================================================
+
+  async getChatConversation(userId: string, petId?: string): Promise<unknown[] | null> {
+    if (!isSupabaseConfigured || !userId) return null
+    try {
+      let query = supabase
+        .from('chat_conversations')
+        .select('*')
+        .eq('user_id', userId)
+        .order('updated_at', { ascending: false })
+
+      if (petId) query = query.eq('pet_id', petId)
+
+      const { data, error } = await query.limit(1).maybeSingle()
+      if (error || !data) return null
+      return Array.isArray(data.messages) ? data.messages : null
+    } catch (err) {
+      console.error('Failed to load chat from Supabase:', err)
+      return null
+    }
+  },
+
+  async saveChatConversation(
+    userId: string,
+    messages: unknown[],
+    petId?: string
+  ): Promise<boolean> {
+    if (!isSupabaseConfigured || !userId) return false
+    try {
+      const { error } = await supabase.from('chat_conversations').upsert(
+        {
+          user_id: userId,
+          pet_id: petId || null,
+          title: 'Chat with Mealie',
+          messages,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id' }
+      )
+      if (error) throw error
+      return true
+    } catch (err) {
+      console.error('Failed to persist chat in Supabase:', err)
+      return false
+    }
+  },
+
+  // =========================================================================
+  // 9. VETERINARY CLINICS DIRECTORY
+  // =========================================================================
+
+  async getVets(): Promise<Vet[]> {
+    if (!isSupabaseConfigured) return []
+    try {
+      const { data, error } = await supabase
+        .from('vets')
+        .select('*')
+        .order('rating', { ascending: false })
+
+      if (error) throw error
+      if (!data || data.length === 0) return []
+
+      return data.map((row, idx) => ({
+        id: row.id || idx + 1,
+        name: row.name,
+        address: row.address,
+        city: row.city,
+        phone: row.phone,
+        distance: row.distance || '2.5 km',
+        latitude: row.latitude ? Number(row.latitude) : undefined,
+        longitude: row.longitude ? Number(row.longitude) : undefined,
+        emergency: Boolean(row.emergency),
+        openNow: Boolean(row.open_now),
+        hours: row.hours || undefined,
+        services: Array.isArray(row.services) ? row.services : ['General Checkup', 'Vaccination'],
+        rating: row.rating ? Number(row.rating) : 4.5,
+        verified: Boolean(row.verified ?? true),
+      }))
+    } catch (err) {
+      console.error('Failed to load vets directory from Supabase:', err)
+      return []
+    }
+  },
+
+  async seedVetsIfEmpty(demoVets: Vet[]): Promise<boolean> {
+    if (!isSupabaseConfigured || !demoVets || demoVets.length === 0) return false
+    try {
+      const { count, error: countErr } = await supabase
+        .from('vets')
+        .select('*', { count: 'exact', head: true })
+
+      if (countErr) {
+        console.warn('Could not check vets count in Supabase:', countErr.message)
+        return false
+      }
+
+      if (count && count > 0) return true // Already seeded
+
+      const rows = demoVets.map((v) => ({
+        name: v.name,
+        address: v.address,
+        city: v.city,
+        phone: v.phone,
+        distance: v.distance,
+        latitude: v.latitude,
+        longitude: v.longitude,
+        emergency: v.emergency,
+        open_now: v.openNow,
+        hours: v.hours,
+        services: v.services,
+        rating: v.rating,
+        verified: v.verified ?? true,
+      }))
+
+      const { error: insertErr } = await supabase.from('vets').insert(rows)
+      if (insertErr) {
+        console.warn('Could not auto-seed vets into Supabase:', insertErr.message)
+        return false
+      }
+      return true
+    } catch (err) {
+      console.warn('Auto-seed exception:', err)
       return false
     }
   },

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import type { DragEvent, ChangeEvent } from 'react'
 import {
   Camera,
@@ -7,11 +7,14 @@ import {
   Info,
   CheckCircle2,
   AlertTriangle,
-  ArrowRight,
   ShieldCheck,
+  X,
+  RefreshCw,
+  AlertCircle,
 } from 'lucide-react'
 import type { Species, FoodCategory, ScanResult } from '../../types'
 import { api } from '../../services/api'
+import { supabaseStorage } from '../../services/supabase-storage'
 
 export type ScannedFoodData = ScanResult & {
   species: Species
@@ -20,86 +23,6 @@ export type ScannedFoodData = ScanResult & {
   sampleLabel?: string
 }
 
-export const SAMPLE_PRESETS: {
-  id: string
-  title: string
-  badge: string
-  species: Species
-  category: FoodCategory
-  highlight: string
-  data: ScannedFoodData
-}[] = [
-  {
-    id: 'sample-pedigree',
-    title: 'Pedigree Adult Dog (Dry)',
-    badge: 'Dog • Adult',
-    species: 'dog',
-    category: 'dry',
-    highlight: '21% Protein • 10% Fat • ₱155',
-    data: {
-      productName: 'Adult Chicken & Vegetables Dry Dog Food',
-      brand: 'Pedigree',
-      species: 'dog',
-      category: 'dry',
-      calories: 345,
-      protein: 21,
-      fat: 10,
-      fiber: 5,
-      moisture: 12,
-      packageWeight: 1500,
-      price: 155,
-      confidence: 'high',
-      sampleLabel: 'Pedigree Adult Chicken & Vegetables Recipe',
-    },
-  },
-  {
-    id: 'sample-whiskas',
-    title: 'Whiskas Mackerel Cat (Dry)',
-    badge: 'Cat • Adult',
-    species: 'cat',
-    category: 'dry',
-    highlight: '30% Protein • 10% Fat • ₱210',
-    data: {
-      productName: 'Mackerel Flavor Adult Cat Dry Food',
-      brand: 'Whiskas',
-      species: 'cat',
-      category: 'dry',
-      calories: 350,
-      protein: 30,
-      fat: 10,
-      fiber: 5,
-      moisture: 12,
-      packageWeight: 1200,
-      price: 210,
-      confidence: 'high',
-      sampleLabel: 'Whiskas Ocean Mackerel Premium Dry Formula',
-    },
-  },
-  {
-    id: 'sample-budget',
-    title: 'Budget Dog Food (Low protein, high fiber)',
-    badge: 'Dog • Economy',
-    species: 'dog',
-    category: 'dry',
-    highlight: '15% Protein • 8.5% Fiber • ₱85',
-    data: {
-      productName: 'Economy Maintenance Formula Dog Kibble',
-      brand: 'BudgetBites',
-      species: 'dog',
-      category: 'dry',
-      calories: 290,
-      protein: 15,
-      fat: 6,
-      fiber: 8.5,
-      moisture: 14,
-      packageWeight: 1500,
-      price: 85,
-      confidence: 'medium',
-      sampleLabel: 'BudgetBites Standard Maintenance Blend',
-    },
-  },
-]
-
 type ScannerUploadProps = {
   onStartScan: (data: ScannedFoodData, previewUrl?: string) => void
 }
@@ -107,8 +30,130 @@ type ScannerUploadProps = {
 export default function ScannerUpload({ onStartScan }: ScannerUploadProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const [isCameraOpen, setIsCameraOpen] = useState(false)
+  const [cameraError, setCameraError] = useState<string | null>(null)
+  const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment')
+  const [isCapturing, setIsCapturing] = useState(false)
+
   const cameraInputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+
+  // Stop camera tracks cleanly
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop())
+      streamRef.current = null
+    }
+  }
+
+  // Start live camera stream
+  const startCamera = async (mode: 'environment' | 'user' = facingMode) => {
+    stopCamera()
+    setCameraError(null)
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setCameraError('Camera access is not supported on this browser. Please upload a photo instead.')
+      return
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: mode },
+          width: { ideal: 1920, min: 640 },
+          height: { ideal: 1080, min: 480 },
+        },
+        audio: false,
+      })
+
+      streamRef.current = stream
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+        await videoRef.current.play()
+      }
+    } catch (err: unknown) {
+      console.warn('Camera stream error:', err)
+      const errorMsg =
+        err instanceof Error && err.name === 'NotAllowedError'
+          ? 'Camera permission denied. Please allow camera permissions in your browser address bar.'
+          : 'Unable to start camera. Please ensure no other app is using your webcam, or upload an image.'
+      setCameraError(errorMsg)
+    }
+  }
+
+  // Clean up media stream on unmount
+  useEffect(() => {
+    return () => {
+      stopCamera()
+    }
+  }, [])
+
+  // Open camera modal
+  const handleOpenCamera = () => {
+    setIsCameraOpen(true)
+    startCamera(facingMode)
+  }
+
+  // Close camera modal
+  const handleCloseCamera = () => {
+    stopCamera()
+    setIsCameraOpen(false)
+    setCameraError(null)
+  }
+
+  // Switch between front and back cameras
+  const handleToggleFacingMode = () => {
+    const nextMode = facingMode === 'environment' ? 'user' : 'environment'
+    setFacingMode(nextMode)
+    startCamera(nextMode)
+  }
+
+  // Snap photo from live video feed
+  const handleCaptureSnapshot = () => {
+    if (!videoRef.current || isCapturing) return
+
+    setIsCapturing(true)
+    const video = videoRef.current
+
+    try {
+      const canvas = document.createElement('canvas')
+      canvas.width = video.videoWidth || 1280
+      canvas.height = video.videoHeight || 720
+      const ctx = canvas.getContext('2d')
+
+      if (!ctx) {
+        throw new Error('Canvas context unavailable')
+      }
+
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            setUploadError('Failed to capture photo. Please try again.')
+            setIsCapturing(false)
+            return
+          }
+
+          const file = new File([blob], `label-capture-${Date.now()}.jpg`, {
+            type: 'image/jpeg',
+          })
+
+          handleCloseCamera()
+          setIsCapturing(false)
+          processFile(file)
+        },
+        'image/jpeg',
+        0.92
+      )
+    } catch (err) {
+      console.error('Snapshot capture error:', err)
+      setUploadError('Failed to take photo. Please upload directly.')
+      setIsCapturing(false)
+    }
+  }
 
   const processFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -127,10 +172,16 @@ export default function ScannerUpload({ onStartScan }: ScannerUploadProps) {
     reader.onload = async (e) => {
       const dataUrl = e.target?.result as string
 
+      // Upload to Supabase Storage in parallel
+      const storageUrlPromise = supabaseStorage.uploadImage(file, 'food-labels', 'scans').catch(() => null)
+
       // 1. Try real server-side Gemini AI vision extraction
       try {
         const scanRes = await api.scanLabelProxy(dataUrl, file.type)
         if (scanRes && (scanRes.productName || scanRes.brand)) {
+          const cloudUrl = await storageUrlPromise
+          const finalUrl = cloudUrl || dataUrl
+
           const scannedData: ScannedFoodData = {
             productName: String(scanRes.productName || file.name.replace(/\.[^/.]+$/, '')),
             brand: String(scanRes.brand || 'Detected Brand'),
@@ -144,14 +195,17 @@ export default function ScannerUpload({ onStartScan }: ScannerUploadProps) {
             packageWeight: typeof scanRes.packageWeight === 'number' ? scanRes.packageWeight : 1000,
             price: typeof scanRes.price === 'number' ? scanRes.price : 280,
             confidence: (scanRes.confidence as 'high' | 'medium' | 'low') || 'high',
-            imageUrl: dataUrl,
+            imageUrl: finalUrl,
           }
-          onStartScan(scannedData, dataUrl)
+          onStartScan(scannedData, finalUrl)
           return
         }
       } catch {
         // Fallback to simulated extraction if server AI proxy is offline
       }
+
+      const cloudUrl = await storageUrlPromise
+      const finalUrl = cloudUrl || dataUrl
 
       // 2. Simulated OCR extraction from uploaded image
       const simulatedData: ScannedFoodData = {
@@ -167,10 +221,10 @@ export default function ScannerUpload({ onStartScan }: ScannerUploadProps) {
         packageWeight: 1000,
         price: 280,
         confidence: 'high',
-        imageUrl: dataUrl,
+        imageUrl: finalUrl,
       }
 
-      onStartScan(simulatedData, dataUrl)
+      onStartScan(simulatedData, finalUrl)
     }
     reader.onerror = () => {
       setUploadError('Failed to read image file. Please try again.')
@@ -206,11 +260,6 @@ export default function ScannerUpload({ onStartScan }: ScannerUploadProps) {
     }
   }
 
-  const handleSampleClick = (sample: typeof SAMPLE_PRESETS[0]) => {
-    setUploadError(null)
-    onStartScan(sample.data)
-  }
-
   return (
     <div className="mx-auto max-w-4xl space-y-8">
       {/* Header Banner */}
@@ -236,7 +285,7 @@ export default function ScannerUpload({ onStartScan }: ScannerUploadProps) {
 
       {/* Main Upload Area */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        {/* Mode A: Camera Capture */}
+        {/* Mode A: Real Live Camera Capture */}
         <div className="flex flex-col justify-between rounded-2xl border-2 border-brand-dark/10 bg-white p-6 shadow-sm transition-all hover:border-brand-sage/50 hover:shadow-md">
           <div className="space-y-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-sage/15 text-brand-sage">
@@ -251,16 +300,26 @@ export default function ScannerUpload({ onStartScan }: ScannerUploadProps) {
             <ul className="space-y-1.5 text-xs text-brand-dark/60">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-3.5 w-3.5 text-brand-sage" />
-                <span>Instant camera capture on mobile & tablet</span>
+                <span>Instant camera capture on desktop, mobile & tablet</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-3.5 w-3.5 text-brand-sage" />
-                <span>Auto-focus on nutrient numbers & percentage</span>
+                <span>Live viewfinder with auto nutrient alignment guide</span>
               </li>
             </ul>
           </div>
 
-          <div className="mt-6">
+          <div className="mt-6 flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={handleOpenCamera}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-brand-sage px-5 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-sage/90 active:scale-[0.99] cursor-pointer"
+            >
+              <Camera className="h-4 w-4" />
+              <span>Open Camera</span>
+            </button>
+
+            {/* Hidden native input fallback for devices where user wants camera roll */}
             <input
               ref={cameraInputRef}
               type="file"
@@ -269,14 +328,6 @@ export default function ScannerUpload({ onStartScan }: ScannerUploadProps) {
               className="hidden"
               onChange={handleFileChange}
             />
-            <button
-              type="button"
-              onClick={() => cameraInputRef.current?.click()}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-brand-sage px-5 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-sage/90 active:scale-[0.99]"
-            >
-              <Camera className="h-4 w-4" />
-              <span>Open Camera</span>
-            </button>
           </div>
         </div>
 
@@ -322,53 +373,6 @@ export default function ScannerUpload({ onStartScan }: ScannerUploadProps) {
         </div>
       </div>
 
-      {/* Instant Test Presets */}
-      <div className="rounded-2xl border border-brand-dark/10 bg-white p-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-brand-dark/10 pb-4">
-          <div>
-            <h2 className="text-base font-bold text-brand-dark flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-brand-sage" />
-              <span>Try with a Sample Pet Food Label</span>
-            </h2>
-            <p className="text-xs text-brand-dark/60 mt-0.5">
-              Click any sample below to instantly simulate the AI OCR scanner and review the nutritional suitability.
-            </p>
-          </div>
-          <span className="text-xs font-medium text-brand-sage bg-brand-sage/10 px-2.5 py-1 rounded-full self-start sm:self-auto">
-            1-Click Demo
-          </span>
-        </div>
-
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {SAMPLE_PRESETS.map((sample) => (
-            <button
-              key={sample.id}
-              type="button"
-              onClick={() => handleSampleClick(sample)}
-              className="group relative flex flex-col justify-between text-left rounded-xl border border-brand-dark/10 bg-brand-cream/40 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-sage hover:bg-white hover:shadow-md active:scale-[0.99]"
-            >
-              <div>
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <span className="rounded-md bg-brand-dark/10 px-2 py-0.5 text-[11px] font-semibold text-brand-dark">
-                    {sample.badge}
-                  </span>
-                  <ArrowRight className="h-3.5 w-3.5 text-brand-dark/40 transition-transform group-hover:translate-x-1 group-hover:text-brand-sage" />
-                </div>
-                <h3 className="font-semibold text-brand-dark text-sm leading-snug line-clamp-2">
-                  {sample.title}
-                </h3>
-              </div>
-
-              <div className="mt-3 pt-2.5 border-t border-brand-dark/10">
-                <p className="text-xs font-medium text-brand-sage">
-                  {sample.highlight}
-                </p>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Photography Tips & Guidelines */}
       <div className="rounded-xl border border-brand-dark/10 bg-brand-sage/5 p-4 sm:p-5">
         <div className="flex items-start gap-3">
@@ -396,6 +400,122 @@ export default function ScannerUpload({ onStartScan }: ScannerUploadProps) {
           </div>
         </div>
       </div>
+
+      {/* ── LIVE CAMERA VIEWFINDER MODAL ── */}
+      {isCameraOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl bg-slate-950 border border-white/10 shadow-2xl flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-slate-900/60">
+              <div className="flex items-center gap-2.5 text-white">
+                <Camera className="h-5 w-5 text-emerald-400" />
+                <span className="font-bold text-sm sm:text-base">Live Label Scanner</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleToggleFacingMode}
+                  title="Switch camera"
+                  className="flex size-9 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 active:scale-95"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleCloseCamera}
+                  className="flex size-9 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 active:scale-95"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Video Viewfinder Area */}
+            <div className="relative aspect-4/3 w-full bg-black flex items-center justify-center overflow-hidden">
+              {cameraError ? (
+                <div className="p-8 text-center text-white max-w-md space-y-4">
+                  <div className="size-12 mx-auto rounded-full bg-red-500/20 text-red-400 flex items-center justify-center">
+                    <AlertCircle className="size-6" />
+                  </div>
+                  <p className="text-sm font-medium text-slate-300">{cameraError}</p>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => startCamera(facingMode)}
+                      className="px-4 py-2 rounded-xl bg-white/10 text-white text-xs font-semibold hover:bg-white/20 transition"
+                    >
+                      Try Again
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleCloseCamera()
+                        fileInputRef.current?.click()
+                      }}
+                      className="px-4 py-2 rounded-xl bg-brand-sage text-white text-xs font-semibold hover:bg-brand-sage/90 transition"
+                    >
+                      Upload Image Instead
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="h-full w-full object-cover"
+                  />
+
+                  {/* Viewfinder Target Framing Overlay */}
+                  <div className="pointer-events-none absolute inset-6 sm:inset-10 flex flex-col items-center justify-between border-2 border-dashed border-emerald-400/70 rounded-2xl p-4">
+                    <div className="rounded-full bg-black/60 px-3 py-1 text-[11px] font-semibold text-emerald-300 backdrop-blur-xs flex items-center gap-1.5">
+                      <span className="size-2 rounded-full bg-emerald-400 animate-ping" />
+                      Align Guaranteed Analysis & Weight
+                    </div>
+
+                    <p className="text-[11px] text-white/70 bg-black/50 px-3 py-1 rounded-full backdrop-blur-xs text-center">
+                      Hold still for clear nutrient detection
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Modal Footer with Shutter Action */}
+            <div className="flex items-center justify-between px-6 py-4 bg-slate-900 border-t border-white/10">
+              <button
+                type="button"
+                onClick={handleCloseCamera}
+                className="text-xs font-semibold text-slate-400 hover:text-white transition"
+              >
+                Cancel
+              </button>
+
+              {!cameraError && (
+                <button
+                  type="button"
+                  disabled={isCapturing}
+                  onClick={handleCaptureSnapshot}
+                  className="flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-bold text-slate-900 shadow-lg transition hover:bg-slate-100 active:scale-95 disabled:opacity-50 cursor-pointer"
+                >
+                  <div className="size-3.5 rounded-full bg-red-600 animate-pulse" />
+                  <span>{isCapturing ? 'Processing...' : 'Snap Photo'}</span>
+                </button>
+              )}
+
+              <div className="w-12 text-right">
+                <span className="text-[11px] text-slate-500 uppercase tracking-wider font-mono">
+                  {facingMode === 'environment' ? 'Rear' : 'Front'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

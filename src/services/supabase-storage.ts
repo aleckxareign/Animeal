@@ -19,6 +19,20 @@ export const supabaseStorage = {
       return URL.createObjectURL(file)
     }
 
+    // 1. Security Check: Validate file type
+    const allowedMime = ['image/jpeg', 'image/png', 'image/webp']
+    if (!allowedMime.includes(file.type)) {
+      console.warn(`Disallowed file upload type: ${file.type}. Allowed: JPG, PNG, WebP.`)
+      return URL.createObjectURL(file)
+    }
+
+    // 2. Security Check: Validate file size (10MB maximum limit)
+    const MAX_SIZE_BYTES = 10 * 1024 * 1024
+    if (file.size > MAX_SIZE_BYTES) {
+      console.warn(`File exceeds maximum size limit (10MB). Size: ${file.size} bytes.`)
+      return URL.createObjectURL(file)
+    }
+
     try {
       const extension = file.type.split('/')[1] || 'jpg'
       const fileName = `${folder}/${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${extension}`

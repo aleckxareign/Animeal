@@ -9,7 +9,7 @@
 
 @theme {
   --color-brand-dark: #164040;
-  --color-brand-sage: rgb(68 99 47 / 0.85);
+  --color-brand-sage: #44632f;
   --color-brand-cream: #f6f3ec;
   --color-brand-alert: #b5432f;
   --font-display: "TT Ramillas", Georgia, serif;
@@ -58,6 +58,29 @@
   --sidebar-accent-foreground: #164040;
   --sidebar-border: rgba(22, 64, 64, 0.12);
   --sidebar-ring: #44632f;
+}
+
+.dark {
+  --background: #0d1717;
+  --foreground: #f6f3ec;
+  --card: #132525;
+  --card-foreground: #f6f3ec;
+  --popover: #132525;
+  --popover-foreground: #f6f3ec;
+  --primary: #5ea340;
+  --primary-foreground: #ffffff;
+  --secondary: #1a3333;
+  --secondary-foreground: #f6f3ec;
+  --muted: #1a3333;
+  --muted-foreground: #9cb6b6;
+  --accent: #214343;
+  --accent-foreground: #f6f3ec;
+  --destructive: #e0523e;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #5ea340;
+  color: #f6f3ec;
+  background-color: #0d1717;
 }
 
 * {
@@ -266,44 +289,10 @@ button {
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
-
 @layer base {
   a {
-  color: inherit;
-  text-decoration: none;
+    color: inherit;
+    text-decoration: none;
   }
   * {
     @apply border-border outline-ring/50;
@@ -314,4 +303,180 @@ button {
   html {
     @apply font-sans;
   }
+}
+
+/* ==========================================================================
+   ANIMEAL DARK MODE COMPREHENSIVE UI & FONT COLOR SYSTEM
+   Ensures cards, metric tiles, text, headings, badges, tooltips, and inputs
+   match dark mode with crisp contrast and high legibility.
+   ========================================================================== */
+
+/* ── 1. Page Backgrounds in Dark Mode ── */
+.dark body,
+.dark #root,
+.dark .min-h-screen.bg-brand-cream\/30,
+.dark .min-h-screen.bg-brand-cream\/40,
+.dark .min-h-\[85vh\].bg-brand-cream\/40,
+.dark .bg-brand-cream\/30,
+.dark .bg-brand-cream\/40,
+.dark .bg-brand-cream\/50,
+.dark .bg-\[\#edf2f7\] {
+  background-color: #0d1717 !important;
+}
+
+.dark section.bg-brand-cream,
+.dark section.bg-white,
+.dark section[class*="bg-brand-cream"],
+.dark section[class*="bg-white"] {
+  background-color: #0d1717 !important;
+}
+
+/* ── 2. Cards, Modals & Elevated Surfaces in Dark Mode ── */
+.dark .bg-white:not(.keep-white),
+.dark [data-slot="card"],
+.dark .card {
+  background-color: #132525 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f6f3ec !important;
+}
+
+/* ── 3. Nested Tiles, Metric Chips & Sub-Containers ── */
+.dark .bg-slate-100,
+.dark .bg-slate-50,
+.dark .bg-stone-100,
+.dark .bg-stone-50 {
+  background-color: #0e1d1d !important;
+  color: #f6f3ec !important;
+}
+
+.dark .bg-brand-cream,
+.dark [class*="bg-brand-cream\/10"],
+.dark [class*="bg-brand-cream\/20"],
+.dark [class*="bg-brand-cream\/30"],
+.dark [class*="bg-brand-cream\/40"],
+.dark [class*="bg-brand-cream\/50"],
+.dark [class*="bg-brand-cream\/60"],
+.dark [class*="bg-brand-cream\/70"],
+.dark [class*="bg-brand-cream\/80"] {
+  background-color: #1a3333 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f6f3ec !important;
+}
+
+/* ── 4. Typography & Font Colors in Dark Mode ── */
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6,
+.dark .font-display {
+  color: #ffffff !important;
+}
+
+/* Primary brand dark text becomes crisp white/cream */
+.dark .text-brand-dark,
+.dark .text-slate-900,
+.dark .text-stone-900,
+.dark .text-gray-900 {
+  color: #ffffff !important;
+}
+
+/* Opacity levels for brand dark text */
+.dark [class*="text-brand-dark\/80"],
+.dark [class*="text-brand-dark\/75"],
+.dark [class*="text-brand-dark\/70"],
+.dark .text-slate-700,
+.dark .text-stone-700 {
+  color: #d8e8e8 !important;
+}
+
+.dark [class*="text-brand-dark\/60"],
+.dark [class*="text-brand-dark\/50"],
+.dark .text-slate-500,
+.dark .text-stone-500 {
+  color: #9cb6b6 !important;
+}
+
+.dark [class*="text-brand-dark\/40"],
+.dark [class*="text-brand-dark\/30"],
+.dark .text-slate-400,
+.dark .text-stone-400 {
+  color: #728d8d !important;
+}
+
+/* ── 5. Dark Action Buttons & Tooltips ── */
+.dark .bg-brand-dark {
+  background-color: #1e3d3d !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.dark .bg-brand-dark:hover {
+  background-color: #274f4f !important;
+}
+
+/* ── 6. Vibrant Sage Accents & Primary Buttons ── */
+.dark .text-brand-sage {
+  color: #6fc248 !important;
+}
+
+.dark .bg-brand-sage {
+  background-color: #4a8030 !important;
+  color: #ffffff !important;
+}
+
+.dark .bg-brand-sage:hover {
+  background-color: #559338 !important;
+}
+
+.dark [class*="bg-brand-sage\/10"],
+.dark [class*="bg-brand-sage\/15"],
+.dark [class*="bg-brand-sage\/20"] {
+  background-color: rgba(78, 128, 53, 0.25) !important;
+}
+
+/* ── 7. Alert Badges & Highlights ── */
+.dark .text-brand-alert {
+  color: #f87171 !important;
+}
+
+.dark [class*="bg-brand-alert\/10"],
+.dark [class*="bg-brand-alert\/15"] {
+  background-color: rgba(220, 68, 68, 0.22) !important;
+}
+
+/* ── 8. Form Inputs, Selects & Textareas ── */
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark textarea,
+.dark select {
+  background-color: #0f1d1d !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #637e7e !important;
+}
+
+/* ── 9. Borders & Dividers ── */
+.dark [class*="border-brand-dark\/"],
+.dark [class*="border-border\/"],
+.dark .border-border,
+.dark [class*="divide-brand-dark\/"],
+.dark [class*="divide-border\/"],
+.dark .border-stone-200,
+.dark .border-slate-200 {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ── 10. Water metric quick buttons ── */
+.dark .bg-cyan-100\/80,
+.dark .bg-cyan-100 {
+  background-color: rgba(6, 182, 212, 0.2) !important;
+  color: #67e8f9 !important;
+}
+.dark .bg-cyan-100\/80:hover {
+  background-color: rgba(6, 182, 212, 0.3) !important;
 }

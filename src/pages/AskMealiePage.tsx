@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useApp } from '../context/AppContext'
+import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
+import { isSupabaseConfigured } from '../lib/supabase'
+import { supabaseDb } from '../services/supabase-db'
 import ChatHeader from '../components/ask-mealie/ChatHeader'
 import VeterinaryDisclaimerBanner from '../components/ask-mealie/VeterinaryDisclaimerBanner'
 import MessageBubble from '../components/ask-mealie/MessageBubble'
@@ -50,6 +53,7 @@ function getInitialGreeting(pet: Pet | null): ExtendedChatMessage {
 
 export default function AskMealiePage() {
   const { pets, activePet, setActivePet } = useApp()
+  const { user } = useAuth()
   const { addToast } = useToast()
 
   const [messages, setMessages] = useState<ExtendedChatMessage[]>(() => {
@@ -63,10 +67,24 @@ export default function AskMealiePage() {
   const [isThinking, setIsThinking] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Persist messages
+  // Initial load from Supabase if available
+  useEffect(() => {
+    if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+      supabaseDb.getChatConversation(user.id, activePet?.id).then((cloudMessages) => {
+        if (cloudMessages && cloudMessages.length > 0) {
+          setMessages(cloudMessages as ExtendedChatMessage[])
+        }
+      }).catch(() => {})
+    }
+  }, [user?.id, activePet?.id])
+
+  // Persist messages to LocalStorage & Supabase Cloud
   useEffect(() => {
     saveToStorage(STORAGE_KEY, messages)
-  }, [messages])
+    if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id' && messages.length > 1) {
+      supabaseDb.saveChatConversation(user.id, messages, activePet?.id).catch(() => {})
+    }
+  }, [messages, user?.id, activePet?.id])
 
   // Scroll to bottom helper
   const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
@@ -153,8 +171,11 @@ export default function AskMealiePage() {
         // Fallback to client-side direct or local engine
       }
 
-      // 2. Try client-side direct Gemini API if key is configured in browser env
-      if (import.meta.env.VITE_GEMINI_API_KEY) {
+      // 2. Try client-side direct Gemini API (DEVELOPMENT ONLY fallback)
+      // ⚠️ SECURITY NOTE: VITE_GEMINI_API_KEY is exposed in the browser bundle.
+      // In production, always rely on the server proxy (/api/ai/chat) instead.
+      // This branch only fires if the server proxy failed AND the key is set locally.
+      if (import.meta.env.VITE_GEMINI_API_KEY && import.meta.env.DEV) {
         try {
           const petProfile = activePet
             ? {
