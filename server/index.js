@@ -231,27 +231,37 @@ const defaultDb = {
   customFoods: [],
 }
 
-// Load DB
+// In-memory DB cache for ultra-fast, zero-overhead reads
+let inMemoryDb = null
+
+// Load DB with atomic fallback
 function readDb() {
+  if (inMemoryDb) return inMemoryDb
   try {
     if (!fs.existsSync(DB_FILE)) {
-      fs.writeFileSync(DB_FILE, JSON.stringify(defaultDb, null, 2), 'utf-8')
-      return defaultDb
+      writeDb(defaultDb)
+      inMemoryDb = JSON.parse(JSON.stringify(defaultDb))
+      return inMemoryDb
     }
     const raw = fs.readFileSync(DB_FILE, 'utf-8')
-    return JSON.parse(raw)
+    inMemoryDb = JSON.parse(raw)
+    return inMemoryDb
   } catch (err) {
     console.error('Error reading db, using defaults:', err)
-    return defaultDb
+    inMemoryDb = JSON.parse(JSON.stringify(defaultDb))
+    return inMemoryDb
   }
 }
 
-// Save DB
+// Atomic & Safe DB Writer: writes to unique .tmp file first, then atomically renames
 function writeDb(data) {
+  inMemoryDb = data
   try {
-    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8')
+    const tmpFile = `${DB_FILE}.${Date.now()}.${Math.random().toString(36).slice(2)}.tmp`
+    fs.writeFileSync(tmpFile, JSON.stringify(data, null, 2), 'utf-8')
+    fs.renameSync(tmpFile, DB_FILE)
   } catch (err) {
-    console.error('Error writing db:', err)
+    console.error('Error atomic writing db:', err)
   }
 }
 
@@ -408,6 +418,22 @@ app.post('/api/feedings/:id/undo', (req, res) => {
   res.json(item)
 })
 
+app.put('/api/feedings/:id', (req, res) => {
+  const db = readDb()
+  const idx = db.feedings.findIndex((f) => f.id === req.params.id)
+  if (idx === -1) return res.status(404).json({ error: 'Feeding entry not found' })
+  db.feedings[idx] = { ...db.feedings[idx], ...req.body }
+  writeDb(db)
+  res.json(db.feedings[idx])
+})
+
+app.delete('/api/feedings/:id', (req, res) => {
+  const db = readDb()
+  db.feedings = db.feedings.filter((f) => f.id !== req.params.id)
+  writeDb(db)
+  res.json({ success: true, message: 'Feeding removed' })
+})
+
 // ── 3. WELLNESS (WATER & WEIGHT) ──
 app.get('/api/wellness/water/:petId', (req, res) => {
   const db = readDb()
@@ -514,6 +540,51 @@ app.post('/api/household', (req, res) => {
   db.household.push(member)
   writeDb(db)
   res.status(201).json(member)
+})
+
+app.put('/api/household/:id', (req, res) => {
+  const db = readDb()
+  const idx = db.household.findIndex((m) => m.id === req.params.id)
+  if (idx === -1) return res.status(404).json({ error: 'Household member not found' })
+  db.household[idx] = { ...db.household[idx], ...req.body }
+  writeDb(db)
+  res.json(db.household[idx])
+})
+
+app.delete('/api/household/:id', (req, res) => {
+  const db = readDb()
+  db.household = db.household.filter((m) => m.id !== req.params.id)
+  writeDb(db)
+  res.json({ success: true, message: 'Household member removed' })
+})
+
+// ── 5.1 FOODS & CUSTOM FOODS ──
+app.get('/api/foods', (req, res) => {
+  const db = readDb()
+  res.json(db.customFoods || [])
+})
+
+app.post('/api/foods', (req, res) => {
+  const db = readDb()
+  const food = {
+    ...req.body,
+    id: generateId(),
+    isCustom: true,
+    verified: false,
+    createdAt: new Date().toISOString(),
+  }
+  if (!db.customFoods) db.customFoods = []
+  db.customFoods.unshift(food)
+  writeDb(db)
+  res.status(201).json(food)
+})
+
+app.delete('/api/foods/:id', (req, res) => {
+  const db = readDb()
+  if (!db.customFoods) db.customFoods = []
+  db.customFoods = db.customFoods.filter((f) => f.id !== req.params.id)
+  writeDb(db)
+  res.json({ success: true, message: 'Custom food removed' })
 })
 
 // ── 6. MEALIE AI CONVERSATION ENGINE ──

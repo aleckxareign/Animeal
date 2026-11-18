@@ -64,6 +64,15 @@ export const api = {
     request<FeedingEntry>(`/feedings/${id}/undo`, {
       method: 'POST',
     }),
+  updateFeeding: (id: string, updates: Partial<FeedingEntry>) =>
+    request<FeedingEntry>(`/feedings/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates),
+    }),
+  deleteFeeding: (id: string) =>
+    request<{ success: boolean }>(`/feedings/${id}`, {
+      method: 'DELETE',
+    }),
 
   // Wellness: Water
   getWaterLogs: (petId: string) =>
@@ -108,6 +117,22 @@ export const api = {
     request<HouseholdMember>('/household', {
       method: 'POST',
       body: JSON.stringify({ name }),
+    }),
+  deleteHouseholdMember: (id: string) =>
+    request<{ success: boolean }>(`/household/${id}`, {
+      method: 'DELETE',
+    }),
+
+  // Foods
+  getCustomFoods: () => request<Record<string, unknown>[]>('/foods'),
+  addCustomFood: (food: Record<string, unknown>) =>
+    request<Record<string, unknown>>('/foods', {
+      method: 'POST',
+      body: JSON.stringify(food),
+    }),
+  deleteCustomFood: (id: string) =>
+    request<{ success: boolean }>(`/foods/${id}`, {
+      method: 'DELETE',
     }),
 
   // Mealie AI Chat Engine

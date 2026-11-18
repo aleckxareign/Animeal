@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import {
   ChevronDown,
@@ -37,6 +37,35 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
 
+  // Explore Tools 3-second grace period timer & outside click detection
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const exploreDropdownRef = useRef<HTMLLIElement | null>(null)
+
+  const clearCloseTimeout = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current)
+      closeTimeoutRef.current = null
+    }
+  }
+
+  const handleExploreMouseEnter = () => {
+    clearCloseTimeout()
+    setOpen(true)
+  }
+
+  const handleExploreMouseLeave = () => {
+    clearCloseTimeout()
+    // Keep dropdown open for 0.25 seconds after mo use leaves before closing
+    closeTimeoutRef.current = setTimeout(() => {
+      setOpen(false)
+    }, 250)
+  }
+
+  const handleExploreToggle = () => {
+    clearCloseTimeout()
+    setOpen((prev) => !prev)
+  }
+
   // Profile Action Modals
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
@@ -47,10 +76,26 @@ export default function Navbar() {
   const { theme, toggleTheme } = useTheme()
 
   const closeAll = () => {
+    clearCloseTimeout()
     setOpen(false)
     setMobileOpen(false)
     setProfileMenuOpen(false)
   }
+
+  // Close Explore Tools if user clicks anywhere outside of it
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (exploreDropdownRef.current && !exploreDropdownRef.current.contains(e.target as Node)) {
+        clearCloseTimeout()
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleOutsideClick)
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick)
+      clearCloseTimeout()
+    }
+  }, [])
 
   return (
     <>
@@ -78,8 +123,7 @@ export default function Navbar() {
               <NavLink
                 to="/"
                 className={({ isActive }) =>
-                  `transition-colors hover:text-brand-sage ${
-                    isActive ? 'text-brand-sage font-bold' : ''
+                  `transition-colors hover:text-brand-sage ${isActive ? 'text-brand-sage font-bold' : ''
                   }`
                 }
               >
@@ -92,8 +136,7 @@ export default function Navbar() {
               <NavLink
                 to="/care-schedule"
                 className={({ isActive }) =>
-                  `flex items-center gap-1.5 transition-colors hover:text-brand-sage ${
-                    isActive ? 'text-brand-sage font-bold' : ''
+                  `flex items-center gap-1.5 transition-colors hover:text-brand-sage ${isActive ? 'text-brand-sage font-bold' : ''
                   }`
                 }
               >
@@ -107,8 +150,7 @@ export default function Navbar() {
               <NavLink
                 to="/household"
                 className={({ isActive }) =>
-                  `flex items-center gap-1.5 transition-colors hover:text-brand-sage ${
-                    isActive ? 'text-brand-sage font-bold' : ''
+                  `flex items-center gap-1.5 transition-colors hover:text-brand-sage ${isActive ? 'text-brand-sage font-bold' : ''
                   }`
                 }
               >
@@ -117,17 +159,19 @@ export default function Navbar() {
               </NavLink>
             </li>
 
-            {/* Explore Tools Dropdown */}
+            {/* Explore Tools Dropdown with 3-second grace timer & hover bridge */}
             <li
-              className="relative"
-              onMouseEnter={() => setOpen(true)}
-              onMouseLeave={() => setOpen(false)}
+              ref={exploreDropdownRef}
+              className="relative py-1"
+              onMouseEnter={handleExploreMouseEnter}
+              onMouseLeave={handleExploreMouseLeave}
             >
               <button
                 id="explore-trigger"
-                className="flex items-center gap-1.5 transition-colors hover:text-brand-sage focus:outline-none cursor-pointer"
-                onClick={() => setOpen((v) => !v)}
+                className="flex items-center gap-1.5 transition-colors hover:text-brand-sage focus:outline-none cursor-pointer py-1 px-1 rounded-md"
+                onClick={handleExploreToggle}
                 aria-expanded={open}
+                aria-haspopup="true"
               >
                 <span>Explore Tools</span>
                 <ChevronDown className={`size-4 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
@@ -136,7 +180,9 @@ export default function Navbar() {
               {open && (
                 <div
                   id="explore-panel"
-                  className="absolute left-1/2 top-full z-50 mt-2 w-84 -translate-x-1/2 rounded-2xl border border-border/70 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-xl ring-1 ring-black/5 animate-scale-in"
+                  className="absolute left-1/2 top-full z-50 mt-2 w-84 -translate-x-1/2 rounded-2xl border border-border/70 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-xl ring-1 ring-black/5 animate-scale-in before:absolute before:-top-3 before:inset-x-0 before:h-3 before:content-['']"
+                  onMouseEnter={handleExploreMouseEnter}
+                  onMouseLeave={handleExploreMouseLeave}
                 >
                   <div className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-brand-dark/50 dark:text-slate-400">
                     Care & Nutrition Modules
@@ -169,8 +215,7 @@ export default function Navbar() {
               <NavLink
                 to="/ask-mealie"
                 className={({ isActive }) =>
-                  `flex items-center gap-2 rounded-full bg-brand-sage/10 px-4 py-1.5 text-sm font-bold text-brand-sage transition hover:bg-brand-sage/20 ${
-                    isActive ? 'ring-2 ring-brand-sage/40' : ''
+                  `flex items-center gap-2 rounded-full bg-brand-sage/10 px-4 py-1.5 text-sm font-bold text-brand-sage transition hover:bg-brand-sage/20 ${isActive ? 'ring-2 ring-brand-sage/40' : ''
                   }`
                 }
               >

@@ -12,8 +12,9 @@ import type {
 } from '../types'
 
 /**
- * Type-safe database service mapping Supabase PostgreSQL tables to AniMeal frontend models.
- * Automatically translates between Postgres snake_case and TypeScript camelCase.
+ * Type-safe, high-performance database service mapping Supabase PostgreSQL tables
+ * to AniMeal frontend models with snake_case <-> camelCase mapping, query bounding,
+ * and robust error handling.
  */
 export const supabaseDb = {
   // =========================================================================
@@ -59,9 +60,9 @@ export const supabaseDb = {
         .from('pets')
         .insert({
           user_id: userId,
-          name: pet.name,
+          name: pet.name.trim(),
           species: pet.species,
-          breed: pet.breed,
+          breed: pet.breed.trim(),
           weight_kg: pet.weight,
           age_years: pet.age,
           neutered: pet.neutered,
@@ -100,9 +101,9 @@ export const supabaseDb = {
     if (!isSupabaseConfigured || !petId) return false
     try {
       const payload: Record<string, unknown> = {}
-      if (updates.name !== undefined) payload.name = updates.name
+      if (updates.name !== undefined) payload.name = updates.name.trim()
       if (updates.species !== undefined) payload.species = updates.species
-      if (updates.breed !== undefined) payload.breed = updates.breed
+      if (updates.breed !== undefined) payload.breed = updates.breed.trim()
       if (updates.weight !== undefined) payload.weight_kg = updates.weight
       if (updates.age !== undefined) payload.age_years = updates.age
       if (updates.neutered !== undefined) payload.neutered = updates.neutered
@@ -137,7 +138,11 @@ export const supabaseDb = {
   // 2. FEEDING LOGS
   // =========================================================================
 
-  async getFeedings(userId: string, petId?: string): Promise<FeedingEntry[]> {
+  /**
+   * Fetches feeding logs with optional petId and limit.
+   * Default limit of 100 prevents unbounded memory and payload sizes.
+   */
+  async getFeedings(userId: string, petId?: string, limit = 100): Promise<FeedingEntry[]> {
     if (!isSupabaseConfigured || !userId) return []
     try {
       let query = supabase
@@ -145,6 +150,7 @@ export const supabaseDb = {
         .select('*')
         .eq('user_id', userId)
         .order('fed_at', { ascending: false })
+        .limit(limit)
 
       if (petId) {
         query = query.eq('pet_id', petId)
@@ -174,6 +180,46 @@ export const supabaseDb = {
     }
   },
 
+  /**
+   * High-efficiency query fetching only today's feeding records for calorie calculation
+   */
+  async getTodayFeedings(userId: string, petId: string): Promise<FeedingEntry[]> {
+    if (!isSupabaseConfigured || !userId || !petId) return []
+    try {
+      const startOfDay = new Date()
+      startOfDay.setHours(0, 0, 0, 0)
+
+      const { data, error } = await supabase
+        .from('feeding_logs')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('pet_id', petId)
+        .gte('fed_at', startOfDay.toISOString())
+        .order('fed_at', { ascending: false })
+
+      if (error) throw error
+      if (!data) return []
+
+      return data.map((row) => ({
+        id: row.id,
+        petId: row.pet_id,
+        foodId: row.food_id || '',
+        foodName: row.food_name,
+        portion: Number(row.portion_g),
+        unit: (row.portion_unit || 'g') as PortionUnit,
+        calories: Number(row.calories_consumed),
+        protein: Number(row.protein_g || 0),
+        fat: Number(row.fat_g || 0),
+        fiber: Number(row.fiber_g || 0),
+        fedBy: row.fed_by_name || 'Owner',
+        timestamp: row.fed_at,
+      }))
+    } catch (err) {
+      console.error('Failed to fetch today feedings from Supabase:', err)
+      return []
+    }
+  },
+
   async addFeeding(
     userId: string,
     entry: Omit<FeedingEntry, 'id' | 'timestamp'> & { timestamp?: string }
@@ -188,12 +234,12 @@ export const supabaseDb = {
           food_id: entry.foodId,
           food_name: entry.foodName,
           brand: entry.foodName,
-          portion_g: entry.portion,
+          portion_g: Math.max(0, entry.portion),
           portion_unit: entry.unit || 'g',
-          calories_consumed: entry.calories,
-          protein_g: entry.protein || 0,
-          fat_g: entry.fat || 0,
-          fiber_g: entry.fiber || 0,
+          calories_consumed: Math.max(0, entry.calories),
+          protein_g: Math.max(0, entry.protein || 0),
+          fat_g: Math.max(0, entry.fat || 0),
+          fiber_g: Math.max(0, entry.fiber || 0),
           fed_by_name: entry.fedBy || 'Owner',
           fed_at: entry.timestamp || new Date().toISOString(),
         })
@@ -220,6 +266,31 @@ export const supabaseDb = {
     } catch (err) {
       console.error('Failed to save feeding log in Supabase:', err)
       return null
+    }
+  },
+
+  async updateFeeding(
+    feedingId: string,
+    updates: Partial<FeedingEntry>
+  ): Promise<boolean> {
+    if (!isSupabaseConfigured || !feedingId) return false
+    try {
+      const payload: Record<string, unknown> = {}
+      if (updates.portion !== undefined) payload.portion_g = Math.max(0, updates.portion)
+      if (updates.unit !== undefined) payload.portion_unit = updates.unit
+      if (updates.calories !== undefined) payload.calories_consumed = Math.max(0, updates.calories)
+      if (updates.protein !== undefined) payload.protein_g = Math.max(0, updates.protein)
+      if (updates.fat !== undefined) payload.fat_g = Math.max(0, updates.fat)
+      if (updates.fiber !== undefined) payload.fiber_g = Math.max(0, updates.fiber)
+      if (updates.foodName !== undefined) payload.food_name = updates.foodName
+      if (updates.fedBy !== undefined) payload.fed_by_name = updates.fedBy
+
+      const { error } = await supabase.from('feeding_logs').update(payload).eq('id', feedingId)
+      if (error) throw error
+      return true
+    } catch (err) {
+      console.error('Failed to update feeding log in Supabase:', err)
+      return false
     }
   },
 
@@ -289,8 +360,8 @@ export const supabaseDb = {
         .from('foods')
         .insert({
           user_id: userId,
-          name: food.name,
-          brand: food.brand,
+          name: food.name.trim(),
+          brand: food.brand.trim(),
           species: food.species,
           category: food.category,
           life_stage_suitability: food.lifeStageSuitability,
@@ -339,11 +410,55 @@ export const supabaseDb = {
     }
   },
 
+  async updateCustomFood(
+    foodId: string,
+    updates: Partial<FoodItem>
+  ): Promise<boolean> {
+    if (!isSupabaseConfigured || !foodId) return false
+    try {
+      const payload: Record<string, unknown> = {}
+      if (updates.name !== undefined) payload.name = updates.name.trim()
+      if (updates.brand !== undefined) payload.brand = updates.brand.trim()
+      if (updates.species !== undefined) payload.species = updates.species
+      if (updates.category !== undefined) payload.category = updates.category
+      if (updates.lifeStageSuitability !== undefined) payload.life_stage_suitability = updates.lifeStageSuitability
+      if (updates.caloriesPer100g !== undefined) payload.calories_per_100g = updates.caloriesPer100g
+      if (updates.protein !== undefined) payload.protein_pct = updates.protein
+      if (updates.fat !== undefined) payload.fat_pct = updates.fat
+      if (updates.fiber !== undefined) payload.fiber_pct = updates.fiber
+      if (updates.moisture !== undefined) payload.moisture_pct = updates.moisture
+      if (updates.servingSize !== undefined) payload.serving_size_g = updates.servingSize
+      if (updates.servingUnit !== undefined) payload.serving_unit = updates.servingUnit
+      if (updates.price !== undefined) payload.price_php = updates.price
+      if (updates.packageSize !== undefined) payload.package_size_g = updates.packageSize
+      if (updates.pricePerCalorie !== undefined) payload.price_per_calorie = updates.pricePerCalorie
+
+      const { error } = await supabase.from('foods').update(payload).eq('id', foodId)
+      if (error) throw error
+      return true
+    } catch (err) {
+      console.error('Failed to update custom food in Supabase:', err)
+      return false
+    }
+  },
+
+  async deleteCustomFood(foodId: string): Promise<boolean> {
+    if (!isSupabaseConfigured || !foodId) return false
+    try {
+      const { error } = await supabase.from('foods').delete().eq('id', foodId)
+      if (error) throw error
+      return true
+    } catch (err) {
+      console.error('Failed to delete custom food in Supabase:', err)
+      return false
+    }
+  },
+
   // =========================================================================
   // 4. WELLNESS: HYDRATION
   // =========================================================================
 
-  async getHydrationLogs(userId: string, petId?: string): Promise<WaterLog[]> {
+  async getHydrationLogs(userId: string, petId?: string, limit = 100): Promise<WaterLog[]> {
     if (!isSupabaseConfigured || !userId) return []
     try {
       let query = supabase
@@ -351,6 +466,7 @@ export const supabaseDb = {
         .select('*')
         .eq('user_id', userId)
         .order('logged_at', { ascending: false })
+        .limit(limit)
 
       if (petId) {
         query = query.eq('pet_id', petId)
@@ -384,7 +500,7 @@ export const supabaseDb = {
         .insert({
           user_id: userId,
           pet_id: petId,
-          amount_ml: amount,
+          amount_ml: Math.max(0, amount),
           logged_at: new Date().toISOString(),
         })
         .select()
@@ -409,7 +525,7 @@ export const supabaseDb = {
   // 5. WELLNESS: WEIGHT
   // =========================================================================
 
-  async getWeightLogs(userId: string, petId?: string): Promise<WeightLog[]> {
+  async getWeightLogs(userId: string, petId?: string, limit = 100): Promise<WeightLog[]> {
     if (!isSupabaseConfigured || !userId) return []
     try {
       let query = supabase
@@ -417,6 +533,7 @@ export const supabaseDb = {
         .select('*')
         .eq('user_id', userId)
         .order('logged_at', { ascending: true })
+        .limit(limit)
 
       if (petId) {
         query = query.eq('pet_id', petId)
@@ -453,8 +570,8 @@ export const supabaseDb = {
         .insert({
           user_id: userId,
           pet_id: petId,
-          weight_kg: weight,
-          notes: notes || null,
+          weight_kg: Math.max(0.1, weight),
+          notes: notes ? notes.trim() : null,
           logged_at: date || new Date().toISOString(),
         })
         .select()
@@ -541,9 +658,9 @@ export const supabaseDb = {
         .insert({
           user_id: userId,
           pet_id: task.petId,
-          title: task.title,
+          title: task.title.trim(),
           task_type: task.type,
-          notes: task.notes || null,
+          notes: task.notes ? task.notes.trim() : null,
           frequency: task.frequency || 'once',
           time: task.time || '09:00',
           due_date: task.dueDate,
@@ -587,8 +704,9 @@ export const supabaseDb = {
       if (updates.completedBy !== undefined) payload.completed_by = updates.completedBy
       if (updates.snoozedUntil !== undefined) payload.snoozed_until = updates.snoozedUntil
       if (updates.dueDate !== undefined) payload.due_date = updates.dueDate
-      if (updates.title !== undefined) payload.title = updates.title
-      if (updates.notes !== undefined) payload.notes = updates.notes
+      if (updates.title !== undefined) payload.title = updates.title.trim()
+      if (updates.notes !== undefined) payload.notes = updates.notes ? updates.notes.trim() : null
+      payload.updated_at = new Date().toISOString()
 
       const { error } = await supabase.from('care_tasks').update(payload).eq('id', taskId)
       if (error) throw error
@@ -651,7 +769,7 @@ export const supabaseDb = {
         .from('household_members')
         .insert({
           user_id: userId,
-          name,
+          name: name.trim(),
           color,
           is_owner: isOwner,
         })
@@ -670,6 +788,27 @@ export const supabaseDb = {
     } catch (err) {
       console.error('Failed to add household member in Supabase:', err)
       return null
+    }
+  },
+
+  async updateHouseholdMember(
+    id: string,
+    updates: Partial<HouseholdMember>
+  ): Promise<boolean> {
+    if (!isSupabaseConfigured || !id) return false
+    try {
+      const payload: Record<string, unknown> = {}
+      if (updates.name !== undefined) payload.name = updates.name.trim()
+      if (updates.color !== undefined) payload.color = updates.color
+      if (updates.isOwner !== undefined) payload.is_owner = updates.isOwner
+      payload.updated_at = new Date().toISOString()
+
+      const { error } = await supabase.from('household_members').update(payload).eq('id', id)
+      if (error) throw error
+      return true
+    } catch (err) {
+      console.error('Failed to update household member in Supabase:', err)
+      return false
     }
   },
 
@@ -738,14 +877,19 @@ export const supabaseDb = {
   // 9. VETERINARY CLINICS DIRECTORY
   // =========================================================================
 
-  async getVets(): Promise<Vet[]> {
+  async getVets(city?: string): Promise<Vet[]> {
     if (!isSupabaseConfigured) return []
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('vets')
         .select('*')
         .order('rating', { ascending: false })
 
+      if (city) {
+        query = query.ilike('city', `%${city}%`)
+      }
+
+      const { data, error } = await query
       if (error) throw error
       if (!data || data.length === 0) return []
 
@@ -813,4 +957,3 @@ export const supabaseDb = {
     }
   },
 }
-

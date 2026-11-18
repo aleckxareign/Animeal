@@ -149,6 +149,7 @@ type AppContextType = AppState & {
   removeMember: (id: string) => void
   // Custom food actions
   addCustomFood: (food: Omit<FoodItem, 'id' | 'verified' | 'isCustom'>) => void
+  removeCustomFood: (id: string) => void
   getAllFoods: () => FoodItem[]
 }
 
@@ -667,6 +668,7 @@ export function AppProvider({ children, preview = false }: { children: ReactNode
     if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
       supabaseDb.removeHouseholdMember(id).catch(() => {})
     }
+    api.deleteHouseholdMember(id).catch(() => {})
   }, [user?.id])
 
   // ── Custom food actions ──
@@ -694,6 +696,22 @@ export function AppProvider({ children, preview = false }: { children: ReactNode
           }
         }).catch(() => {})
       }
+      api.addCustomFood(customFoodItem as any).catch(() => {})
+    },
+    [user?.id],
+  )
+
+  const removeCustomFood = useCallback(
+    (id: string) => {
+      setState((s) => ({
+        ...s,
+        customFoods: s.customFoods.filter((f) => f.id !== id),
+      }))
+
+      if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id') {
+        supabaseDb.deleteCustomFood(id).catch(() => {})
+      }
+      api.deleteCustomFood(id).catch(() => {})
     },
     [user?.id],
   )
@@ -729,6 +747,7 @@ export function AppProvider({ children, preview = false }: { children: ReactNode
         addMember,
         removeMember,
         addCustomFood,
+        removeCustomFood,
         getAllFoods,
       }}
     >
