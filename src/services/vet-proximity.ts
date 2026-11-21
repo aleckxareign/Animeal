@@ -254,12 +254,77 @@ function parseOsmToVet(item: Record<string, unknown>, originLat?: number, origin
 }
 
 /**
+ * Autocomplete search for Philippine locations via Nominatim.
+ * Returns up to `limit` place suggestions with their coordinates.
+ */
+export interface LocationSuggestion {
+  displayName: string
+  shortName: string
+  lat: number
+  lon: number
+  type: string // e.g. 'city', 'town', 'village', 'province'
+}
+
+export async function autocompleteLocation(
+  query: string,
+  limit = 6
+): Promise<LocationSuggestion[]> {
+  if (!query || query.trim().length < 2) return []
+  try {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 5000)
+
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+      query.trim()
+    )}&countrycodes=ph&format=json&addressdetails=1&limit=${limit}`
+
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        Accept: 'application/json',
+        'User-Agent': 'AniMeal-Pet-Care-App/1.0',
+      },
+    })
+    clearTimeout(timer)
+
+    if (!res.ok) return []
+    const data = await res.json()
+    if (!Array.isArray(data)) return []
+
+    return data.map((item: Record<string, unknown>) => {
+      const addr = (item.address as Record<string, string>) || {}
+      const shortName =
+        addr.city ||
+        addr.town ||
+        addr.municipality ||
+        addr.city_district ||
+        addr.county ||
+        addr.province ||
+        (item.name as string) ||
+        (item.display_name as string) ||
+        query
+      const type = (item.type as string) || (item.class as string) || 'place'
+      return {
+        displayName: item.display_name as string,
+        shortName,
+        lat: Number(item.lat),
+        lon: Number(item.lon),
+        type,
+      }
+    })
+  } catch (err) {
+    console.warn('Autocomplete location error:', err)
+    return []
+  }
+}
+
+/**
  * Fetch real veterinary clinics and animal hospitals near coordinates using OpenStreetMap Nominatim API.
  */
 export async function fetchLiveNearbyVetsFromApi(
   userLat: number,
   userLon: number,
-  radiusKm = 25
+  radiusKm = 50
 ): Promise<Vet[]> {
   try {
     const controller = new AbortController()

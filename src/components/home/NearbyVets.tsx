@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import {
   MapPin,
   Phone,
@@ -6,17 +6,17 @@ import {
   Search,
   Navigation,
   Compass,
-  Filter,
   List,
   Map as MapIcon,
-  Crosshair,
   Loader2,
   Sparkles,
   Clock,
-  ChevronDown,
-  ChevronUp,
   Check,
   RotateCcw,
+  ChevronDown,
+  ChevronUp,
+  X,
+  Building2,
 } from 'lucide-react'
 import { vets as fallbackVets } from '../../data/vets'
 import type { Vet } from '../../types'
@@ -29,8 +29,10 @@ import {
   reverseGeocodeCoords,
   geocodeLocationName,
   fetchLiveNearbyVetsFromApi,
+  autocompleteLocation,
   type UserCoords,
   type MapBounds,
+  type LocationSuggestion,
 } from '../../services/vet-proximity'
 
 const INITIAL_COUNT = 3
@@ -105,27 +107,45 @@ function getMapCoordinates(
   return { left: `${x.toFixed(1)}%`, top: `${y.toFixed(1)}%` }
 }
 
-const POPULAR_CITIES = [
-  'All',
-  'Quezon City',
-  'Manila',
-  'Makati',
-  'Taguig',
-  'Pasig',
-  'Mandaluyong',
-  'Marikina',
-  'Las Piñas',
-  'San Juan',
-  'Cainta',
-  'Cebu City',
-  'Baguio',
-  'Davao City',
-]
+const LOCATION_STORAGE_KEY = 'animeal_user_location'
+
+/** Save user location to localStorage for persistence across sessions */
+function saveLocationToStorage(coords: UserCoords) {
+  try {
+    localStorage.setItem(LOCATION_STORAGE_KEY, JSON.stringify({
+      latitude: coords.latitude,
+      longitude: coords.longitude,
+      city: coords.city,
+      displayName: coords.displayName,
+      source: coords.source,
+      savedAt: Date.now(),
+    }))
+  } catch { /* storage full or private mode */ }
+}
+
+/** Load persisted user location from localStorage (expires after 24h) */
+function loadLocationFromStorage(): UserCoords | null {
+  try {
+    const raw = localStorage.getItem(LOCATION_STORAGE_KEY)
+    if (!raw) return null
+    const data = JSON.parse(raw)
+    // Expire after 24 hours
+    if (Date.now() - (data.savedAt || 0) > 24 * 60 * 60 * 1000) {
+      localStorage.removeItem(LOCATION_STORAGE_KEY)
+      return null
+    }
+    return data as UserCoords
+  } catch {
+    return null
+  }
+}
 
 export default function NearbyVets() {
   const [allVets, setAllVets] = useState<Vet[]>(fallbackVets)
-  const [selectedCity, setSelectedCity] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [locationSuggestions, setLocationSuggestions] = useState<LocationSuggestion[]>([])
+  const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false)
   const [isSearchingLocation, setIsSearchingLocation] = useState(false)
   const [filterEmergency, setFilterEmergency] = useState(false)
   const [filterOpenNow, setFilterOpenNow] = useState(false)
@@ -133,11 +153,27 @@ export default function NearbyVets() {
   const [userLocation, setUserLocation] = useState<UserCoords | undefined>()
   const [isLocating, setIsLocating] = useState(false)
   const [locationStatus, setLocationStatus] = useState<'idle' | 'success' | 'denied' | 'unsupported'>('idle')
-  const [locationSubtitle, setLocationSubtitle] = useState('Tap to sort clinics by your loc...')
+  const [locationSubtitle, setLocationSubtitle] = useState('Tap to sort clinics by your location')
   const [currentRegionName, setCurrentRegionName] = useState('Metro Manila & Rizal area directory')
   const [mobileTab, setMobileTab] = useState<'list' | 'map'>('list')
   const [expanded, setExpanded] = useState(false)
   const [expandedClinicId, setExpandedClinicId] = useState<number | string | null>(null)
+  const searchContainerRef = useRef<HTMLDivElement>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const hasAutoRequestedLocation = useRef(false)
+  // Close search suggestions on click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // 1. Initial Load: Load initial directory from Supabase if available or use fallback
   useEffect(() => {
@@ -157,6 +193,32 @@ export default function NearbyVets() {
         })
     } else {
       setSelectedVet(fallbackVets[0] ?? null)
+    }
+  }, [])
+
+  // Helper: After getting coordinates, fetch live vets and merge with fallback
+  const fetchAndMergeVets = useCallback(async (lat: number, lon: number) => {
+    try {
+      // Start with 50 km radius
+      let liveVets = await fetchLiveNearbyVetsFromApi(lat, lon, 50)
+      // If fewer than 5 results, expand to 100 km
+      if (liveVets.length < 5) {
+        const widerVets = await fetchLiveNearbyVetsFromApi(lat, lon, 100)
+        if (widerVets.length > liveVets.length) {
+          liveVets = widerVets
+        }
+      }
+      // Merge: live results take priority, then add fallback clinics not already found
+      const liveIds = new Set(liveVets.map((v) => v.name.toLowerCase()))
+      const uniqueFallbacks = fallbackVets.filter(
+        (fb) => !liveIds.has(fb.name.toLowerCase())
+      )
+      const merged = [...liveVets, ...uniqueFallbacks]
+      setAllVets(merged)
+      setSelectedVet(merged[0] ?? null)
+    } catch (apiErr) {
+      console.warn('Could not fetch live OSM clinics:', apiErr)
+      // Keep fallback data visible
     }
   }, [])
 
@@ -189,19 +251,20 @@ export default function NearbyVets() {
           ? `${geoInfo.district}, ${geoInfo.city}`
           : geoInfo?.city || 'Your Location'
 
+        // Update the userCoords with resolved city info
+        const enrichedCoords: UserCoords = {
+          ...userCoords,
+          city: geoInfo?.city,
+          displayName: areaLabel,
+        }
+        setUserLocation(enrichedCoords)
+        saveLocationToStorage(enrichedCoords)
+
         setLocationSubtitle(`Clinics near ${areaLabel}`)
         setCurrentRegionName(`Clinics near ${areaLabel}`)
 
         // Fetch real live veterinary clinics and animal hospitals near the user's coordinates
-        try {
-          const liveVets = await fetchLiveNearbyVetsFromApi(coords.latitude, coords.longitude, 25)
-          if (liveVets.length > 0) {
-            setAllVets(liveVets)
-            setSelectedVet(liveVets[0] ?? null)
-          }
-        } catch (apiErr) {
-          console.warn('Could not fetch live OSM clinics for GPS coordinates:', apiErr)
-        }
+        await fetchAndMergeVets(coords.latitude, coords.longitude)
       },
       (err) => {
         console.warn('Browser geolocation permission denied or failed:', err.message)
@@ -215,14 +278,70 @@ export default function NearbyVets() {
         maximumAge: 0, // Force fresh live reading
       }
     )
-  }, [])
+  }, [fetchAndMergeVets])
 
-  // 3. Search Location Feature: Geocodes location query & fetches live clinics in that area
-  const handleLocationSearch = async (e?: React.FormEvent) => {
+  // 2b. Auto-request location on first visit; restore from localStorage if saved
+  useEffect(() => {
+    if (hasAutoRequestedLocation.current) return
+    hasAutoRequestedLocation.current = true
+
+    // Try to restore from localStorage first
+    const saved = loadLocationFromStorage()
+    if (saved) {
+      setUserLocation(saved)
+      setLocationStatus('success')
+      setLocationSubtitle(
+        saved.source === 'gps'
+          ? `Clinics near ${saved.displayName || saved.city || 'Your Location'}`
+          : `Clinics in ${saved.city || 'your area'}`
+      )
+      setCurrentRegionName(
+        `Clinics near ${saved.displayName || saved.city || 'Your Location'}`
+      )
+      // Fetch clinics based on saved location
+      fetchAndMergeVets(saved.latitude, saved.longitude)
+    }
+
+    // Auto-request fresh GPS (will update saved location)
+    if (navigator.geolocation) {
+      // Small delay to let the UI render first
+      const timer = setTimeout(() => {
+        handleRequestLocation()
+      }, 1500)
+      return () => clearTimeout(timer)
+    }
+  }, [handleRequestLocation, fetchAndMergeVets])
+
+  // 3. Debounced autocomplete: query Nominatim as user types
+  const handleSearchInputChange = (value: string) => {
+    setSearchQuery(value)
+    setShowSuggestions(true)
+
+    // Cancel any pending debounce
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+
+    const trimmed = value.trim()
+    if (trimmed.length < 2) {
+      setLocationSuggestions([])
+      setIsFetchingSuggestions(false)
+      return
+    }
+
+    setIsFetchingSuggestions(true)
+    debounceRef.current = setTimeout(async () => {
+      const suggestions = await autocompleteLocation(trimmed, 6)
+      setLocationSuggestions(suggestions)
+      setIsFetchingSuggestions(false)
+    }, 300)
+  }
+
+  // 3b. Search Location Feature: Geocodes location query & fetches live clinics in that area
+  const handleLocationSearch = async (e?: React.FormEvent, customQuery?: string) => {
     if (e) e.preventDefault()
-    const query = searchQuery.trim()
+    const query = (customQuery ?? searchQuery).trim()
     if (!query) return
 
+    setShowSuggestions(false)
     setIsSearchingLocation(true)
     try {
       const geo = await geocodeLocationName(query)
@@ -241,25 +360,13 @@ export default function NearbyVets() {
           setUserLocation(refLocation)
           setLocationSubtitle(`Clinics in ${geo.city}`)
           setLocationStatus('success')
+          saveLocationToStorage(refLocation)
         }
 
         setCurrentRegionName(`Clinics in ${geo.city}`)
 
-        // Fetch real veterinary clinics in and around the searched location
-        const liveVets = await fetchLiveNearbyVetsFromApi(geo.lat, geo.lon, 25)
-        if (liveVets.length > 0) {
-          setAllVets(liveVets)
-          setSelectedVet(liveVets[0] ?? null)
-        } else {
-          // If no OSM clinics found in small radius, try wider radius
-          const widerVets = await fetchLiveNearbyVetsFromApi(geo.lat, geo.lon, 45)
-          if (widerVets.length > 0) {
-            setAllVets(widerVets)
-            setSelectedVet(widerVets[0] ?? null)
-          }
-        }
-      } else {
-        // Query didn't resolve to a town/city, filter existing clinics by name or street
+        // Fetch real veterinary clinics and animal hospitals
+        await fetchAndMergeVets(geo.lat, geo.lon)
       }
     } catch (err) {
       console.warn('Location search error:', err)
@@ -268,53 +375,69 @@ export default function NearbyVets() {
     }
   }
 
-  // 4. City Dropdown Selection: Switches city and loads real clinics for that city
-  const handleCityChange = async (cityName: string) => {
-    setSelectedCity(cityName)
-    if (cityName === 'All') {
-      setCurrentRegionName('Metro Manila & Rizal area directory')
-      return
+  // Handle selecting a suggested location from the autocomplete dropdown
+  const handleSelectLocation = (suggestion: LocationSuggestion) => {
+    setSearchQuery(suggestion.shortName)
+    setShowSuggestions(false)
+    setLocationSuggestions([])
+
+    // Directly use the suggestion's coordinates - no need to re-geocode
+    const refLocation: UserCoords = {
+      latitude: suggestion.lat,
+      longitude: suggestion.lon,
+      city: suggestion.shortName,
+      displayName: suggestion.displayName,
+      source: 'search',
     }
 
+    if (!userLocation || userLocation.source === 'search') {
+      setUserLocation(refLocation)
+      setLocationSubtitle(`Clinics in ${suggestion.shortName}`)
+      setLocationStatus('success')
+      saveLocationToStorage(refLocation)
+    }
+
+    setCurrentRegionName(`Clinics in ${suggestion.shortName}`)
     setIsSearchingLocation(true)
-    try {
-      const geo = await geocodeLocationName(`${cityName}, Philippines`)
-      if (geo) {
-        const refCoords: UserCoords = {
-          latitude: geo.lat,
-          longitude: geo.lon,
-          city: geo.city,
-          source: 'search',
-        }
-        if (!userLocation || userLocation.source === 'search') {
-          setUserLocation(refCoords)
-          setLocationSubtitle(`Clinics in ${geo.city}`)
-          setLocationStatus('success')
-        }
-        setCurrentRegionName(`Clinics in ${geo.city}`)
-
-        const liveClinics = await fetchLiveNearbyVetsFromApi(geo.lat, geo.lon, 25)
-        if (liveClinics.length > 0) {
-          setAllVets(liveClinics)
-          setSelectedVet(liveClinics[0] ?? null)
-        }
-      }
-    } catch (err) {
-      console.warn('City filter load error:', err)
-    } finally {
+    fetchAndMergeVets(suggestion.lat, suggestion.lon).finally(() => {
       setIsSearchingLocation(false)
-    }
+    })
   }
 
-  // 5. Reset all filters and search query
+  // Handle selecting a suggested clinic
+  const handleSelectClinic = (clinic: Vet) => {
+    setSearchQuery(clinic.name)
+    setShowSuggestions(false)
+    setLocationSuggestions([])
+    setSelectedVet(clinic)
+    setExpandedClinicId(clinic.id)
+  }
+
+  // 4. Reset all filters and search query
   const handleResetFilters = () => {
     setSearchQuery('')
-    setSelectedCity('All')
+    setShowSuggestions(false)
+    setLocationSuggestions([])
     setFilterEmergency(false)
     setFilterOpenNow(false)
     setExpanded(false)
     setCurrentRegionName(userLocation ? 'Sorted by your live GPS coordinates' : 'Metro Manila & Rizal area directory')
   }
+
+  // Computed matching clinics from local data for autocomplete
+  const trimmedQuery = searchQuery.trim().toLowerCase()
+
+  const matchingClinics = useMemo(() => {
+    if (!trimmedQuery || trimmedQuery.length < 2) return []
+    return allVets
+      .filter(
+        (vet) =>
+          vet.name.toLowerCase().includes(trimmedQuery) ||
+          vet.address.toLowerCase().includes(trimmedQuery) ||
+          vet.city.toLowerCase().includes(trimmedQuery)
+      )
+      .slice(0, 4)
+  }, [trimmedQuery, allVets])
 
   // Dynamic distance calculation via Haversine formula relative to user location (or searched center)
   const vetsWithLiveDistance = useMemo(() => {
@@ -340,22 +463,15 @@ export default function NearbyVets() {
     })
   }, [allVets, userLocation])
 
-  // Filter by text search query, 24/7 emergency, and open status
+  // Filter by 24/7 emergency and open status (search query no longer filters the list inline —
+  // it triggers a geocode + live fetch instead)
   const filteredVets = useMemo(() => {
     return vetsWithLiveDistance.filter((vet) => {
       if (filterEmergency && !vet.emergency) return false
       if (filterOpenNow && !vet.openNow) return false
-
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase().trim()
-        const matchesName = vet.name.toLowerCase().includes(query)
-        const matchesAddress = vet.address.toLowerCase().includes(query)
-        const matchesCity = vet.city.toLowerCase().includes(query)
-        if (!matchesName && !matchesAddress && !matchesCity) return false
-      }
       return true
     })
-  }, [vetsWithLiveDistance, filterEmergency, filterOpenNow, searchQuery])
+  }, [vetsWithLiveDistance, filterEmergency, filterOpenNow])
 
   // Sort closest clinics first
   const sortedVets = useMemo(() => {
@@ -396,48 +512,61 @@ export default function NearbyVets() {
               Instant distance and directions to verified veterinary clinics and 24/7 animal hospitals near you.
             </p>
 
-            {/* GPS Location Bar (One-Tap Geolocation Detection with User Permission) */}
-            <div className="rounded-2xl border border-brand-sage/20 dark:border-slate-800 bg-white dark:bg-[#132525] p-3.5 shadow-sm transition-all space-y-2.5">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2.5 min-w-0">
+            {/* ── User Location & Proximity Status Card ── */}
+            <div className="rounded-2xl border border-brand-sage/20 dark:border-slate-800 bg-white dark:bg-[#132525] p-4 shadow-xs transition-all space-y-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3 min-w-0">
                   <div
-                    className={`flex size-9 shrink-0 items-center justify-center rounded-xl transition-colors ${
+                    className={`flex size-10 shrink-0 items-center justify-center rounded-xl transition-colors ${
                       userLocation
-                        ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300'
+                        ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 ring-2 ring-emerald-500/20'
                         : 'bg-brand-sage/10 dark:bg-slate-800 text-brand-sage dark:text-emerald-400'
                     }`}
                   >
                     {isLocating ? (
-                      <Loader2 className="size-4 animate-spin" />
+                      <Loader2 className="size-5 animate-spin" />
                     ) : (
-                      <Crosshair className="size-4" />
+                      <MapPin className="size-5" />
                     )}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-bold text-brand-dark dark:text-white truncate">
-                      {userLocation?.source === 'gps'
-                        ? 'GPS Location Active'
-                        : userLocation?.source === 'search'
-                        ? `Location: ${userLocation.city}`
-                        : 'Show Nearest Clinics'}
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-brand-dark/50 dark:text-slate-400">
+                        {userLocation?.source === 'gps'
+                          ? 'Live GPS Location'
+                          : userLocation?.source === 'search'
+                          ? 'Searched Location'
+                          : 'Proximity'}
+                      </span>
+                      {userLocation?.source === 'gps' && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                          <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          Active
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm font-extrabold text-brand-dark dark:text-white truncate mt-0.5">
+                      {userLocation
+                        ? userLocation.displayName || userLocation.city || 'Coordinates Acquired'
+                        : 'Location Not Set'}
                     </p>
-                    <p className="text-[11px] text-brand-dark/60 dark:text-slate-400 truncate">
+                    <p className="text-xs text-brand-dark/60 dark:text-slate-400 truncate mt-0.5">
                       {locationSubtitle}
                     </p>
                   </div>
                 </div>
 
-                {/* Activation Button */}
+                {/* Location Action Button */}
                 <button
                   type="button"
                   onClick={handleRequestLocation}
                   disabled={isLocating}
-                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all transform active:scale-95 cursor-pointer shadow-sm ${
+                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all transform active:scale-95 cursor-pointer shadow-xs ${
                     userLocation?.source === 'gps'
-                      ? 'bg-[#1b4332] hover:bg-[#143225] text-white'
+                      ? 'bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800'
                       : 'bg-brand-dark hover:bg-brand-sage text-white'
                   }`}
-                  title="Request browser GPS permission and sort clinics by your exact proximity"
+                  title={userLocation?.source === 'gps' ? 'Refresh live GPS location' : 'Use your current location'}
                 >
                   {isLocating ? (
                     <>
@@ -446,13 +575,13 @@ export default function NearbyVets() {
                     </>
                   ) : userLocation?.source === 'gps' ? (
                     <>
-                      <Check className="size-3.5" />
-                      <span>Updated</span>
+                      <RotateCcw className="size-3.5" />
+                      <span>Refresh</span>
                     </>
                   ) : (
                     <>
                       <Navigation className="size-3.5" />
-                      <span>Near Me</span>
+                      <span>Use My Location</span>
                     </>
                   )}
                 </button>
@@ -462,115 +591,231 @@ export default function NearbyVets() {
               {locationStatus === 'denied' && (
                 <div className="rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 p-2.5 text-[11px] text-amber-900 dark:text-amber-200">
                   <p className="font-bold flex items-center gap-1">
-                    <AlertCircle className="size-3.5 text-amber-600" />
+                    <AlertCircle className="size-3.5 text-amber-600 shrink-0" />
                     Location access blocked
                   </p>
                   <p className="mt-0.5 text-amber-800/90 dark:text-amber-300">
-                    Please allow location permissions in your browser or search your city/neighborhood in the box below.
+                    Enable location access in your browser or type any Philippine city/neighborhood in the search bar below.
                   </p>
                 </div>
               )}
 
               {/* Nearest Clinic Highlight Badge */}
               {userLocation && nearestVet && (
-                <div className="flex items-center gap-2 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 px-3 py-1.5 text-xs font-semibold text-emerald-900 dark:text-emerald-200 shadow-xs">
-                  <Sparkles className="size-3.5 shrink-0 text-emerald-600 dark:text-emerald-400 animate-pulse" />
+                <div className="flex items-center gap-2 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 px-3 py-1.5 text-xs font-semibold text-emerald-900 dark:text-emerald-200">
+                  <Sparkles className="size-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
                   <span className="truncate">
-                    Nearest: <strong>{nearestVet.name}</strong> ({nearestVet.formattedDistance})
+                    Closest: <strong>{nearestVet.name}</strong> ({nearestVet.formattedDistance})
                   </span>
                 </div>
               )}
             </div>
 
-            {/* Search Feature (Supports searching by city, municipality, street, or clinic name) */}
-            <form onSubmit={handleLocationSearch} className="space-y-3">
-              <div className="relative">
-                <span className="sr-only">Search clinic name, street, or city</span>
+            {/* ── Search Input with Live Autocomplete ── */}
+            <div className="relative" ref={searchContainerRef}>
+              <form onSubmit={handleLocationSearch} className="relative">
+                <span className="sr-only">Search city, neighborhood, or clinic</span>
                 <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-brand-dark/40 dark:text-slate-400" />
                 <input
-                  type="search"
-                  placeholder="Search clinic name, street, or city"
+                  type="text"
+                  placeholder="Search city, neighborhood, or clinic name..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="min-h-11 w-full rounded-xl border border-brand-dark/15 dark:border-slate-700 bg-white dark:bg-[#132525] py-2.5 pl-10 pr-20 text-sm text-brand-dark dark:text-white placeholder:text-brand-dark/40 dark:placeholder:text-slate-500 focus:border-brand-sage focus:outline-none focus:ring-2 focus:ring-brand-sage/20 transition-all"
+                  onFocus={() => setShowSuggestions(true)}
+                  onChange={(e) => handleSearchInputChange(e.target.value)}
+                  className="min-h-11 w-full rounded-xl border border-brand-dark/15 dark:border-slate-700 bg-white dark:bg-[#132525] py-2.5 pl-10 pr-24 text-sm text-brand-dark dark:text-white placeholder:text-brand-dark/40 dark:placeholder:text-slate-500 focus:border-brand-sage focus:outline-none focus:ring-2 focus:ring-brand-sage/20 transition-all shadow-xs"
                 />
-                <button
-                  type="submit"
-                  disabled={isSearchingLocation}
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg bg-brand-sage dark:bg-emerald-700 text-white px-2.5 py-1.5 text-xs font-bold hover:bg-brand-sage/90 transition-colors cursor-pointer disabled:opacity-50"
-                  title="Search location via Geocoding API"
-                >
-                  {isSearchingLocation ? <Loader2 className="size-3.5 animate-spin" /> : 'Search'}
-                </button>
-              </div>
-
-              {/* City Filter & Reset Controls */}
-              <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
-                <label>
-                  <span className="sr-only">Filter by city</span>
-                  <select
-                    value={selectedCity}
-                    onChange={(e) => handleCityChange(e.target.value)}
-                    className="min-h-11 w-full rounded-xl border border-brand-dark/15 dark:border-slate-700 bg-white dark:bg-[#132525] px-3.5 text-sm font-medium text-brand-dark dark:text-white focus:border-brand-sage focus:outline-none focus:ring-2 focus:ring-brand-sage/20 transition-all cursor-pointer"
+                
+                <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery('')
+                        setShowSuggestions(false)
+                        setLocationSuggestions([])
+                      }}
+                      className="p-1 rounded-md text-brand-dark/40 hover:text-brand-dark dark:text-slate-400 dark:hover:text-white hover:bg-black/5 transition-colors cursor-pointer"
+                      title="Clear search"
+                    >
+                      <X className="size-3.5" />
+                    </button>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={isSearchingLocation}
+                    className="rounded-lg bg-brand-sage dark:bg-emerald-700 text-white px-2.5 py-1.5 text-xs font-bold hover:bg-brand-sage/90 transition-colors cursor-pointer disabled:opacity-50"
+                    title="Search location via geocoding"
                   >
-                    {POPULAR_CITIES.map((city) => (
-                      <option key={city} value={city} className="dark:bg-[#132525] dark:text-white">
-                        {city === 'All' ? 'All Metro Manila Areas' : city}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                    {isSearchingLocation ? <Loader2 className="size-3.5 animate-spin" /> : 'Search'}
+                  </button>
+                </div>
+              </form>
 
-                <button
-                  type="button"
-                  onClick={handleResetFilters}
-                  className="inline-flex min-h-11 items-center justify-center gap-1 rounded-xl border border-brand-dark/15 dark:border-slate-700 bg-white dark:bg-[#132525] px-3.5 text-xs font-bold text-brand-dark/70 dark:text-slate-300 hover:bg-brand-cream dark:hover:bg-[#1a3333] transition-colors cursor-pointer"
-                  title="Reset all filters"
-                >
-                  <RotateCcw className="size-3.5" />
-                  <span>Reset</span>
-                </button>
-              </div>
-            </form>
+              {/* Live Suggestions Popup Dropdown */}
+              {showSuggestions && searchQuery.trim().length >= 2 && (
+                <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-2xl border border-brand-sage/20 dark:border-slate-700 bg-white dark:bg-[#132525] shadow-xl overflow-hidden py-1.5 max-h-80 overflow-y-auto">
+                  
+                  {/* Loading indicator */}
+                  {isFetchingSuggestions && (
+                    <div className="flex items-center gap-2 px-4 py-2.5 text-xs text-brand-dark/50 dark:text-slate-400">
+                      <Loader2 className="size-3.5 animate-spin" />
+                      <span>Searching places...</span>
+                    </div>
+                  )}
 
-            {/* Quick Filter Pills (Emergency 24/7 & Open Now) */}
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <span className="mr-1 inline-flex items-center gap-1.5 text-xs font-bold text-brand-dark/65 dark:text-slate-400">
-                <Filter className="size-3.5" /> Filter
-              </span>
-              
-              <button
-                type="button"
-                aria-pressed={filterEmergency}
-                onClick={() => setFilterEmergency((value) => !value)}
-                className={`min-h-10 rounded-full px-3.5 text-xs font-bold transition-all cursor-pointer ${
-                  filterEmergency
-                    ? 'bg-rose-600 text-white shadow-sm ring-2 ring-rose-500/30'
-                    : 'border border-brand-dark/15 dark:border-slate-700 bg-white dark:bg-[#132525] text-brand-dark/75 dark:text-slate-300 hover:bg-brand-cream dark:hover:bg-[#1a3333]'
-                }`}
-              >
-                🚨 24/7 Emergency
-              </button>
-              
-              <button
-                type="button"
-                aria-pressed={filterOpenNow}
-                onClick={() => setFilterOpenNow((value) => !value)}
-                className={`min-h-10 rounded-full px-3.5 text-xs font-bold transition-all cursor-pointer ${
-                  filterOpenNow
-                    ? 'bg-emerald-700 text-white shadow-sm ring-2 ring-emerald-500/30'
-                    : 'border border-brand-dark/15 dark:border-slate-700 bg-white dark:bg-[#132525] text-brand-dark/75 dark:text-slate-300 hover:bg-brand-cream dark:hover:bg-[#1a3333]'
-                }`}
-              >
-                🟢 Open now
-              </button>
+                  {/* Live Location Suggestions from Nominatim */}
+                  {locationSuggestions.length > 0 && (
+                    <div className="p-1">
+                      <p className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-brand-dark/45 dark:text-slate-400">
+                        Locations & Areas
+                      </p>
+                      {locationSuggestions.map((suggestion, idx) => (
+                        <button
+                          key={`${suggestion.lat}-${suggestion.lon}-${idx}`}
+                          type="button"
+                          onClick={() => handleSelectLocation(suggestion)}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-left rounded-xl hover:bg-brand-sage/10 dark:hover:bg-slate-800/80 transition-colors cursor-pointer group"
+                        >
+                          <div className="flex size-7 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 shrink-0 group-hover:bg-emerald-200 dark:group-hover:bg-emerald-900/80 transition-colors">
+                            <MapPin className="size-3.5" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-bold text-brand-dark dark:text-white truncate">
+                              {suggestion.shortName}
+                            </p>
+                            <p className="text-[10px] text-brand-dark/45 dark:text-slate-400 truncate leading-tight">
+                              {suggestion.displayName}
+                            </p>
+                          </div>
+                          <span className="shrink-0 text-[10px] text-brand-dark/35 dark:text-slate-500 capitalize">
+                            {suggestion.type}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Matching Clinics from local data */}
+                  {matchingClinics.length > 0 && (
+                    <div className={`p-1 ${locationSuggestions.length > 0 ? 'border-t border-brand-dark/5 dark:border-slate-800' : ''}`}>
+                      <p className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-brand-dark/45 dark:text-slate-400">
+                        Veterinary Clinics
+                      </p>
+                      {matchingClinics.map((clinic) => (
+                        <button
+                          key={clinic.id}
+                          type="button"
+                          onClick={() => handleSelectClinic(clinic)}
+                          className="w-full flex items-center justify-between gap-2 px-3 py-2 text-left rounded-xl hover:bg-brand-sage/10 dark:hover:bg-slate-800/80 transition-colors text-xs cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="flex size-7 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 shrink-0">
+                              <Building2 className="size-3.5" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-bold text-brand-dark dark:text-white truncate">
+                                {clinic.name}
+                              </p>
+                              <p className="text-[10px] text-brand-dark/50 dark:text-slate-400 truncate">
+                                {clinic.city || clinic.address}
+                              </p>
+                            </div>
+                          </div>
+                          {clinic.distance && (
+                            <span className="shrink-0 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                              {clinic.distance}
+                            </span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Empty state */}
+                  {!isFetchingSuggestions && locationSuggestions.length === 0 && matchingClinics.length === 0 && (
+                    <div className="px-4 py-3 text-center text-xs text-brand-dark/60 dark:text-slate-400">
+                      Press <kbd className="font-bold text-brand-dark dark:text-white bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">Enter</kbd> or tap Search to look up "{searchQuery}"
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
-            <p className="text-xs font-medium text-brand-dark/60 dark:text-slate-400">
-              Showing <span className="font-bold text-brand-dark dark:text-white">{visibleVets.length}</span>
-              {visibleVets.length < filteredVets.length && ` of ${filteredVets.length}`} {filteredVets.length === 1 ? 'clinic' : 'clinics'}
-              {userLocation && <span className="ml-1 text-emerald-700 dark:text-emerald-400 font-semibold">(nearest first)</span>}
-            </p>
+            {/* ── Filter Controls Row ── */}
+            <div className="space-y-2 pt-1">
+              <div className="flex flex-wrap items-center gap-2">
+                {/* All Clinics Pill */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFilterEmergency(false)
+                    setFilterOpenNow(false)
+                  }}
+                  className={`min-h-9 rounded-full px-3.5 text-xs font-bold transition-all cursor-pointer ${
+                    !filterEmergency && !filterOpenNow
+                      ? 'bg-brand-sage text-white shadow-xs'
+                      : 'border border-brand-dark/15 dark:border-slate-700 bg-white dark:bg-[#132525] text-brand-dark/75 dark:text-slate-300 hover:bg-brand-cream dark:hover:bg-[#1a3333]'
+                  }`}
+                >
+                  All ({vetsWithLiveDistance.length})
+                </button>
+
+                {/* Emergency 24/7 Filter */}
+                <button
+                  type="button"
+                  aria-pressed={filterEmergency}
+                  onClick={() => setFilterEmergency((value) => !value)}
+                  className={`min-h-9 rounded-full px-3.5 text-xs font-bold transition-all cursor-pointer ${
+                    filterEmergency
+                      ? 'bg-rose-600 text-white shadow-xs ring-2 ring-rose-500/30'
+                      : 'border border-brand-dark/15 dark:border-slate-700 bg-white dark:bg-[#132525] text-brand-dark/75 dark:text-slate-300 hover:bg-brand-cream dark:hover:bg-[#1a3333]'
+                  }`}
+                >
+                  🚨 24/7 Emergency
+                </button>
+
+                {/* Open Now Filter */}
+                <button
+                  type="button"
+                  aria-pressed={filterOpenNow}
+                  onClick={() => setFilterOpenNow((value) => !value)}
+                  className={`min-h-9 rounded-full px-3.5 text-xs font-bold transition-all cursor-pointer ${
+                    filterOpenNow
+                      ? 'bg-emerald-700 text-white shadow-xs ring-2 ring-emerald-500/30'
+                      : 'border border-brand-dark/15 dark:border-slate-700 bg-white dark:bg-[#132525] text-brand-dark/75 dark:text-slate-300 hover:bg-brand-cream dark:hover:bg-[#1a3333]'
+                  }`}
+                >
+                  🟢 Open Now
+                </button>
+
+                {/* Reset button (visible when query or filters active) */}
+                {(filterEmergency || filterOpenNow || searchQuery) && (
+                  <button
+                    type="button"
+                    onClick={handleResetFilters}
+                    className="inline-flex min-h-9 items-center gap-1 rounded-full border border-brand-dark/15 dark:border-slate-700 bg-white dark:bg-[#132525] px-3 text-xs font-bold text-brand-dark/70 dark:text-slate-300 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40 dark:hover:text-rose-300 transition-colors cursor-pointer ml-auto"
+                    title="Reset filters and search"
+                  >
+                    <RotateCcw className="size-3" />
+                    <span>Reset</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Clinic Count & Proximity Status */}
+              <div className="flex items-center justify-between text-xs font-medium text-brand-dark/60 dark:text-slate-400 pt-0.5">
+                <p>
+                  Showing <span className="font-bold text-brand-dark dark:text-white">{visibleVets.length}</span>
+                  {visibleVets.length < filteredVets.length && ` of ${filteredVets.length}`} {filteredVets.length === 1 ? 'clinic' : 'clinics'}
+                  {userLocation && <span className="ml-1 text-emerald-700 dark:text-emerald-400 font-semibold">(nearest first)</span>}
+                </p>
+                {searchQuery && (
+                  <span className="text-[11px] text-brand-dark/50 dark:text-slate-400 truncate max-w-[140px]">
+                    for "{searchQuery}"
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* ── Right Column: Interactive Map & Distance-Ranked List ── */}

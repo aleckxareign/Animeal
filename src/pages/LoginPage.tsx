@@ -23,7 +23,7 @@ import {
 } from 'lucide-react'
 
 export default function LoginPage() {
-  const { isLoggedIn, signIn, signUp, signInWithGoogle, demoLogin } = useAuth()
+  const { isLoggedIn, signIn, signUp, signInWithGoogle } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const location = useLocation()
   const from = (location.state as { from?: string } | null)?.from ?? '/'
@@ -117,10 +117,6 @@ export default function LoginPage() {
     } finally {
       setIsSubmitting(false)
     }
-  }
-
-  function handleDemoLogin() {
-    demoLogin()
   }
 
   function handleForgotPassword(e: FormEvent) {
@@ -274,18 +270,8 @@ export default function LoginPage() {
               </button>
             </div>
 
-            {/* Quick Action Buttons (Demo & Google) */}
+            {/* Quick Action Buttons (Google OAuth) */}
             <div className="space-y-2.5">
-              {/* 1-Click Demo Sign In */}
-              <button
-                type="button"
-                onClick={handleDemoLogin}
-                className="w-full flex items-center justify-center gap-2.5 rounded-full border border-slate-300/90 dark:border-slate-700 bg-white dark:bg-[#1a3333] py-2.5 px-4 text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-[#203f3f] shadow-xs transition-all cursor-pointer"
-              >
-                <span className="text-amber-500 text-sm">⚡</span>
-                <span>Sign in with Quick Demo Access (1-Click)</span>
-              </button>
-
               {/* Sign in / Sign up with Google (Live Supabase OAuth) */}
               <button
                 type="button"

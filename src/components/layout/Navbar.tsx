@@ -13,6 +13,7 @@ import {
   Sun,
   HelpCircle,
   Sparkles,
+  Compass,
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useApp } from '../../context/AppContext'
@@ -132,7 +133,7 @@ export default function Navbar() {
             </li>
 
             {/* Care Schedule Direct Link */}
-            <li>
+            <li id="tour-care-schedule">
               <NavLink
                 to="/care-schedule"
                 className={({ isActive }) =>
@@ -146,7 +147,7 @@ export default function Navbar() {
             </li>
 
             {/* Household Direct Link */}
-            <li>
+            <li id="tour-household">
               <NavLink
                 to="/household"
                 className={({ isActive }) =>
@@ -161,6 +162,7 @@ export default function Navbar() {
 
             {/* Explore Tools Dropdown with 3-second grace timer & hover bridge */}
             <li
+              id="tour-explore-tools"
               ref={exploreDropdownRef}
               className="relative py-1"
               onMouseEnter={handleExploreMouseEnter}
@@ -211,7 +213,7 @@ export default function Navbar() {
               </Link>
             </li>
 
-            <li>
+            <li id="tour-ask-mealie">
               <NavLink
                 to="/ask-mealie"
                 className={({ isActive }) =>
@@ -337,9 +339,21 @@ export default function Navbar() {
                         <HelpCircle className="size-4 text-brand-sage" />
                         <span>Help Center</span>
                       </button>
+
+                      {/* 5. App Tour & Guide */}
+                      <button
+                        onClick={() => {
+                          setProfileMenuOpen(false)
+                          window.dispatchEvent(new CustomEvent('open-animeal-tour'))
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-stone-700 dark:text-slate-200 hover:bg-brand-cream/60 dark:hover:bg-slate-800 transition text-left cursor-pointer"
+                      >
+                        <Compass className="size-4 text-brand-sage" />
+                        <span>App Tour &amp; Guide</span>
+                      </button>
                     </div>
 
-                    {/* 5. Logout */}
+                    {/* 6. Logout */}
                     <div className="pt-1 border-t border-stone-100 dark:border-slate-800">
                       <button
                         onClick={() => {
@@ -496,6 +510,18 @@ export default function Navbar() {
                 >
                   <HelpCircle className="size-4 text-brand-sage" />
                   <span>Help Center</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeAll()
+                    window.dispatchEvent(new CustomEvent('open-animeal-tour'))
+                  }}
+                  className="w-full flex items-center gap-2.5 py-2.5 px-3 rounded-xl text-sm font-bold text-brand-dark dark:text-white hover:bg-stone-100 dark:hover:bg-slate-800"
+                >
+                  <Compass className="size-4 text-brand-sage" />
+                  <span>App Tour &amp; Guide</span>
                 </button>
 
                 <button

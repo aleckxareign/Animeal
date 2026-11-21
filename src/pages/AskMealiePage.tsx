@@ -65,7 +65,9 @@ export default function AskMealiePage() {
   })
 
   const [isThinking, setIsThinking] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const latestMessageIdRef = useRef<string | null>(null)
+  const isInitialLoadRef = useRef(true)
 
   // Initial load from Supabase if available
   useEffect(() => {
@@ -86,14 +88,45 @@ export default function AskMealiePage() {
     }
   }, [messages, user?.id, activePet?.id])
 
-  // Scroll to bottom helper
-  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
-    messagesEndRef.current?.scrollIntoView({ behavior })
-  }, [])
-
+  // Smart container-only scroll management (prevents window jumping and ensures response is visible)
   useEffect(() => {
-    scrollToBottom('smooth')
-  }, [messages, isThinking, scrollToBottom])
+    const container = messagesContainerRef.current
+    if (!container) return
+
+    // Initial load: instant scroll to bottom
+    if (isInitialLoadRef.current) {
+      container.scrollTop = container.scrollHeight
+      isInitialLoadRef.current = false
+      return
+    }
+
+    // While thinking (user sent a prompt): scroll to bottom to show typing indicator
+    if (isThinking) {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: 'smooth',
+      })
+      return
+    }
+
+    // When an AI response arrives: scroll smoothly to the start of the new response so user doesn't scroll up!
+    if (latestMessageIdRef.current) {
+      const el = document.getElementById(`msg-${latestMessageIdRef.current}`)
+      if (el) {
+        const targetTop = el.offsetTop - container.offsetTop - 16
+        container.scrollTo({
+          top: Math.max(0, targetTop),
+          behavior: 'smooth',
+        })
+      } else {
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior: 'smooth',
+        })
+      }
+      latestMessageIdRef.current = null
+    }
+  }, [messages, isThinking])
 
   // Handle switching pet: update context and show friendly toast
   const handleSelectPet = (petId: string) => {
@@ -133,6 +166,11 @@ export default function AskMealiePage() {
         timestamp: Date.now(),
       }))
 
+      const appendMealieMessage = (msg: ExtendedChatMessage) => {
+        latestMessageIdRef.current = msg.id
+        setMessages((prev) => [...prev, msg])
+      }
+
       // 1. Try server-side Gemini AI proxy first (keeps API key secure on server)
       try {
         const proxyRes = await api.chatGeminiProxy(
@@ -163,7 +201,7 @@ export default function AskMealiePage() {
                   { label: '📖 Food Library', type: 'link', value: '/food-library' },
                 ],
           }
-          setMessages((prev) => [...prev, mealieMsg])
+          appendMealieMessage(mealieMsg)
           setIsThinking(false)
           return
         }
@@ -172,9 +210,6 @@ export default function AskMealiePage() {
       }
 
       // 2. Try client-side direct Gemini API (DEVELOPMENT ONLY fallback)
-      // ⚠️ SECURITY NOTE: VITE_GEMINI_API_KEY is exposed in the browser bundle.
-      // In production, always rely on the server proxy (/api/ai/chat) instead.
-      // This branch only fires if the server proxy failed AND the key is set locally.
       if (import.meta.env.VITE_GEMINI_API_KEY && import.meta.env.DEV) {
         try {
           const petProfile = activePet
@@ -209,7 +244,7 @@ export default function AskMealiePage() {
                   { label: '📖 Food Library', type: 'link', value: '/food-library' },
                 ],
           }
-          setMessages((prev) => [...prev, mealieMsg])
+          appendMealieMessage(mealieMsg)
           setIsThinking(false)
           return
         } catch (geminiErr) {
@@ -228,7 +263,7 @@ export default function AskMealiePage() {
           severity: res.severity,
           actions: res.actions,
         }
-        setMessages((prev) => [...prev, mealieMsg])
+        appendMealieMessage(mealieMsg)
       } catch {
         // 4. Fallback to local rule engine
         const response = generateMealieAnswer(trimmed, activePet)
@@ -240,7 +275,7 @@ export default function AskMealiePage() {
           severity: response.severity,
           actions: response.actions,
         }
-        setMessages((prev) => [...prev, mealieMsg])
+        appendMealieMessage(mealieMsg)
       } finally {
         setIsThinking(false)
       }
@@ -261,23 +296,28 @@ export default function AskMealiePage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-80px)] flex-col bg-brand-cream/30">
-      <div className="mx-auto flex h-full w-full max-w-[1600px] flex-col px-4 sm:px-8 lg:px-12 py-3 sm:py-5">
+    <div className="flex h-full w-full flex-col bg-[#fcfbf9] dark:bg-slate-950 overflow-hidden">
+      <div className="mx-auto flex h-full w-full max-w-4xl flex-col px-3 sm:px-6 py-2 sm:py-3 overflow-hidden">
         {/* 1. Header with Pet Context Switcher */}
-        <ChatHeader
-          pets={pets}
-          activePet={activePet}
-          onSelectPet={handleSelectPet}
-          onClearChat={handleClearChat}
-        />
+        <div className="shrink-0 rounded-2xl border border-stone-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
+          <ChatHeader
+            pets={pets}
+            activePet={activePet}
+            onSelectPet={handleSelectPet}
+            onClearChat={handleClearChat}
+          />
+        </div>
 
         {/* 2. Top Banner: Veterinary Advice Disclaimer */}
-        <div className="mt-3">
+        <div className="mt-2 shrink-0 rounded-xl overflow-hidden border border-amber-300/60 shadow-2xs">
           <VeterinaryDisclaimerBanner />
         </div>
 
         {/* 3. Messages Scroll Area */}
-        <div className="mt-4 flex-1 overflow-y-auto rounded-3xl border border-border/70 bg-white/80 p-4 shadow-sm backdrop-blur-xs sm:p-6 space-y-4">
+        <div
+          ref={messagesContainerRef}
+          className="my-3 flex-1 overflow-y-auto rounded-2xl border border-stone-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-4 sm:p-6 space-y-4 shadow-sm"
+        >
           {messages.map((msg) => (
             <MessageBubble
               key={msg.id}
@@ -288,22 +328,27 @@ export default function AskMealiePage() {
 
           {/* 4. Typing Indicator */}
           {isThinking && <TypingIndicator />}
-
-          <div ref={messagesEndRef} className="h-1" />
         </div>
 
-        {/* 5. Quick-Question Suggestion Chips */}
-        <QuickChips
-          onSelectChip={handleSendMessage}
-          disabled={isThinking}
-        />
+        {/* 5. Bottom Interactive Deck (Quick Chips + Chat Input) */}
+        <div className="shrink-0 space-y-2 pb-1">
+          {/* Quick-Question Suggestion Chips */}
+          <div className="rounded-xl border border-stone-200/70 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 shadow-2xs overflow-hidden">
+            <QuickChips
+              onSelectChip={handleSendMessage}
+              disabled={isThinking}
+            />
+          </div>
 
-        {/* 6. Chat Input Area */}
-        <ChatInput
-          onSendMessage={handleSendMessage}
-          disabled={isThinking}
-          onVoiceClick={handleVoiceClick}
-        />
+          {/* Chat Input Area */}
+          <div className="rounded-2xl border border-stone-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+            <ChatInput
+              onSendMessage={handleSendMessage}
+              disabled={isThinking}
+              onVoiceClick={handleVoiceClick}
+            />
+          </div>
+        </div>
       </div>
     </div>
   )

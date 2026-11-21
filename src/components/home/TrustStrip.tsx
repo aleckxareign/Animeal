@@ -18,10 +18,10 @@ const items = [
   },
 ]
 
-export default function TrustStrip() {
+export default function TrustStrip({ className = '' }: { className?: string }) {
   return (
-    <section className="bg-brand-dark text-white border-y border-white/10">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10 py-6">
+    <section className={`bg-brand-dark text-white border-t border-white/10 mt-auto ${className}`}>
+      <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10 py-5 sm:py-6">
         <ul className="grid gap-6 lg:grid-cols-3 lg:divide-x lg:divide-white/15">
           {items.map((item, idx) => (
             <li key={item.title} className={`flex items-start gap-3 ${idx > 0 ? 'lg:pl-6' : ''}`}>

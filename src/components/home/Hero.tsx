@@ -1,17 +1,10 @@
-import { CheckCircle2, Play, Sparkles, Heart, ShieldCheck, ArrowRight } from 'lucide-react'
+import { Sparkles, Heart, ShieldCheck, ArrowRight } from 'lucide-react'
 import Button from '../ui/button'
 import { Badge } from '../ui/badge'
 
-const perks = [
-  'Personalized RER calorie targets',
-  'Philippine pet food price & macro comparisons',
-  'AI label scanner with AAFCO verdicts',
-  'Daily hydration & weight tracking',
-]
-
-export default function Hero() {
+export default function Hero({ className = '' }: { className?: string }) {
   return (
-    <section className="bg-brand-cream py-10 sm:py-12 lg:py-14 landing-wide:pt-3 landing-wide:pb-6">
+    <section className={`bg-brand-cream py-8 sm:py-10 lg:py-12 landing-wide:pt-3 landing-wide:pb-6 flex-1 flex flex-col justify-center ${className}`}>
       <div className="mx-auto grid w-full max-w-[98.5rem] items-center gap-8 px-5 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-10 lg:px-10 landing-wide:gap-12">
 
         {/* Left Column (Hero Content) */}
@@ -37,11 +30,6 @@ export default function Hero() {
             <Button to="/meal-tracker" size="lg" className="font-semibold landing-wide:h-13 landing-wide:gap-3 landing-wide:rounded-[1.25rem] landing-wide:px-6 landing-wide:text-lg">
               <span>Get Started Free</span>
               <ArrowRight className="size-5" />
-            </Button>
-
-            <Button to="/#how-it-works" variant="outline" size="lg" className="font-semibold landing-wide:h-13 landing-wide:gap-3 landing-wide:rounded-[1.25rem] landing-wide:px-6 landing-wide:text-lg">
-              <Play className="size-4.5 fill-current" />
-              <span>How It Works</span>
             </Button>
           </div>
 
@@ -119,30 +107,6 @@ export default function Hero() {
               <span>Hydration: 450ml / 600ml</span>
               <span className="text-brand-sage font-bold">Healthy Range ✓</span>
             </p>
-          </div>
-
-          {/* Floating Perks Card (Floats on wide screens) */}
-          <div className="min-w-0 rounded-2xl bg-white p-4 shadow-md landing-wide:absolute landing-wide:top-0 landing-wide:right-[clamp(-7rem,calc((98.5rem-100vw)/2+2.5rem),0rem)] landing-wide:z-10 landing-wide:w-[22rem] landing-wide:rounded-[1.75rem] landing-wide:p-5 landing-wide:shadow-2xl">
-            <div className="mb-3.5 flex items-center gap-3 landing-wide:mb-4">
-              <div className="flex size-10 shrink-0 landing-wide:size-11 items-center justify-center rounded-xl bg-brand-sage/15 text-brand-sage">
-                <Sparkles className="size-5" />
-              </div>
-              <div>
-                <p className="text-sm font-bold leading-tight text-brand-dark landing-wide:text-base">
-                  Complete Pet Care Hub
-                </p>
-                <p className="text-xs text-brand-dark/75 landing-wide:text-sm">All-in-one nutrition suite</p>
-              </div>
-            </div>
-
-            <ul className="grid gap-2.5 text-sm text-brand-dark/80 landing-wide:gap-3">
-              {perks.map((perk) => (
-                <li key={perk} className="flex items-start gap-2">
-                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-brand-sage landing-wide:size-5" />
-                  <span className="font-medium leading-snug landing-wide:text-base">{perk}</span>
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
       </div>

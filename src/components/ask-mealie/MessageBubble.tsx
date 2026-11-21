@@ -118,16 +118,16 @@ export default function MessageBubble({
 
   if (isUser) {
     return (
-      <div className="flex justify-end gap-2.5 animate-slide-up pl-10 sm:pl-16">
+      <div id={`msg-${message.id}`} className="flex justify-end gap-2.5 animate-slide-up pl-10 sm:pl-16">
         <div className="flex flex-col items-end max-w-[85%] sm:max-w-[75%]">
-          <div className="rounded-2xl rounded-tr-xs bg-brand-dark px-4 py-3 text-white shadow-sm ring-1 ring-black/5">
+          <div className="rounded-2xl rounded-tr-xs bg-brand-sage px-4 py-3 text-white shadow-sm ring-1 ring-black/5">
             <FormattedContent content={message.content} isUser={true} />
           </div>
-          <span className="mt-1 text-[11px] text-brand-dark/50 px-1">
+          <span className="mt-1 text-[11px] text-brand-dark/50 px-1 font-mono">
             {formattedTime}
           </span>
         </div>
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-dark/10 text-brand-dark shadow-xs mt-1">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-sage/15 text-brand-sage shadow-xs mt-1">
           <User size={15} />
         </div>
       </div>
@@ -136,13 +136,13 @@ export default function MessageBubble({
 
   // Mealie response styling according to severity
   const containerClasses = isEmergency
-    ? 'border-2 border-red-500 bg-red-50/70 shadow-md ring-1 ring-red-400/30'
+    ? 'border-2 border-red-500 bg-red-50/80 shadow-md ring-1 ring-red-400/30'
     : isCaution
-      ? 'border border-amber-300 bg-amber-50/50 shadow-xs'
-      : 'border border-brand-dark/10 bg-white shadow-xs'
+      ? 'border border-amber-300 bg-amber-50/60 shadow-xs'
+      : 'border border-border/70 bg-white dark:bg-slate-800/90 shadow-xs'
 
   return (
-    <div className="flex justify-start gap-2.5 animate-slide-up pr-6 sm:pr-14">
+    <div id={`msg-${message.id}`} className="flex justify-start gap-2.5 animate-slide-up pr-6 sm:pr-14">
       {/* Mealie Avatar */}
       <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-cream ring-1 ring-brand-sage/30 shadow-xs mt-1">
         <img
