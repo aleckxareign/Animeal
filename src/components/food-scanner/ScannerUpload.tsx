@@ -11,10 +11,13 @@ import {
   X,
   RefreshCw,
   AlertCircle,
+  Loader2,
 } from 'lucide-react'
-import type { Species, FoodCategory, ScanResult } from '../../types'
+import type { Species, FoodCategory, ScanResult, Pet } from '../../types'
 import { api } from '../../services/api'
+import { scanLabel } from '../../services/gemini'
 import { supabaseStorage } from '../../services/supabase-storage'
+import { useToast } from '../../context/ToastContext'
 
 export type ScannedFoodData = ScanResult & {
   species: Species
@@ -25,15 +28,18 @@ export type ScannedFoodData = ScanResult & {
 
 type ScannerUploadProps = {
   onStartScan: (data: ScannedFoodData, previewUrl?: string) => void
+  activePet?: Pet | null
 }
 
-export default function ScannerUpload({ onStartScan }: ScannerUploadProps) {
+export default function ScannerUpload({ onStartScan, activePet }: ScannerUploadProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [isCameraOpen, setIsCameraOpen] = useState(false)
   const [cameraError, setCameraError] = useState<string | null>(null)
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment')
   const [isCapturing, setIsCapturing] = useState(false)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const { addToast } = useToast()
 
   const cameraInputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -155,7 +161,159 @@ export default function ScannerUpload({ onStartScan }: ScannerUploadProps) {
     }
   }
 
-  const processFile = (file: File) => {
+  // Helper to resize/compress images on an HTML <canvas> (max width 1024px, JPEG quality 0.8)
+  const compressImage = (
+    file: File | Blob,
+    maxWidth = 1024,
+    quality = 0.8
+  ): Promise<{ base64: string; mimeType: string; dataUrl: string }> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onerror = () => reject(new Error('Failed to read image file.'))
+      reader.onload = (e) => {
+        const img = new Image()
+        img.onerror = () => reject(new Error('Failed to parse image data.'))
+        img.onload = () => {
+          let width = img.width
+          let height = img.height
+
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width)
+            width = maxWidth
+          }
+
+          const canvas = document.createElement('canvas')
+          canvas.width = width
+          canvas.height = height
+
+          const ctx = canvas.getContext('2d')
+          if (!ctx) {
+            reject(new Error('Canvas 2D context unavailable.'))
+            return
+          }
+
+          ctx.drawImage(img, 0, 0, width, height)
+          const mimeType = 'image/jpeg'
+          const dataUrl = canvas.toDataURL(mimeType, quality)
+          const base64 = dataUrl.replace(/^data:image\/\w+;base64,/, '')
+          resolve({ base64, mimeType, dataUrl })
+        }
+        img.src = e.target?.result as string
+      }
+      reader.readAsDataURL(file)
+    })
+  }
+
+  // Maps scan result fields from Gemini cleanly to ScannedFoodData
+  const mapScanResultToScannedData = (
+    scanRes: Partial<ScanResult> & Record<string, unknown>,
+    defaultName: string,
+    imageUrl: string,
+    species: Species = 'dog'
+  ): ScannedFoodData => {
+    const isFoodItem = scanRes.isFoodItem !== false
+    const detectedCat = scanRes.detectedCategory as ScannedFoodData['detectedCategory']
+
+    if (!isFoodItem || detectedCat === 'unrelated_image') {
+      return {
+        productName: String(scanRes.product || scanRes.productName || 'Not a food item'),
+        product: String(scanRes.product || scanRes.productName || 'Not a food item'),
+        brand: String(scanRes.brand || 'N/A'),
+        species,
+        category: 'dry',
+        calories: null,
+        caloriesPer100g: null,
+        protein: null,
+        crudeProteinPct: null,
+        fat: null,
+        crudeFatPct: null,
+        fiber: null,
+        crudeFiberPct: null,
+        moisture: null,
+        moisturePct: null,
+        packageWeight: null,
+        price: null,
+        confidence: 'low',
+        suitability: 'unknown',
+        suitabilityNote: String(
+          scanRes.suitabilityNote ||
+            'Hindi ito pagkain ng alaga o food product. Mangyaring mag-upload ng malinaw na litrato ng pet food packaging o pagkain.'
+        ),
+        ingredients: [],
+        isFoodItem: false,
+        detectedCategory: 'unrelated_image',
+        imageUrl,
+      }
+    }
+
+    const productName = String(scanRes.product || scanRes.productName || defaultName || 'Scanned Pet Food')
+    const brand = String(scanRes.brand || 'Detected Brand')
+    const calories =
+      typeof scanRes.caloriesPer100g === 'number'
+        ? scanRes.caloriesPer100g
+        : typeof scanRes.calories === 'number'
+          ? scanRes.calories
+          : null
+    const protein =
+      typeof scanRes.crudeProteinPct === 'number'
+        ? scanRes.crudeProteinPct
+        : typeof scanRes.protein === 'number'
+          ? scanRes.protein
+          : null
+    const fat =
+      typeof scanRes.crudeFatPct === 'number'
+        ? scanRes.crudeFatPct
+        : typeof scanRes.fat === 'number'
+          ? scanRes.fat
+          : null
+    const fiber =
+      typeof scanRes.crudeFiberPct === 'number'
+        ? scanRes.crudeFiberPct
+        : typeof scanRes.fiber === 'number'
+          ? scanRes.fiber
+          : null
+    const moisture =
+      typeof scanRes.moisturePct === 'number'
+        ? scanRes.moisturePct
+        : typeof scanRes.moisture === 'number'
+          ? scanRes.moisture
+          : null
+    const packageWeight = typeof scanRes.packageWeight === 'number' ? scanRes.packageWeight : null
+    const price = typeof scanRes.price === 'number' ? scanRes.price : null
+    const confidence = (scanRes.confidence as 'high' | 'medium' | 'low') || 'high'
+    const suitability = scanRes.suitability as 'safe' | 'caution' | 'unsafe' | 'unknown' | undefined
+    const suitabilityNote = typeof scanRes.suitabilityNote === 'string' ? scanRes.suitabilityNote : undefined
+    const ingredients = Array.isArray(scanRes.ingredients) ? (scanRes.ingredients as string[]) : undefined
+
+    return {
+      productName,
+      product: productName,
+      brand,
+      species,
+      category: 'dry',
+      calories,
+      caloriesPer100g: calories,
+      protein,
+      crudeProteinPct: protein,
+      fat,
+      crudeFatPct: fat,
+      fiber,
+      crudeFiberPct: fiber,
+      moisture,
+      moisturePct: moisture,
+      packageWeight,
+      price,
+      confidence,
+      suitability,
+      suitabilityNote,
+      ingredients,
+      isFoodItem: true,
+      detectedCategory: detectedCat === 'whole_or_human_food' ? 'whole_or_human_food' : 'pet_food_label',
+      imageUrl,
+    }
+  }
+
+  const processFile = async (file: File) => {
     if (!file.type.startsWith('image/')) {
       setUploadError('Please select a valid image file (JPG, PNG, WebP).')
       return
@@ -167,69 +325,77 @@ export default function ScannerUpload({ onStartScan }: ScannerUploadProps) {
     }
 
     setUploadError(null)
+    setIsAnalyzing(true)
 
-    const reader = new FileReader()
-    reader.onload = async (e) => {
-      const dataUrl = e.target?.result as string
+    try {
+      // Compress/resize on canvas (max width 1024px, JPEG quality 0.8) for fast 1-2s vision scans
+      const { base64, mimeType, dataUrl } = await compressImage(file, 1024, 0.8)
 
-      // Upload to Supabase Storage in parallel
+      // Upload to Supabase Storage in parallel if configured
       const storageUrlPromise = supabaseStorage.uploadImage(file, 'food-labels', 'scans').catch(() => null)
 
-      // 1. Try real server-side Gemini AI vision extraction
-      try {
-        const scanRes = await api.scanLabelProxy(dataUrl, file.type)
-        if (scanRes && (scanRes.productName || scanRes.brand)) {
-          const cloudUrl = await storageUrlPromise
-          const finalUrl = cloudUrl || dataUrl
+      const petSpecies = activePet?.species || 'dog'
+      const fallbackName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ') || 'Scanned Food'
 
-          const scannedData: ScannedFoodData = {
-            productName: String(scanRes.productName || file.name.replace(/\.[^/.]+$/, '')),
-            brand: String(scanRes.brand || 'Detected Brand'),
-            species: 'dog',
-            category: 'dry',
-            calories: typeof scanRes.caloriesPer100g === 'number' ? scanRes.caloriesPer100g : 350,
-            protein: typeof scanRes.protein === 'number' ? scanRes.protein : 24,
-            fat: typeof scanRes.fat === 'number' ? scanRes.fat : 12,
-            fiber: typeof scanRes.fiber === 'number' ? scanRes.fiber : 4,
-            moisture: typeof scanRes.moisture === 'number' ? scanRes.moisture : 10,
-            packageWeight: typeof scanRes.packageWeight === 'number' ? scanRes.packageWeight : 1000,
-            price: typeof scanRes.price === 'number' ? scanRes.price : 280,
-            confidence: (scanRes.confidence as 'high' | 'medium' | 'low') || 'high',
-            imageUrl: finalUrl,
-          }
-          onStartScan(scannedData, finalUrl)
-          return
+      let scanRes: Partial<ScanResult> | null = null
+
+      // 1. Try real server-side Gemini AI vision extraction proxy first
+      try {
+        const proxyRes = await api.scanLabelProxy(base64, mimeType, activePet || undefined)
+        if (proxyRes && (proxyRes.brand || proxyRes.product || proxyRes.productName || proxyRes.isFoodItem !== undefined)) {
+          scanRes = proxyRes as Partial<ScanResult>
         }
-      } catch {
-        // Fallback to simulated extraction if server AI proxy is offline
+      } catch (proxyErr) {
+        console.warn('Server-side scan proxy failed, attempting client-side fallback:', proxyErr)
+      }
+
+      // 2. Client-side scanLabel fallback if server proxy fails or returned empty
+      if (!scanRes) {
+        try {
+          const petProfile = activePet
+            ? {
+                name: activePet.name,
+                species: activePet.species,
+                breed: activePet.breed || 'Pet',
+                ageMonths: (activePet.age || 1) * 12,
+                weightKg: activePet.weight || 10,
+                lifeStage: activePet.lifeStage,
+                neutered: activePet.neutered,
+                dailyCalorieTarget: activePet.dailyCalorieTarget,
+                dietaryPreference: activePet.dietaryPreference,
+                preferredFoods: activePet.preferredFoods,
+                avoidedFoods: activePet.avoidedFoods,
+              }
+            : null
+
+          scanRes = await scanLabel(base64, mimeType, petProfile)
+        } catch (clientErr) {
+          console.warn('Client-side scanLabel fallback failed:', clientErr)
+        }
+      }
+
+      // 3. If both server proxy and client direct scan failed, report a real error (no mock/fake data!)
+      if (!scanRes) {
+        const errorMsg = 'Could not analyze food label. Please ensure the image is clear and well-lit, or try again.'
+        setUploadError(errorMsg)
+        addToast(errorMsg, 'error')
+        setIsAnalyzing(false)
+        return
       }
 
       const cloudUrl = await storageUrlPromise
       const finalUrl = cloudUrl || dataUrl
 
-      // 2. Simulated OCR extraction from uploaded image
-      const simulatedData: ScannedFoodData = {
-        productName: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ') || 'Scanned Pet Food',
-        brand: 'Detected Brand',
-        species: 'dog',
-        category: 'dry',
-        calories: 360,
-        protein: 24,
-        fat: 12,
-        fiber: 4,
-        moisture: 10,
-        packageWeight: 1000,
-        price: 280,
-        confidence: 'high',
-        imageUrl: finalUrl,
-      }
-
-      onStartScan(simulatedData, finalUrl)
+      const mappedData = mapScanResultToScannedData(scanRes, fallbackName, finalUrl, petSpecies)
+      setIsAnalyzing(false)
+      onStartScan(mappedData, finalUrl)
+    } catch (err: unknown) {
+      console.error('Processing image error:', err)
+      const errorMsg = err instanceof Error ? err.message : 'Failed to process image.'
+      setUploadError(errorMsg)
+      addToast(errorMsg, 'error')
+      setIsAnalyzing(false)
     }
-    reader.onerror = () => {
-      setUploadError('Failed to read image file. Please try again.')
-    }
-    reader.readAsDataURL(file)
   }
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
@@ -276,6 +442,16 @@ export default function ScannerUpload({ onStartScan }: ScannerUploadProps) {
         </p>
       </div>
 
+      {isAnalyzing && (
+        <div className="animate-fade-in flex items-center justify-center gap-3 rounded-2xl border border-brand-sage/30 bg-brand-sage/10 p-5 text-sm text-brand-dark shadow-sm">
+          <Loader2 className="h-6 w-6 animate-spin text-brand-sage shrink-0" />
+          <div>
+            <p className="font-bold text-base">Analyzing packaging with Gemini Vision AI...</p>
+            <p className="text-xs text-brand-dark/70">Extracting guaranteed analysis & suitability (~1–2s)</p>
+          </div>
+        </div>
+      )}
+
       {uploadError && (
         <div className="animate-fade-in flex items-center gap-3 rounded-xl border border-brand-alert/20 bg-brand-alert/10 p-4 text-sm text-brand-alert">
           <AlertTriangle className="h-5 w-5 shrink-0" />
@@ -312,8 +488,9 @@ export default function ScannerUpload({ onStartScan }: ScannerUploadProps) {
           <div className="mt-6 flex flex-col gap-2">
             <button
               type="button"
+              disabled={isAnalyzing}
               onClick={handleOpenCamera}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-brand-sage px-5 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-sage/90 active:scale-[0.99] cursor-pointer"
+              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-brand-sage px-5 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-sage/90 active:scale-[0.99] disabled:opacity-50 cursor-pointer"
             >
               <Camera className="h-4 w-4" />
               <span>Open Camera</span>
@@ -336,8 +513,12 @@ export default function ScannerUpload({ onStartScan }: ScannerUploadProps) {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => {
+            if (!isAnalyzing) fileInputRef.current?.click()
+          }}
           className={`group flex cursor-pointer flex-col justify-between rounded-2xl border-2 border-dashed p-6 text-center transition-all ${
+            isAnalyzing ? 'opacity-50 pointer-events-none' : ''
+          } ${
             isDragging
               ? 'border-brand-sage bg-brand-sage/5 shadow-md scale-[1.01]'
               : 'border-brand-dark/20 bg-white hover:border-brand-sage/60 hover:bg-brand-cream/30 hover:shadow-sm'

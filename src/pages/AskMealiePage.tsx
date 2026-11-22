@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
@@ -17,7 +18,11 @@ import { api } from '../services/api'
 import type { ChatAction, Pet } from '../types'
 import { generateId, loadFromStorage, saveToStorage } from '../utils/storage'
 
-const STORAGE_KEY = 'animeal_ask_mealie_chat_v1'
+const STORAGE_KEY_PREFIX = 'animeal_ask_mealie_chat_v2_'
+
+function getChatStorageKey(petId: string | null | undefined): string {
+  return `${STORAGE_KEY_PREFIX}${petId || 'no-pet'}`
+}
 
 function getInitialGreeting(pet: Pet | null): ExtendedChatMessage {
   if (pet) {
@@ -55,9 +60,11 @@ export default function AskMealiePage() {
   const { pets, activePet, setActivePet } = useApp()
   const { user } = useAuth()
   const { addToast } = useToast()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const [messages, setMessages] = useState<ExtendedChatMessage[]>(() => {
-    const saved = loadFromStorage<ExtendedChatMessage[] | null>(STORAGE_KEY, null)
+    const key = getChatStorageKey(activePet?.id)
+    const saved = loadFromStorage<ExtendedChatMessage[] | null>(key, null)
     if (saved && Array.isArray(saved) && saved.length > 0) {
       return saved
     }
@@ -68,6 +75,24 @@ export default function AskMealiePage() {
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const latestMessageIdRef = useRef<string | null>(null)
   const isInitialLoadRef = useRef(true)
+  const prevPetIdRef = useRef<string | null | undefined>(activePet?.id ?? (pets.length === 0 ? 'no-pet' : null))
+
+  // Switch chat history when active pet changes
+  useEffect(() => {
+    const threadKey = activePet?.id ?? (pets.length === 0 ? 'no-pet' : null)
+    if (threadKey === null) return
+    if (prevPetIdRef.current === threadKey) return
+
+    prevPetIdRef.current = threadKey
+    const key = getChatStorageKey(threadKey === 'no-pet' ? null : threadKey)
+    const saved = loadFromStorage<ExtendedChatMessage[] | null>(key, null)
+    if (saved && Array.isArray(saved) && saved.length > 0) {
+      setMessages(saved)
+    } else {
+      setMessages([getInitialGreeting(activePet)])
+    }
+    isInitialLoadRef.current = true
+  }, [activePet, pets.length])
 
   // Initial load from Supabase if available
   useEffect(() => {
@@ -80,9 +105,11 @@ export default function AskMealiePage() {
     }
   }, [user?.id, activePet?.id])
 
-  // Persist messages to LocalStorage & Supabase Cloud
+  // Persist messages to LocalStorage & Supabase Cloud per active pet
   useEffect(() => {
-    saveToStorage(STORAGE_KEY, messages)
+    const threadKey = activePet?.id || 'no-pet'
+    const storageKey = getChatStorageKey(threadKey === 'no-pet' ? null : threadKey)
+    saveToStorage(storageKey, messages)
     if (isSupabaseConfigured && user?.id && user.id !== 'demo-user-id' && messages.length > 1) {
       supabaseDb.saveChatConversation(user.id, messages, activePet?.id).catch(() => {})
     }
@@ -137,10 +164,13 @@ export default function AskMealiePage() {
     }
   }
 
-  // Handle clearing chat
+  // Handle clearing chat (only for current pet thread)
   const handleClearChat = () => {
     const freshGreeting = getInitialGreeting(activePet)
     setMessages([freshGreeting])
+    const threadKey = activePet?.id || 'no-pet'
+    const storageKey = getChatStorageKey(threadKey === 'no-pet' ? null : threadKey)
+    saveToStorage(storageKey, [freshGreeting])
     addToast('Chat conversation cleared', 'info')
   }
 
@@ -160,24 +190,32 @@ export default function AskMealiePage() {
       setMessages((prev) => [...prev, userMsg])
       setIsThinking(true)
 
-      const chatHistory = messages.map((m) => ({
-        role: (m.role === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
-        text: m.content,
-        timestamp: Date.now(),
-      }))
+      // Build chat history for Gemini, excluding the initial welcome message so the first turn is always a user message
+      const chatHistory = messages
+        .filter((m) => m.id !== 'welcome-message')
+        .map((m) => ({
+          role: (m.role === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
+          text: m.content,
+          timestamp: Date.now(),
+        }))
 
       const appendMealieMessage = (msg: ExtendedChatMessage) => {
         latestMessageIdRef.current = msg.id
         setMessages((prev) => [...prev, msg])
       }
 
-      // 1. Try server-side Gemini AI proxy first (keeps API key secure on server)
+      // 1. Try server-side Gemini AI proxy first (keeps API key secure on server) with a 4-second timeout
       try {
-        const proxyRes = await api.chatGeminiProxy(
-          trimmed,
-          chatHistory,
-          activePet || undefined
-        )
+        const proxyRes = await Promise.race([
+          api.chatGeminiProxy(
+            trimmed,
+            chatHistory,
+            activePet || undefined
+          ),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('Backend chat proxy timeout')), 4000)
+          ),
+        ])
 
         if (proxyRes?.reply) {
           const isEmergency =
@@ -209,8 +247,8 @@ export default function AskMealiePage() {
         // Fallback to client-side direct or local engine
       }
 
-      // 2. Try client-side direct Gemini API (DEVELOPMENT ONLY fallback)
-      if (import.meta.env.VITE_GEMINI_API_KEY && import.meta.env.DEV) {
+      // 2. Try client-side direct Gemini API fallback
+      if (import.meta.env.VITE_GEMINI_API_KEY) {
         try {
           const petProfile = activePet
             ? {
@@ -219,6 +257,12 @@ export default function AskMealiePage() {
                 breed: activePet.breed || 'Pet',
                 ageMonths: (activePet.age || 1) * 12,
                 weightKg: activePet.weight || 10,
+                lifeStage: activePet.lifeStage,
+                neutered: activePet.neutered,
+                dailyCalorieTarget: activePet.dailyCalorieTarget,
+                dietaryPreference: activePet.dietaryPreference,
+                preferredFoods: activePet.preferredFoods,
+                avoidedFoods: activePet.avoidedFoods,
               }
             : undefined
 
@@ -282,6 +326,17 @@ export default function AskMealiePage() {
     },
     [isThinking, activePet, messages],
   )
+
+  // Auto-send query parameter if navigated with /ask-mealie?q=... (e.g. from homepage quick suggestions)
+  const queryHandledRef = useRef(false)
+  useEffect(() => {
+    const qParam = searchParams.get('q')
+    if (qParam && !queryHandledRef.current) {
+      queryHandledRef.current = true
+      handleSendMessage(qParam)
+      setSearchParams({}, { replace: true })
+    }
+  }, [searchParams, handleSendMessage, setSearchParams])
 
   // Handle action click (chip triggers follow-up question)
   const handleActionClick = (action: ChatAction) => {

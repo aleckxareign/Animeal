@@ -12,6 +12,7 @@ export type Feature = {
 // ===== Pet types =====
 export type Species = 'dog' | 'cat'
 export type LifeStage = 'puppy' | 'kitten' | 'adult' | 'senior'
+export type DietaryPreference = 'any' | 'wet_only' | 'dry_only' | 'home_cooked' | 'picky'
 
 export type Pet = {
   id: string
@@ -24,6 +25,9 @@ export type Pet = {
   lifeStage: LifeStage
   avatarEmoji: string
   dailyCalorieTarget: number
+  dietaryPreference?: DietaryPreference
+  preferredFoods?: string[]
+  avoidedFoods?: string[]
   waterGoal: number
   createdAt: string
 }
@@ -180,6 +184,12 @@ export type PetProfile = {
   breed: string
   ageMonths: number
   weightKg: number
+  lifeStage?: string
+  neutered?: boolean
+  dailyCalorieTarget?: number
+  dietaryPreference?: string
+  preferredFoods?: string[]
+  avoidedFoods?: string[]
 }
 
 // ─── Chat types ────────────────────────────────────────────────
@@ -209,6 +219,8 @@ export type ScanResult = {
   packageWeight: number | null
   price: number | null
   confidence: 'high' | 'medium' | 'low'
+  isFoodItem?: boolean
+  detectedCategory?: 'pet_food_label' | 'whole_or_human_food' | 'unrelated_image'
   suitability?: 'safe' | 'caution' | 'unsafe' | 'unknown'
   suitabilityNote?: string
   ingredients?: string[]

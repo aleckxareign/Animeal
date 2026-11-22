@@ -69,6 +69,23 @@
       "dailyCalorieTarget": 1579,
       "waterGoal": 2500,
       "createdAt": "2026-11-04T04:22:57.414Z"
+    },
+    {
+      "id": "mwrotuottasl1fu",
+      "name": "Ming ming",
+      "species": "cat",
+      "breed": "Puspin (Pusang Pinoy)",
+      "weight": 5,
+      "age": 1,
+      "neutered": true,
+      "lifeStage": "adult",
+      "avatarEmoji": "🐱",
+      "dailyCalorieTarget": 281,
+      "waterGoal": 250,
+      "dietaryPreference": "any",
+      "preferredFoods": [],
+      "avoidedFoods": [],
+      "createdAt": "2026-11-22T10:22:15.197Z"
     }
   ],
   "feedings": [

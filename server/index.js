@@ -91,7 +91,7 @@ const aiLimiter = rateLimit({
 app.use('/api', generalLimiter)
 app.use('/api/ai', aiLimiter)
 
-app.use(express.json({ limit: '10mb' }))
+app.use(express.json({ limit: '15mb' }))
 
 // ── 4. Secure Cookies helper (used if session cookies ever needed) ──
 // Sessions are JWT-based via Supabase; cookies are set by Supabase client-side.
@@ -322,7 +322,19 @@ app.get('/api/pets', (req, res) => {
 
 app.post('/api/pets', (req, res) => {
   const db = readDb()
-  const { name, species, breed, weight, age, neutered, lifeStage, avatarEmoji } = req.body
+  const {
+    name,
+    species,
+    breed,
+    weight,
+    age,
+    neutered,
+    lifeStage,
+    avatarEmoji,
+    dietaryPreference,
+    preferredFoods,
+    avoidedFoods,
+  } = req.body
 
   const weightNum = Number(weight) || 5
   const dailyCalorieTarget = calculateDailyCalories(weightNum, species, lifeStage, neutered)
@@ -340,6 +352,9 @@ app.post('/api/pets', (req, res) => {
     avatarEmoji: avatarEmoji || (species === 'cat' ? '🐱' : '🐕'),
     dailyCalorieTarget,
     waterGoal,
+    dietaryPreference: dietaryPreference || 'any',
+    preferredFoods: Array.isArray(preferredFoods) ? preferredFoods : [],
+    avoidedFoods: Array.isArray(avoidedFoods) ? avoidedFoods : [],
     createdAt: new Date().toISOString(),
   }
 
@@ -591,14 +606,17 @@ app.delete('/api/foods/:id', (req, res) => {
 const TOXIC_TRIGGERS = [
   { words: ['chocolate', 'tsokolate', 'cacao'], item: 'Chocolate', danger: 'high' },
   { words: ['onion', 'sibuyas', 'garlic', 'bawang', 'leek'], item: 'Onions / Garlic (Allium)', danger: 'high' },
-  { words: ['grape', 'raisin', 'ubas'], item: 'Grapes / Raisins', danger: 'high' },
+  { words: ['grape', 'raisin', 'ubas', 'pasas'], item: 'Grapes / Raisins', danger: 'high' },
   { words: ['xylitol', 'sugar-free', 'sweetener'], item: 'Xylitol', danger: 'high' },
-  { words: ['paracetamol', 'biogesic', 'ibuprofen', 'panadol'], item: 'Human Painkillers', danger: 'emergency' },
+  { words: ['paracetamol', 'biogesic', 'ibuprofen', 'panadol', 'advil'], item: 'Human Painkillers', danger: 'emergency' },
+  { words: ['lily', 'lilies', 'liryo'], item: 'Lilies (deadly to cats)', danger: 'emergency' },
+  { words: ['alcohol', 'beer', 'wine', 'alak'], item: 'Alcohol', danger: 'high' },
+  { words: ['coffee', 'kape', 'caffeine'], item: 'Caffeine', danger: 'high' },
 ]
 
 app.post('/api/mealie/chat', (req, res) => {
   const { message, petContext } = req.body
-  const q = (message || '').toLowerCase()
+  const q = (message || '').toLowerCase().trim()
 
   // 1. Check for emergency toxic substances
   for (const trigger of TOXIC_TRIGGERS) {
@@ -609,18 +627,154 @@ app.post('/api/mealie/chat', (req, res) => {
         content: `🚨 **EMERGENCY WARNING: ${trigger.item} is extremely toxic to pets!**\n\nIngestion can cause acute organ damage or toxicity. Do NOT induce vomiting without consulting a professional.\n\n**Immediate Action:** Please contact or proceed immediately to the nearest veterinary emergency clinic!`,
         actions: [
           { label: '🏥 Find Emergency Vet Clinic Now', type: 'link', value: '/#nearby-vets' },
-          { label: '📞 Call Emergency Hotline', type: 'link', value: 'tel:0285349012' },
+          { label: '📞 Call PAWS Hotline: (02) 8475-1688', type: 'link', value: 'tel:0284751688' },
         ],
         timestamp: new Date().toISOString(),
       })
     }
   }
 
-  // 2. Personalized response with pet context
+  // 2. Pet context
   const petName = petContext?.name ? `**${petContext.name}**` : 'your pet'
   const petSpecies = petContext?.species || 'pet'
 
-  if (q.includes('how much') || q.includes('magkano') || q.includes('portion') || q.includes('gaano karami')) {
+  // Hydration first (so 'how much water' doesn't get hijacked by food portions!)
+  if (q.includes('water') || q.includes('tubig') || q.includes('hydration') || q.includes('uhaw')) {
+    return res.json({
+      role: 'mealie',
+      severity: 'info',
+      content: `💧 **Daily Hydration Guideline:**\nThe veterinary standard for ${petSpecies}s is **~50 ml of fresh water per kg of body weight** daily.\n\nFor ${petName}, that is approximately **${petContext?.waterGoal || 500} ml per day**.\n\n💡 **Tip:** If ${petName} is a picky drinker, incorporating wet canned food or soaking kibble helps boost water intake!`,
+      actions: [
+        { label: '💧 Track Water Today', type: 'link', value: '/pet-wellness?tab=water' },
+        { label: '🍲 View Food Options', type: 'link', value: '/food-library' },
+      ],
+      timestamp: new Date().toISOString(),
+    })
+  }
+
+  // Vet cost check (so 'magkano magpa-vet' doesn't get hijacked by food portions!)
+  if (q.includes('magkano magpa-vet') || q.includes('presyo ng vet') || q.includes('vet cost') || q.includes('consultation fee')) {
+    return res.json({
+      role: 'mealie',
+      severity: 'info',
+      content: `🏥 **Veterinary Consultation & Check-up Estimates (PH):**\n\n• **General Consultation:** ~₱300 – ₱700\n• **Core Vaccines (5-in-1 / 4-in-1):** ~₱450 – ₱800 per shot\n• **Anti-Rabies Shot:** ~₱250 – ₱450 (or free at your City Veterinary Office!)\n• **Deworming (Purga):** ~₱150 – ₱350 based on weight\n\nContact nearby veterinary clinics to confirm their specific consultation schedules.`,
+      actions: [
+        { label: '🏥 Find Nearby Vets', type: 'link', value: '/#nearby-vets' },
+      ],
+      timestamp: new Date().toISOString(),
+    })
+  }
+
+  // Safe foods: chicken & rice
+  if (q.includes('chicken') || q.includes('manok') || q.includes('rice') || q.includes('kanin') || q.includes('lugaw')) {
+    return res.json({
+      role: 'mealie',
+      severity: 'info',
+      content: `🍗 **Boiled Chicken & White Rice:**\n\nPlain boiled skinless chicken breast with soft white rice is one of the safest and most gentle bland meals for dogs and recovering cats!\n\n• **Preparation:** Boil in plain water without onions, garlic, soy sauce, or oil.\n• **Great for:** Soothing mild diarrhea or restoring appetite.`,
+      actions: [
+        { label: '🍲 Log Meal in Tracker', type: 'link', value: '/meal-tracker' },
+        { label: '📖 Food Library', type: 'link', value: '/food-library' },
+      ],
+      timestamp: new Date().toISOString(),
+    })
+  }
+
+  // Safe foods: eggs
+  if (q.includes('egg') || q.includes('itlog')) {
+    return res.json({
+      role: 'mealie',
+      severity: 'info',
+      content: `🍳 **Cooked Eggs for Pets:**\n\nPlain cooked eggs (scrambled or hard-boiled) are a healthy, highly digestible protein source packed with amino acids and riboflavin for ${petName}.\n\n• **Important:** Cook plain with no oil, butter, salt, or onions. Avoid raw egg whites.`,
+      actions: [
+        { label: '🍲 Food Library', type: 'link', value: '/food-library' },
+      ],
+      timestamp: new Date().toISOString(),
+    })
+  }
+
+  // Safe foods: kalabasa / pumpkin
+  if (q.includes('kalabasa') || q.includes('pumpkin') || q.includes('squash')) {
+    return res.json({
+      role: 'mealie',
+      severity: 'info',
+      content: `🎃 **Kalabasa (Pumpkin / Squash):**\n\nPlain cooked kalabasa is a fantastic source of soluble fiber that soothes digestive upset, helping with both mild diarrhea and constipation in ${petSpecies}s!\n\n• **Serving:** Steam or boil soft, mash plain, and mix 1–2 spoonfuls with their meal.`,
+      actions: [
+        { label: '🍲 Food Library', type: 'link', value: '/food-library' },
+      ],
+      timestamp: new Date().toISOString(),
+    })
+  }
+
+  // Symptoms: vomiting
+  if (q.includes('vomit') || q.includes('suka') || q.includes('nagsuka')) {
+    return res.json({
+      role: 'mealie',
+      severity: 'caution',
+      content: `🤢 **Vomiting Advice for ${petName}:**\n\nIf it is a single isolated episode and ${petName} is active and alert, rest their stomach for 2 hours, offer small sips of water, then a bland meal of boiled chicken and white rice.\n\n🚨 **Rush to a vet immediately if:** vomiting repeatedly (3+ times), blood is present, swollen abdomen, or suspected toxic ingestion.`,
+      actions: [
+        { label: '🏥 Find Nearby Vets', type: 'link', value: '/#nearby-vets' },
+      ],
+      timestamp: new Date().toISOString(),
+    })
+  }
+
+  // Symptoms: diarrhea
+  if (q.includes('diarrhea') || q.includes('pagtatae') || q.includes('lbm')) {
+    return res.json({
+      role: 'mealie',
+      severity: 'caution',
+      content: `💩 **Diarrhea Care for ${petName}:**\n\nEnsure access to fresh drinking water to prevent dehydration. Feed a bland diet of boiled skinless chicken breast + soft white rice + 1 spoon of steamed kalabasa.\n\n🚨 **See a clinic right away if:** there is blood in the stool, black tarry color, or lasts over 24 hours.`,
+      actions: [
+        { label: '🏥 Find Nearby Vets', type: 'link', value: '/#nearby-vets' },
+      ],
+      timestamp: new Date().toISOString(),
+    })
+  }
+
+  // Symptoms: ticks & fleas
+  if (q.includes('garapata') || q.includes('pulgas') || q.includes('flea') || q.includes('tick')) {
+    return res.json({
+      role: 'mealie',
+      severity: 'info',
+      content: `🪲 **Ticks & Fleas (Garapata at Pulgas):**\n\nIn our Philippine climate, ticks and fleas transmit blood parasites (Ehrlichiosis). Veterinary oral chewables (such as NexGard, Bravecto, or Simparica) or topical spot-ons provide safe, month-long protection.\n\nWash pet bedding in hot water and clean outdoor resting spots!`,
+      actions: [
+        { label: '🏥 Find Nearby Vet Clinic', type: 'link', value: '/#nearby-vets' },
+        { label: '🗓️ Care Schedule', type: 'link', value: '/care-schedule' },
+      ],
+      timestamp: new Date().toISOString(),
+    })
+  }
+
+  // Greetings & Conversational
+  if (q === 'hi' || q === 'hello' || q === 'kamusta' || q.startsWith('hi ') || q.startsWith('hello ')) {
+    return res.json({
+      role: 'mealie',
+      severity: 'info',
+      content: `Hello there! 🐾 I am **Mealie**, your AI Pet Nutrition & Care Assistant!\n\nI am ready to help you with advice tailored for ${petName} (${petSpecies}). Ask me about safe vs toxic foods, daily calories, water goals, or everyday wellness!`,
+      actions: [
+        { label: '🍫 Is chocolate safe?', type: 'chip', value: 'Is chocolate safe for dogs?' },
+        { label: '🍗 Can pets eat chicken & rice?', type: 'chip', value: 'Can dogs eat chicken and rice?' },
+        { label: '💧 How much water?', type: 'chip', value: 'How much water does my pet need?' },
+      ],
+      timestamp: new Date().toISOString(),
+    })
+  }
+
+  // Gratitude
+  if (q.includes('thank') || q.includes('salamat')) {
+    return res.json({
+      role: 'mealie',
+      severity: 'info',
+      content: `Walang anuman! 🐾 Always happy to support you and ${petName}. Give them a gentle hug and treat from Mealie! ❤️`,
+      actions: [
+        { label: '🍲 Food Library', type: 'link', value: '/food-library' },
+      ],
+      timestamp: new Date().toISOString(),
+    })
+  }
+
+  // Feeding & Portion calculations
+  if (q.includes('how much') || q.includes('portion') || q.includes('gaano karami') || q.includes('pakainin') || q.includes('calorie')) {
     return res.json({
       role: 'mealie',
       severity: 'info',
@@ -633,25 +787,14 @@ app.post('/api/mealie/chat', (req, res) => {
     })
   }
 
-  if (q.includes('water') || q.includes('tubig') || q.includes('hydration')) {
-    return res.json({
-      role: 'mealie',
-      severity: 'info',
-      content: `💧 Hydration is essential! The veterinary guideline for ${petSpecies}s is **~50 ml of fresh water per kg of body weight** daily.\n\nFor ${petName}, that's roughly **${petContext?.waterGoal || 500} ml per day**. Tip: If ${petName} is a picky drinker, incorporating wet food helps boost water intake!`,
-      actions: [
-        { label: '💧 Track Water Today', type: 'link', value: '/pet-wellness?tab=water' },
-      ],
-      timestamp: new Date().toISOString(),
-    })
-  }
-
   // General helpful response
   res.json({
     role: 'mealie',
     severity: 'info',
-    content: `Kamusta! I am **Mealie**, your AI pet nutrition assistant! 🐾\n\nI can help you review ingredients, calculate portion targets for ${petName}, or guide you on when to visit the clinic.\n\nAsk me about safe fruits, best foods for Pinoy pets, or common symptoms!`,
+    content: `Kamusta! I hear your question: *"${message}"*.\n\nI can help review food safety for ${petName}, calculate daily calorie and water targets, or guide you on when to visit the clinic.\n\nTry asking me:\n• *"Pwede ba ang manok at kanin sa alaga ko?"*\n• *"How much water does my pet need?"*\n• *"Is chocolate or garlic safe?"*`,
     actions: [
-      { label: '🍲 What foods are safe?', type: 'chip', value: 'Can dogs eat human food?' },
+      { label: '🍗 Safe Whole Foods', type: 'chip', value: 'Can dogs eat chicken and rice?' },
+      { label: '🍲 View Food Library', type: 'link', value: '/food-library' },
       { label: '🏥 Find Nearby Vets', type: 'link', value: '/#nearby-vets' },
     ],
     timestamp: new Date().toISOString(),
@@ -668,21 +811,29 @@ function getGeminiClient() {
 
 function buildServerMealiePrompt(pet) {
   const petCtx = pet
-    ? `\nActive pet profile:\n- Name: ${pet.name || 'Pet'}\n- Species: ${pet.species || 'dog'}\n- Breed: ${pet.breed || 'Mixed'}\n- Age: ${pet.age ? `${pet.age} years` : '1 year'}\n- Weight: ${pet.weight || pet.weightKg || '5'} kg\nAlways tailor advice to this pet's exact profile.`
-    : '\nNo pet profile is active. Ask the user about their pet when relevant.'
+    ? `\nActive pet profile:
+- Name: ${pet.name || 'Pet'}
+- Species: ${pet.species || 'dog'}
+- Breed: ${pet.breed || 'Mixed'}
+- Age: ${pet.age ? `${pet.age} years` : pet.ageMonths ? `${pet.ageMonths} months` : '1 year'}
+- Weight: ${pet.weight || pet.weightKg || '5'} kg${pet.lifeStage ? `\n- Life stage: ${pet.lifeStage}` : ''}${pet.neutered !== undefined ? `\n- Neutered: ${pet.neutered ? 'Yes' : 'No'}` : ''}${pet.dailyCalorieTarget ? `\n- Daily calorie target: ${pet.dailyCalorieTarget} kcal` : ''}${pet.dietaryPreference && pet.dietaryPreference !== 'any' ? `\n- Dietary preference: ${pet.dietaryPreference.replace('_', ' ')}` : ''}${pet.preferredFoods?.length ? `\n- Preferred/favorite foods: ${Array.isArray(pet.preferredFoods) ? pet.preferredFoods.join(', ') : pet.preferredFoods}` : ''}${pet.avoidedFoods?.length ? `\n- Foods to avoid: ${Array.isArray(pet.avoidedFoods) ? pet.avoidedFoods.join(', ') : pet.avoidedFoods}` : ''}
+Always tailor portion sizes, food choices, and recommendations to this pet's exact profile. Respect their dietary preferences and avoid suggesting foods they dislike.`
+    : '\nNo active pet profile is provided. Give general safe pet nutrition advice. Before estimating specific portions or calorie targets, ask the user what species and approximate weight their pet is. NEVER assume a placeholder pet name like "Bantay" or any default profile.'
 
   return `You are **Mealie**, the friendly AI pet nutrition & care assistant for **AniMeal** — a Filipino pet-care platform.
 
 LANGUAGE RULES:
 • Respond in natural **Taglish** (conversational mixed Tagalog and English).
 • If the user queries in pure English, reply in friendly English with Filipino hospitality.
-• Keep responses concise (under 200 words unless in-depth breakdown is explicitly requested).
+• Keep answers clear and concise (2–4 short paragraphs or bullet points max, under 200 words unless in-depth breakdown is explicitly requested).
 
 CRITICAL PET SAFETY GUARDRAILS (STRICT):
 1. TOXIC SUBSTANCES: Immediately flag and alert on: chocolate/cacao, grapes, raisins, onions (sibuyas), garlic (bawang), chives, xylitol (artificial sweetener), macadamia nuts, avocado, alcohol, coffee/caffeine, cooked bones, raw yeast dough, paracetamol/biogesic/ibuprofen.
    Cats additionally: lilies (deadly!), raw fish (thiaminase), cow's milk (lactose intolerance).
 2. EMERGENCY: If user describes poisoning symptoms or severe distress, urge them to visit a veterinarian IMMEDIATELY and mention the PAWS Emergency line: (02) 8475-1688.
 3. NEVER prescribe drug dosages or substitute for veterinary diagnoses.
+4. BRAND NEUTRALITY: Never recommend a specific commercial brand as "the best." You may compare nutrient profiles objectively.
+5. OFF-TOPIC REDIRECT: If the question is completely unrelated to pets, food, nutrition, or animal care, politely redirect back to pet care.
 ${petCtx}`
 }
 
@@ -706,41 +857,70 @@ app.post('/api/ai/chat', async (req, res) => {
     })
   }
 
-  try {
-    const contents = history.map((m) => ({
-      role: m.role === 'assistant' || m.role === 'mealie' ? 'model' : 'user',
-      parts: [{ text: m.text || m.content || '' }],
-    }))
+  // Multiturn requests must begin with a user turn in the Gemini API
+  const userFirstHistory = []
+  let seenUser = false
+  for (const m of history) {
+    const isUser = m.role === 'user'
+    if (isUser) seenUser = true
+    if (seenUser) {
+      userFirstHistory.push({
+        role: isUser ? 'user' : 'model',
+        parts: [{ text: m.text || m.content || '' }],
+      })
+    }
+  }
 
-    contents.push({
+  const contents = [
+    ...userFirstHistory,
+    {
       role: 'user',
       parts: [{ text: message }],
-    })
+    },
+  ]
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents,
-      config: {
-        systemInstruction: buildServerMealiePrompt(pet),
-        temperature: 0.7,
-        topP: 0.9,
-        maxOutputTokens: 1024,
-      },
-    })
-
-    const reply = response.text || 'Pasensya na, hindi ko nakuha ang sagot. Subukan mo ulit!'
-    res.json({ reply, role: 'mealie', timestamp: new Date().toISOString() })
-  } catch (err) {
-    console.error('Server Gemini error:', err)
-    res.status(500).json({
-      error: err.message || 'Gemini API call failed',
-      fallback: true,
-    })
+  const config = {
+    systemInstruction: buildServerMealiePrompt(pet),
+    temperature: 0.7,
+    topP: 0.9,
+    maxOutputTokens: 600,
+    thinkingConfig: { thinkingBudget: 0 },
   }
+
+  const candidateModels = [
+    'gemini-flash-latest',
+    'gemini-2.5-flash',
+    'gemini-2.5-flash-lite',
+    'gemini-3.1-flash-lite',
+  ]
+
+  let lastErr = null
+  for (const model of candidateModels) {
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents,
+        config,
+      })
+
+      if (response.text) {
+        return res.json({ reply: response.text, role: 'mealie', timestamp: new Date().toISOString() })
+      }
+    } catch (err) {
+      lastErr = err
+      continue
+    }
+  }
+
+  console.error('Server Gemini error (all models exhausted):', lastErr)
+  res.status(500).json({
+    error: lastErr?.message || 'Gemini API call failed',
+    fallback: true,
+  })
 })
 
 app.post('/api/ai/scan', async (req, res) => {
-  const { imageBase64, mimeType = 'image/jpeg' } = req.body
+  const { imageBase64, mimeType = 'image/jpeg', pet = null } = req.body
 
   if (!imageBase64 || typeof imageBase64 !== 'string') {
     return res.status(400).json({ error: 'Missing or invalid imageBase64 in request body.' })
@@ -752,53 +932,130 @@ app.post('/api/ai/scan', async (req, res) => {
     return res.status(400).json({ error: 'Unsupported file format. Please upload JPG, PNG, or WebP.' })
   }
 
-  // Size cap verification (base64 string length <= ~14MB equates to ~10MB file)
-  if (imageBase64.length > 14 * 1024 * 1024) {
-    return res.status(413).json({ error: 'Image exceeds maximum 10MB file upload limit.' })
+  // Size cap verification (base64 string length <= ~20MB equates to ~15MB file)
+  if (imageBase64.length > 20 * 1024 * 1024) {
+    return res.status(413).json({ error: 'Image exceeds maximum 15MB file upload limit.' })
   }
 
   const ai = getGeminiClient()
 
+  if (!ai) {
+    return res.status(503).json({
+      error: 'GEMINI_API_KEY is not configured on the backend server.',
+      fallback: true,
+    })
+  }
+
+  const petCtx = pet
+    ? `\nActive pet profile:
+- Name: ${pet.name || 'Pet'}
+- Species: ${pet.species || 'dog'}
+- Breed: ${pet.breed || 'Mixed'}
+- Life stage: ${pet.lifeStage || 'adult'}
+- Weight: ${pet.weight || pet.weightKg || 5} kg
+${pet.dietaryPreference && pet.dietaryPreference !== 'any' ? `- Dietary preference: ${pet.dietaryPreference.replace('_', ' ')}\n` : ''}${pet.preferredFoods?.length ? `- Preferred foods: ${Array.isArray(pet.preferredFoods) ? pet.preferredFoods.join(', ') : pet.preferredFoods}\n` : ''}${pet.avoidedFoods?.length ? `- Avoided foods: ${Array.isArray(pet.avoidedFoods) ? pet.avoidedFoods.join(', ') : pet.avoidedFoods}\n` : ''}
+Evaluate suitability specifically for this pet — considering species toxicity, life-stage suitability, and their dietary preferences/avoided foods.`
+    : '\nNo active pet profile is provided. Evaluate general dog/cat safety. Note in suitabilityNote that registering a pet profile enables personalized life-stage and preference checks.'
+
+  const prompt = `You are an expert veterinary nutritionist AI. Analyze this image.
+
+STEP 1 — CLASSIFY THE IMAGE:
+• If this image is pet food packaging, a guaranteed analysis table, or a pet food product:
+  - isFoodItem: true
+  - detectedCategory: "pet_food_label"
+• If this image is human food, whole ingredients (e.g. cooked chicken, carrots, fruits, meat):
+  - isFoodItem: true
+  - detectedCategory: "whole_or_human_food"
+• If this image is NOT a food item (e.g. person, household object, blank/blurry screen, car, electronics, landscape, or non-food):
+  - isFoodItem: false
+  - detectedCategory: "unrelated_image"
+  - brand: "N/A"
+  - productName: "Not a food item"
+  - caloriesPer100g: null, protein: null, fat: null, fiber: null, moisture: null, packageWeight: null, price: null
+  - confidence: "low"
+  - suitability: "unknown"
+  - suitabilityNote: "Hindi ito pagkain ng alaga o food product. Mangyaring mag-upload ng malinaw na litrato ng pet food packaging o pagkain."
+  - ingredients: []
+
+STEP 2 — IF isFoodItem IS TRUE:
+Extract the guaranteed analysis and details into a valid raw JSON object:
+- brand: string
+- product: string
+- productName: string
+- caloriesPer100g: number in kcal or null
+- crudeProteinPct: crude protein percentage as number or null
+- crudeFatPct: crude fat percentage as number or null
+- crudeFiberPct: crude fiber percentage as number or null
+- moisturePct: moisture percentage as number or null
+- protein: crude protein percentage as number or null
+- fat: crude fat percentage as number or null
+- fiber: crude fiber percentage as number or null
+- moisture: moisture percentage as number or null
+- packageWeight: weight in grams as number or null
+- price: price in PHP or null
+- confidence: "high" | "medium" | "low"
+- suitability: "safe" | "caution" | "unsafe" | "unknown"
+- suitabilityNote: one sentence advice in Taglish
+- ingredients: array of string ingredient names (max 10)
+- isFoodItem: true
+- detectedCategory: "pet_food_label" | "whole_or_human_food"
+
+Suitability rating guidelines:
+- "safe": balanced, no toxic ingredients, matches pet profile
+- "caution": contains fillers, by-products, artificial additives, slight life-stage mismatch, or avoided foods
+- "unsafe": contains known toxic substances (chocolate, xylitol, grapes, onions, garlic, lilies, raw fish/dairy for cats) or severe mismatch
+- "unknown": cannot determine from image
+
+${petCtx}
+
+Return ONLY a valid JSON object (no markdown, no backticks, no code fence).`
+
   try {
     const cleanBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, '')
-    const prompt = `You are an expert veterinary nutritionist AI. Analyze this pet food packaging photo.
-Extract the guaranteed analysis and details into ONLY a valid raw JSON object (no markdown, no backticks, no code fence):
-
-{
-  "brand": "<brand name or 'Unknown'>",
-  "productName": "<product name or 'Unknown Pet Food'>",
-  "caloriesPer100g": <number in kcal or null>,
-  "protein": <crude protein percentage as number or null>,
-  "fat": <crude fat percentage as number or null>,
-  "fiber": <crude fiber percentage as number or null>,
-  "moisture": <moisture percentage as number or null>,
-  "packageWeight": <weight in grams as number or null>,
-  "price": <price in PHP or null>,
-  "confidence": "<high|medium|low>",
-  "suitability": "<safe|caution|unsafe>",
-  "suitabilityNote": "<one sentence advice in Taglish>"
-}`
-
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: [
-        {
-          role: 'user',
-          parts: [
-            { text: prompt },
-            {
-              inlineData: {
-                data: cleanBase64,
-                mimeType,
-              },
+    const contents = [
+      {
+        role: 'user',
+        parts: [
+          { text: prompt },
+          {
+            inlineData: {
+              data: cleanBase64,
+              mimeType,
             },
-          ],
-        },
-      ],
-      config: {
-        responseMimeType: 'application/json',
+          },
+        ],
       },
-    })
+    ]
+
+    const config = {
+      responseMimeType: 'application/json',
+      thinkingConfig: { thinkingBudget: 0 },
+    }
+
+    let response
+    try {
+      response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents,
+        config,
+      })
+    } catch (modelErr) {
+      if (
+        modelErr.status === 503 ||
+        modelErr.message?.includes('503') ||
+        modelErr.message?.includes('capacity') ||
+        modelErr.message?.includes('overloaded') ||
+        modelErr.message?.includes('RESOURCE_EXHAUSTED')
+      ) {
+        response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash-lite',
+          contents,
+          config,
+        })
+      } else {
+        throw modelErr
+      }
+    }
 
     const text = response.text || '{}'
     const parsed = JSON.parse(text)

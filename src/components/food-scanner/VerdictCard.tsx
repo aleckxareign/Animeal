@@ -33,10 +33,10 @@ export function computeVerdict(
   data: ScannedFoodData,
   activePet?: Pet | null,
 ): VerdictDetails {
-  const { species, protein = 0, fat = 0, fiber = 0 } = data
-  const p = protein ?? 0
-  const f = fat ?? 0
-  const fib = fiber ?? 0
+  const { species } = data
+  const p = data.protein ?? data.crudeProteinPct ?? 0
+  const f = data.fat ?? data.crudeFatPct ?? 0
+  const fib = data.fiber ?? data.crudeFiberPct ?? 0
 
   const positives: string[] = []
   const cautions: string[] = []
@@ -167,7 +167,43 @@ export function computeVerdict(
     }
   }
 
-  // Active pet life stage customization
+  // 1. Species toxicity check
+  const targetSpecies = activePet?.species || species
+  const toxicDog = ['chocolate', 'cacao', 'cocoa', 'xylitol', 'grape', 'raisin', 'onion', 'garlic', 'macadamia', 'avocado', 'caffeine', 'alcohol']
+  const toxicCat = [...toxicDog, 'lily', 'lilies', 'raw fish']
+  const toxicList = targetSpecies === 'cat' ? toxicCat : toxicDog
+
+  const allText = [
+    data.productName || '',
+    data.product || '',
+    data.brand || '',
+    ...(data.ingredients || []),
+    data.sampleLabel || '',
+  ].join(' ').toLowerCase()
+
+  const detectedToxic = toxicList.find((toxic) => allText.includes(toxic))
+  if (detectedToxic) {
+    cautions.unshift(
+      `🚨 Toxic Ingredient Warning: Detected "${detectedToxic}", which is dangerous for ${targetSpecies}s! Do NOT feed this to your pet.`,
+    )
+    verdict = 'review'
+    score = Math.min(score, 20)
+  }
+
+  // 2. AI Scanner Vision notes
+  if (data.suitability === 'unsafe') {
+    cautions.unshift(`AI Safety Alert: ${data.suitabilityNote || 'Potentially unsafe or toxic ingredients detected.'}`)
+    verdict = 'review'
+    score = Math.min(score, 20)
+  } else if (data.suitability === 'caution') {
+    cautions.push(`AI Formulation Note: ${data.suitabilityNote || 'Use caution or control portion sizes.'}`)
+    if (verdict === 'good') verdict = 'okay'
+    score -= 10
+  } else if (data.suitability === 'safe' && data.suitabilityNote) {
+    positives.push(`AI Analysis: ${data.suitabilityNote}`)
+  }
+
+  // 3. Active pet profile customization & dietary preferences
   let speciesNotice = `Evaluated against standard adult ${species} nutritional requirements.`
   if (activePet) {
     if (activePet.species !== species) {
@@ -189,6 +225,62 @@ export function computeVerdict(
         }
       }
     }
+
+    // Dietary preference checks
+    if (activePet.dietaryPreference && activePet.dietaryPreference !== 'any') {
+      const pref = activePet.dietaryPreference
+      const cat = data.category
+      if (pref === 'wet_only' && cat === 'dry') {
+        cautions.push(
+          `Diet Preference Note: ${activePet.name} prefers wet food only, but this is a dry food product.`,
+        )
+        if (verdict === 'good') verdict = 'okay'
+        score -= 10
+      } else if (pref === 'dry_only' && cat === 'wet') {
+        cautions.push(
+          `Diet Preference Note: ${activePet.name} prefers dry food only, but this is a wet food product.`,
+        )
+        if (verdict === 'good') verdict = 'okay'
+        score -= 10
+      } else if (pref === 'picky') {
+        cautions.push(
+          `Picky Eater Note: ${activePet.name} is a picky eater. We recommend introducing this in small mixed portions first.`,
+        )
+      } else if (pref === 'home_cooked') {
+        positives.push(
+          `Diet Context: Can be used to complement or rotate with ${activePet.name}'s home-cooked meals.`,
+        )
+      }
+    }
+
+    // Preferred foods match
+    if (activePet.preferredFoods && activePet.preferredFoods.length > 0) {
+      for (const prefFood of activePet.preferredFoods) {
+        if (allText.includes(prefFood.toLowerCase().trim())) {
+          positives.push(
+            `Favorite Food Match: Contains "${prefFood}", which is one of ${activePet.name}'s favorite foods!`,
+          )
+          score += 5
+        }
+      }
+    }
+
+    // Avoided foods check
+    if (activePet.avoidedFoods && activePet.avoidedFoods.length > 0) {
+      for (const avoided of activePet.avoidedFoods) {
+        if (allText.includes(avoided.toLowerCase().trim())) {
+          cautions.unshift(
+            `Avoided Ingredient Warning: Contains "${avoided}", which is in ${activePet.name}'s avoided foods list!`,
+          )
+          if (verdict === 'good') verdict = 'okay'
+          score -= 20
+        }
+      }
+    }
+  } else {
+    cautions.push(
+      'General Safety Assessment: Register your pet profile to enable personalized life-stage, calorie, and food preference checks.',
+    )
   }
 
   score = Math.max(15, Math.min(98, score))
@@ -228,7 +320,7 @@ export function computeVerdict(
   return {
     verdict: 'review',
     label: 'Review Needed',
-    sublabel: `Nutrient ratios fall below standard guidelines or contain excess fiber`,
+    sublabel: `Nutrient ratios fall below standard guidelines or contain dietary watchouts`,
     badgeBg: 'bg-rose-600',
     badgeText: 'text-white',
     badgeBorder: 'border-rose-700',
@@ -241,14 +333,18 @@ export function computeVerdict(
 }
 
 export default function VerdictCard({ data, activePet }: VerdictCardProps) {
+  if (data.isFoodItem === false) {
+    return null
+  }
+
   const details = computeVerdict(data, activePet)
   const IconComponent = details.icon
 
   // Estimated Nitrogen-Free Extract (Carbohydrates)
-  const proteinVal = data.protein ?? 0
-  const fatVal = data.fat ?? 0
-  const fiberVal = data.fiber ?? 0
-  const moistureVal = data.moisture ?? 10
+  const proteinVal = data.protein ?? data.crudeProteinPct ?? 0
+  const fatVal = data.fat ?? data.crudeFatPct ?? 0
+  const fiberVal = data.fiber ?? data.crudeFiberPct ?? 0
+  const moistureVal = data.moisture ?? data.moisturePct ?? 10
   const estimatedAsh = 7 // Standard commercial pet food mineral ash ~7%
   const estimatedCarbs = Math.max(
     0,
