@@ -37,10 +37,6 @@ if (!API_KEY) {
 const ai = new GoogleGenAI({ apiKey: API_KEY })
 const MODEL = 'gemini-flash-latest'
 
-<<<<<<< HEAD
-// ─── System prompt (duplicated from gemini.ts so tests run independently) ──
-const SYSTEM_PROMPT = `You are **Mealie**, the friendly AI assistant for **Animeal** — a Filipino pet-care platform.
-=======
 type PetProfile = {
   name: string
   species: 'dog' | 'cat'
@@ -60,8 +56,7 @@ function buildChatSystemPrompt(pet?: PetProfile): string {
     ? `\nActive pet profile:\n- Name: ${pet.name}\n- Species: ${pet.species}\n- Breed: ${pet.breed}\n- Age: ${pet.ageMonths} months\n- Weight: ${pet.weightKg} kg${pet.lifeStage ? `\n- Life stage: ${pet.lifeStage}` : ''}${pet.neutered !== undefined ? `\n- Neutered: ${pet.neutered ? 'Yes' : 'No'}` : ''}${pet.dailyCalorieTarget ? `\n- Daily calorie target: ${pet.dailyCalorieTarget} kcal` : ''}${pet.dietaryPreference && pet.dietaryPreference !== 'any' ? `\n- Dietary preference: ${pet.dietaryPreference.replace('_', ' ')}` : ''}${pet.preferredFoods?.length ? `\n- Preferred/favorite foods: ${pet.preferredFoods.join(', ')}` : ''}${pet.avoidedFoods?.length ? `\n- Foods to avoid: ${pet.avoidedFoods.join(', ')}` : ''}\nAlways tailor portion sizes, food choices, and recommendations to this pet's specific needs. Respect their dietary preferences and avoid suggesting foods they don't like.`
     : '\nNo active pet profile is provided. Give general safe pet nutrition advice. Before estimating specific portions or calorie targets, ask the user what species and approximate weight their pet is. NEVER assume a placeholder pet name like "Bantay" or any default profile.'
 
-  return `You are **Mealie**, the friendly AI assistant for **AniMeal** — a Filipino pet-care platform.
->>>>>>> mealie-ai
+  return `You are **Mealie**, the friendly AI assistant for **Animeal** — a Filipino pet-care platform.
 
 LANGUAGE RULES:
 • Respond in **Taglish** (mixed Tagalog + English) by default.
