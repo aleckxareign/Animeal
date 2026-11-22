@@ -164,9 +164,9 @@ export const api = {
     }),
 
   // Server-side Gemini Multimodal Scanner Proxy
-  scanLabelProxy: (imageBase64: string, mimeType = 'image/jpeg') =>
+  scanLabelProxy: (imageBase64: string, mimeType = 'image/jpeg', pet?: Partial<Pet>) =>
     request<Record<string, unknown>>('/ai/scan', {
       method: 'POST',
-      body: JSON.stringify({ imageBase64, mimeType }),
+      body: JSON.stringify({ imageBase64, mimeType, pet: pet || null }),
     }),
 }

@@ -133,12 +133,12 @@ export const quickChips = [
 ]
 
 /**
- * Find the most relevant KB entry for a user question.
+ * Find the most relevant KB entry for a user question using word boundary matching.
  */
 export function findAnswer(
   question: string,
 ): { answer: string; severity: string } | null {
-  const q = question.toLowerCase()
+  const q = question.toLowerCase().trim()
   const allEntries = [...toxicFoods, ...symptomTopics, ...generalTopics]
 
   let bestMatch: KBEntry | null = null
@@ -147,10 +147,28 @@ export function findAnswer(
   for (const entry of allEntries) {
     let score = 0
     for (const kw of entry.keywords) {
-      if (q.includes(kw.toLowerCase())) {
-        score += kw.length // longer keyword matches are more specific
+      const lowerKw = kw.toLowerCase().trim()
+      let matches = false
+
+      if (lowerKw.includes(' ')) {
+        matches = q.includes(lowerKw)
+      } else {
+        const escaped = lowerKw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        const regex = new RegExp(`(?:^|[^a-z0-9])${escaped}(?:$|[^a-z0-9])`, 'i')
+        matches = regex.test(q)
+      }
+
+      if (matches) {
+        // Boost phrases and longer keywords
+        const wordCount = lowerKw.split(/\s+/).length
+        score += lowerKw.length + (wordCount > 1 ? wordCount * 12 : 0)
       }
     }
+
+    if (entry.severity === 'emergency' && score > 0) {
+      score += 25
+    }
+
     if (score > bestScore) {
       bestScore = score
       bestMatch = entry

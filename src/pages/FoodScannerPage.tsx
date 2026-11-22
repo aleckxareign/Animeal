@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Info,
   Layers,
+  AlertTriangle,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { useToast } from '../context/ToastContext'
@@ -81,21 +82,21 @@ export default function FoodScannerPage() {
 
     const price = scannedData.price ?? 0
     const packageWeight = scannedData.packageWeight ?? 1000
-    const caloriesPer100g = scannedData.calories ?? 350
+    const caloriesPer100g = scannedData.calories ?? scannedData.caloriesPer100g ?? 350
 
     const calcPricePerCal = pricePerCalorie(price, packageWeight, caloriesPer100g) ?? undefined
 
     const newFood: Omit<FoodItem, 'id' | 'verified' | 'isCustom'> = {
-      name: scannedData.productName || 'Scanned Pet Food',
+      name: scannedData.productName || scannedData.product || 'Scanned Pet Food',
       brand: scannedData.brand || 'Custom Brand',
       species: [scannedData.species],
       category: scannedData.category,
       lifeStageSuitability: ['adult'],
       caloriesPer100g,
-      protein: scannedData.protein ?? 20,
-      fat: scannedData.fat ?? 10,
-      fiber: scannedData.fiber ?? 4,
-      moisture: scannedData.moisture ?? 10,
+      protein: scannedData.protein ?? scannedData.crudeProteinPct ?? 20,
+      fat: scannedData.fat ?? scannedData.crudeFatPct ?? 10,
+      fiber: scannedData.fiber ?? scannedData.crudeFiberPct ?? 4,
+      moisture: scannedData.moisture ?? scannedData.moisturePct ?? 10,
       servingSize: 100,
       servingUnit: 'g',
       price,
@@ -118,12 +119,12 @@ export default function FoodScannerPage() {
     }
 
     const prefillFood = {
-      name: scannedData.productName,
+      name: scannedData.productName || scannedData.product || 'Scanned Pet Food',
       brand: scannedData.brand,
-      caloriesPer100g: scannedData.calories ?? 350,
-      protein: scannedData.protein ?? 20,
-      fat: scannedData.fat ?? 10,
-      fiber: scannedData.fiber ?? 4,
+      caloriesPer100g: scannedData.calories ?? scannedData.caloriesPer100g ?? 350,
+      protein: scannedData.protein ?? scannedData.crudeProteinPct ?? 20,
+      fat: scannedData.fat ?? scannedData.crudeFatPct ?? 10,
+      fiber: scannedData.fiber ?? scannedData.crudeFiberPct ?? 4,
       portion: 100,
       unit: 'g' as const,
       species: scannedData.species,
@@ -133,7 +134,7 @@ export default function FoodScannerPage() {
     navigate('/meal-tracker', {
       state: { prefillFood },
     })
-    addToast(`Ready to log "${scannedData.productName}" for your pet!`, 'info')
+    addToast(`Ready to log "${scannedData.productName || scannedData.product}" for your pet!`, 'info')
   }
 
   // Select an alternative food
@@ -209,7 +210,7 @@ export default function FoodScannerPage() {
         {/* MODE 1: Upload View */}
         {mode === 'upload' && (
           <div className="animate-fade-in">
-            <ScannerUpload onStartScan={handleStartScan} />
+            <ScannerUpload onStartScan={handleStartScan} activePet={activePet} />
           </div>
         )}
 
@@ -228,134 +229,163 @@ export default function FoodScannerPage() {
         {/* MODE 3: Results View */}
         {mode === 'results' && scannedData && (
           <div className="animate-slide-up space-y-8">
-            {/* Action Bar Header */}
-            <div className="rounded-2xl border border-brand-dark/10 bg-white p-4 sm:p-5 shadow-sm">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-brand-sage/10 px-2.5 py-0.5 text-xs font-bold text-brand-sage">
-                      <Sparkles className="h-3.5 w-3.5" />
-                      Analysis Completed
-                    </span>
-                    <span className="text-xs text-brand-dark/50">
-                      ID: #{Math.abs(scannedData.productName.length * 4829).toString().slice(0, 5)}
-                    </span>
-                  </div>
-                  <h1 className="font-display mt-1 text-xl font-bold text-brand-dark sm:text-2xl">
-                    {scannedData.productName}
-                  </h1>
+            {scannedData.isFoodItem === false ? (
+              <div className="rounded-2xl border-2 border-amber-300 bg-amber-50/90 p-8 text-center shadow-sm space-y-4 max-w-xl mx-auto my-8">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-100 text-amber-600">
+                  <AlertTriangle className="h-8 w-8" />
                 </div>
-
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <button
-                    type="button"
-                    onClick={handleSaveToLibrary}
-                    disabled={isSavedToLibrary}
-                    className={`inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-xs font-bold transition shadow-xs ${
-                      isSavedToLibrary
-                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 cursor-default'
-                        : 'border border-brand-dark/20 bg-white text-brand-dark hover:border-brand-sage hover:bg-brand-cream/50'
-                    }`}
-                  >
-                    {isSavedToLibrary ? (
-                      <>
-                        <CheckCircle className="h-4 w-4 text-emerald-700" />
-                        <span>Saved in Library</span>
-                      </>
-                    ) : (
-                      <>
-                        <BookmarkPlus className="h-4 w-4 text-brand-sage" />
-                        <span>Save to Food Library</span>
-                      </>
-                    )}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleLogMeal}
-                    className="inline-flex items-center gap-2 rounded-xl bg-brand-dark px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-brand-sage transition active:scale-[0.98]"
-                  >
-                    <Utensils className="h-4 w-4 text-amber-300" />
-                    <span>Log as Meal Now</span>
-                  </button>
-
+                <div className="space-y-1.5">
+                  <h2 className="font-display text-2xl font-bold text-amber-950">
+                    Not a Food Item Detected
+                  </h2>
+                  <p className="text-sm text-amber-900/80 leading-relaxed">
+                    {scannedData.suitabilityNote ||
+                      'The uploaded image does not appear to be a pet food packaging or food product. Please upload a clear photo of an actual pet food label or nutrition guaranteed analysis table.'}
+                  </p>
+                </div>
+                <div className="pt-2 flex justify-center">
                   <button
                     type="button"
                     onClick={handleReset}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-brand-dark/15 bg-white p-2.5 text-xs font-medium text-brand-dark hover:bg-brand-cream/60 transition"
-                    title="Scan another label"
+                    className="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-amber-700 transition cursor-pointer"
                   >
                     <RotateCcw className="h-4 w-4" />
+                    <span>Upload a Pet Food Photo</span>
                   </button>
                 </div>
               </div>
-            </div>
-
-            {/* Two-Column Layout */}
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-              {/* Left Column (5 Cols): Extracted Data Editor & Thumbnail Preview */}
-              <div className="space-y-6 lg:col-span-5">
-                {/* Photo Thumbnail / Label Snapshot Card */}
-                {previewUrl ? (
-                  <div className="overflow-hidden rounded-2xl border border-brand-dark/10 bg-white shadow-sm">
-                    <div className="border-b border-brand-dark/10 px-4 py-2.5 text-xs font-bold text-brand-dark flex items-center justify-between">
-                      <span className="flex items-center gap-1.5">
-                        <Layers className="h-3.5 w-3.5 text-brand-sage" />
-                        Scanned Packaging Snapshot
-                      </span>
-                      <span className="text-[11px] text-brand-dark/50 font-normal">
-                        Original Photo
-                      </span>
+            ) : (
+              <>
+                {/* Action Bar Header */}
+                <div className="rounded-2xl border border-brand-dark/10 bg-white p-4 sm:p-5 shadow-sm">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-brand-sage/10 px-2.5 py-0.5 text-xs font-bold text-brand-sage">
+                          <Sparkles className="h-3.5 w-3.5" />
+                          Analysis Completed
+                        </span>
+                        <span className="text-xs text-brand-dark/50">
+                          ID: #{Math.abs(scannedData.productName.length * 4829).toString().slice(0, 5)}
+                        </span>
+                      </div>
+                      <h1 className="font-display mt-1 text-xl font-bold text-brand-dark sm:text-2xl">
+                        {scannedData.productName}
+                      </h1>
                     </div>
-                    <div className="aspect-[16/10] w-full overflow-hidden bg-brand-dark/5">
-                      <img
-                        src={previewUrl}
-                        alt="Scanned Food Label"
-                        className="h-full w-full object-cover"
-                      />
+
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      <button
+                        type="button"
+                        onClick={handleSaveToLibrary}
+                        disabled={isSavedToLibrary}
+                        className={`inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-xs font-bold transition shadow-xs ${
+                          isSavedToLibrary
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 cursor-default'
+                            : 'border border-brand-dark/20 bg-white text-brand-dark hover:border-brand-sage hover:bg-brand-cream/50'
+                        }`}
+                      >
+                        {isSavedToLibrary ? (
+                          <>
+                            <CheckCircle className="h-4 w-4 text-emerald-700" />
+                            <span>Saved in Library</span>
+                          </>
+                        ) : (
+                          <>
+                            <BookmarkPlus className="h-4 w-4 text-brand-sage" />
+                            <span>Save to Food Library</span>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleLogMeal}
+                        className="inline-flex items-center gap-2 rounded-xl bg-brand-dark px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-brand-sage transition active:scale-[0.98]"
+                      >
+                        <Utensils className="h-4 w-4 text-amber-300" />
+                        <span>Log as Meal Now</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleReset}
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-brand-dark/15 bg-white p-2.5 text-xs font-medium text-brand-dark hover:bg-brand-cream/60 transition"
+                        title="Scan another label"
+                      >
+                        <RotateCcw className="h-4 w-4" />
+                      </button>
                     </div>
                   </div>
-                ) : (
-                  <div className="rounded-2xl border border-brand-dark/10 bg-gradient-to-r from-brand-sage/15 to-brand-dark/5 p-4 text-xs text-brand-dark flex items-center gap-3">
-                    <div className="rounded-xl bg-brand-sage/20 p-2 text-brand-sage">
-                      <Sparkles className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="font-bold">Sample Preset Loaded</p>
-                      <p className="text-brand-dark/70">
-                        {scannedData.sampleLabel || 'Pre-verified nutritional package profile'}
+                </div>
+
+                {/* Two-Column Layout */}
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+                  {/* Left Column (5 Cols): Extracted Data Editor & Thumbnail Preview */}
+                  <div className="space-y-6 lg:col-span-5">
+                    {/* Photo Thumbnail / Label Snapshot Card */}
+                    {previewUrl ? (
+                      <div className="overflow-hidden rounded-2xl border border-brand-dark/10 bg-white shadow-sm">
+                        <div className="border-b border-brand-dark/10 px-4 py-2.5 text-xs font-bold text-brand-dark flex items-center justify-between">
+                          <span className="flex items-center gap-1.5">
+                            <Layers className="h-3.5 w-3.5 text-brand-sage" />
+                            Scanned Packaging Snapshot
+                          </span>
+                          <span className="text-[11px] text-brand-dark/50 font-normal">
+                            Original Photo
+                          </span>
+                        </div>
+                        <div className="aspect-[16/10] w-full overflow-hidden bg-brand-dark/5">
+                          <img
+                            src={previewUrl}
+                            alt="Scanned Food Label"
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="rounded-2xl border border-brand-dark/10 bg-gradient-to-r from-brand-sage/15 to-brand-dark/5 p-4 text-xs text-brand-dark flex items-center gap-3">
+                        <div className="rounded-xl bg-brand-sage/20 p-2 text-brand-sage">
+                          <Sparkles className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="font-bold">Sample Preset Loaded</p>
+                          <p className="text-brand-dark/70">
+                            {scannedData.sampleLabel || 'Pre-verified nutritional package profile'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Extracted Data Editor Panel */}
+                    <ExtractedDataEditor
+                      data={scannedData}
+                      onUpdate={handleUpdateData}
+                    />
+
+                    {/* Helpful Philippine Tip */}
+                    <div className="rounded-2xl border border-brand-dark/10 bg-white p-4 text-xs text-brand-dark/70 flex items-start gap-2.5 shadow-xs">
+                      <Info className="h-4 w-4 text-brand-sage shrink-0 mt-0.5" />
+                      <p>
+                        <strong>Tip sa pagpapakain:</strong> You can edit any value in the form above if your package has different numbers. Your verdict and price per calorie recalculate in real-time.
                       </p>
                     </div>
                   </div>
-                )}
 
-                {/* Extracted Data Editor Panel */}
-                <ExtractedDataEditor
-                  data={scannedData}
-                  onUpdate={handleUpdateData}
-                />
+                  {/* Right Column (7 Cols): Verdict Card & Alternative Suggestions */}
+                  <div className="space-y-6 lg:col-span-7">
+                    {/* Suitability Verdict Card */}
+                    <VerdictCard data={scannedData} activePet={activePet} />
 
-                {/* Helpful Philippine Tip */}
-                <div className="rounded-2xl border border-brand-dark/10 bg-white p-4 text-xs text-brand-dark/70 flex items-start gap-2.5 shadow-xs">
-                  <Info className="h-4 w-4 text-brand-sage shrink-0 mt-0.5" />
-                  <p>
-                    <strong>Tip sa pagpapakain:</strong> You can edit any value in the form above if your package has different numbers. Your verdict and price per calorie recalculate in real-time.
-                  </p>
+                    {/* Value & Budget Comparison + Smart Alternatives */}
+                    <AlternativeSuggestions
+                      data={scannedData}
+                      onSelectAlternative={handleSelectAlternative}
+                    />
+                  </div>
                 </div>
-              </div>
-
-              {/* Right Column (7 Cols): Verdict Card & Alternative Suggestions */}
-              <div className="space-y-6 lg:col-span-7">
-                {/* Suitability Verdict Card */}
-                <VerdictCard data={scannedData} activePet={activePet} />
-
-                {/* Value & Budget Comparison + Smart Alternatives */}
-                <AlternativeSuggestions
-                  data={scannedData}
-                  onSelectAlternative={handleSelectAlternative}
-                />
-              </div>
-            </div>
+              </>
+            )}
           </div>
         )}
       </div>

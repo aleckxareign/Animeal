@@ -33,7 +33,7 @@ function FormattedContent({
   const paragraphs = content.split(/\n\n+/)
 
   return (
-    <div className={`space-y-2.5 leading-relaxed text-sm ${isUser ? 'text-white' : 'text-brand-dark'}`}>
+    <div className={`space-y-2.5 leading-relaxed text-sm ${isUser ? 'text-white' : 'text-brand-dark dark:text-slate-100'}`}>
       {paragraphs.map((p, pIdx) => {
         const lines = p.split('\n')
 
@@ -93,7 +93,7 @@ function renderInlineText(text: string, isUser: boolean) {
       return (
         <strong
           key={index}
-          className={`font-semibold ${isUser ? 'text-white underline decoration-white/30' : 'text-brand-dark font-bold'}`}
+          className={`font-semibold ${isUser ? 'text-white underline decoration-white/30' : 'text-brand-dark dark:text-white font-bold'}`}
         >
           {inner}
         </strong>

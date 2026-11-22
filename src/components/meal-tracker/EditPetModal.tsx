@@ -4,7 +4,7 @@ import { useApp } from '../../context/AppContext'
 import { useToast } from '../../context/ToastContext'
 import { getBreeds } from '../../data/breeds'
 import { suggestLifeStage } from '../../utils/calories'
-import type { Pet, Species, LifeStage } from '../../types'
+import type { Pet, Species, LifeStage, DietaryPreference } from '../../types'
 
 type EditPetModalProps = {
   isOpen: boolean
@@ -32,6 +32,9 @@ export default function EditPetModal({ isOpen, pet, onClose }: EditPetModalProps
   const [neutered, setNeutered] = useState<boolean>(pet.neutered)
   const [avatarEmoji, setAvatarEmoji] = useState(pet.avatarEmoji)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [dietaryPreference, setDietaryPreference] = useState<DietaryPreference>(pet.dietaryPreference || 'any')
+  const [preferredFoodsText, setPreferredFoodsText] = useState((pet.preferredFoods || []).join(', '))
+  const [avoidedFoodsText, setAvoidedFoodsText] = useState((pet.avoidedFoods || []).join(', '))
 
   if (!isOpen) return null
 
@@ -61,6 +64,9 @@ export default function EditPetModal({ isOpen, pet, onClose }: EditPetModalProps
       neutered,
       lifeStage,
       avatarEmoji,
+      dietaryPreference,
+      preferredFoods: preferredFoodsText.split(',').map(s => s.trim()).filter(Boolean),
+      avoidedFoods: avoidedFoodsText.split(',').map(s => s.trim()).filter(Boolean),
     })
 
     addToast(`Updated ${name.trim()}'s profile!`, 'success')
@@ -252,6 +258,65 @@ export default function EditPetModal({ isOpen, pet, onClose }: EditPetModalProps
                 No (Intact)
               </button>
             </div>
+          </div>
+
+          {/* Dietary Preferences (Optional) */}
+          <div className="space-y-2.5 rounded-xl border border-brand-dark/10 bg-brand-cream/20 p-3">
+            <label className="block text-xs font-bold uppercase tracking-wider text-brand-dark/70">
+              Diet Preference <span className="font-normal normal-case text-brand-dark/50">(optional)</span>
+            </label>
+            <div className="flex flex-wrap gap-1.5">
+              {([
+                { value: 'any', label: '🍽️ Any' },
+                { value: 'dry_only', label: '🥣 Dry Only' },
+                { value: 'wet_only', label: '🥫 Wet Only' },
+                { value: 'home_cooked', label: '🍳 Home Cooked' },
+                { value: 'picky', label: '😾 Picky Eater' },
+              ] as const).map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setDietaryPreference(opt.value)}
+                  className={`rounded-lg border px-2.5 py-1 text-xs font-semibold transition ${
+                    dietaryPreference === opt.value
+                      ? 'border-brand-sage bg-brand-sage/15 text-brand-sage ring-1 ring-brand-sage/30'
+                      : 'border-brand-dark/15 bg-white text-brand-dark/70 hover:border-brand-dark/30'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 pt-0.5">
+              <div>
+                <label className="block text-[11px] font-semibold text-brand-dark/60 mb-1">
+                  Preferred / Favorite Foods
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. chicken, rice, salmon"
+                  value={preferredFoodsText}
+                  onChange={(e) => setPreferredFoodsText(e.target.value)}
+                  className="w-full rounded-lg border border-brand-dark/15 bg-white px-3 py-1.5 text-xs text-brand-dark placeholder:text-brand-dark/40 focus:border-brand-sage focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-brand-dark/60 mb-1">
+                  Foods to Avoid
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. beef, dairy, pork"
+                  value={avoidedFoodsText}
+                  onChange={(e) => setAvoidedFoodsText(e.target.value)}
+                  className="w-full rounded-lg border border-brand-dark/15 bg-white px-3 py-1.5 text-xs text-brand-dark placeholder:text-brand-dark/40 focus:border-brand-sage focus:outline-none"
+                />
+              </div>
+            </div>
+            <p className="text-[10px] text-brand-dark/50">
+              Comma-separated. Mealie AI will personalize food recommendations based on these.
+            </p>
           </div>
 
           {/* Actions */}

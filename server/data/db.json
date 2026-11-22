@@ -69,9 +69,40 @@
       "dailyCalorieTarget": 1579,
       "waterGoal": 2500,
       "createdAt": "2026-11-04T04:22:57.414Z"
+    },
+    {
+      "id": "mwrotuottasl1fu",
+      "name": "Ming ming",
+      "species": "cat",
+      "breed": "Puspin (Pusang Pinoy)",
+      "weight": 5,
+      "age": 1,
+      "neutered": true,
+      "lifeStage": "adult",
+      "avatarEmoji": "🐱",
+      "dailyCalorieTarget": 281,
+      "waterGoal": 250,
+      "dietaryPreference": "any",
+      "preferredFoods": [],
+      "avoidedFoods": [],
+      "createdAt": "2026-11-22T10:22:15.197Z"
     }
   ],
   "feedings": [
+    {
+      "petId": "b1bafd06-e997-4021-bd1c-a376e95eab31",
+      "foodId": "dog-ped-adult",
+      "foodName": "Pedigree Adult Chicken & Vegetables",
+      "portion": 50,
+      "unit": "g",
+      "calories": 173,
+      "protein": 11,
+      "fat": 5,
+      "fiber": 3,
+      "fedBy": "Maria",
+      "id": "mws1fwsug9qkr0q",
+      "timestamp": "2026-11-22T16:15:19.748Z"
+    },
     {
       "petId": "sample-bruno",
       "foodId": "dog-monge",

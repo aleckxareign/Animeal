@@ -16,6 +16,10 @@ import 'dotenv/config'
 import { GoogleGenAI, Type } from '@google/genai'
 import * as fs from 'fs'
 import * as path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 // ─── Colour helpers ────────────────────────────────────────────
 const green = (s: string) => `\x1b[32m${s}\x1b[0m`
@@ -31,10 +35,33 @@ if (!API_KEY) {
   process.exit(1)
 }
 const ai = new GoogleGenAI({ apiKey: API_KEY })
-const MODEL = 'gemini-2.0-flash'
+const MODEL = 'gemini-flash-latest'
 
+<<<<<<< HEAD
 // ─── System prompt (duplicated from gemini.ts so tests run independently) ──
 const SYSTEM_PROMPT = `You are **Mealie**, the friendly AI assistant for **Animeal** — a Filipino pet-care platform.
+=======
+type PetProfile = {
+  name: string
+  species: 'dog' | 'cat'
+  breed: string
+  ageMonths: number
+  weightKg: number
+  lifeStage?: string
+  neutered?: boolean
+  dailyCalorieTarget?: number
+  dietaryPreference?: string
+  preferredFoods?: string[]
+  avoidedFoods?: string[]
+}
+
+function buildChatSystemPrompt(pet?: PetProfile): string {
+  const petCtx = pet
+    ? `\nActive pet profile:\n- Name: ${pet.name}\n- Species: ${pet.species}\n- Breed: ${pet.breed}\n- Age: ${pet.ageMonths} months\n- Weight: ${pet.weightKg} kg${pet.lifeStage ? `\n- Life stage: ${pet.lifeStage}` : ''}${pet.neutered !== undefined ? `\n- Neutered: ${pet.neutered ? 'Yes' : 'No'}` : ''}${pet.dailyCalorieTarget ? `\n- Daily calorie target: ${pet.dailyCalorieTarget} kcal` : ''}${pet.dietaryPreference && pet.dietaryPreference !== 'any' ? `\n- Dietary preference: ${pet.dietaryPreference.replace('_', ' ')}` : ''}${pet.preferredFoods?.length ? `\n- Preferred/favorite foods: ${pet.preferredFoods.join(', ')}` : ''}${pet.avoidedFoods?.length ? `\n- Foods to avoid: ${pet.avoidedFoods.join(', ')}` : ''}\nAlways tailor portion sizes, food choices, and recommendations to this pet's specific needs. Respect their dietary preferences and avoid suggesting foods they don't like.`
+    : '\nNo active pet profile is provided. Give general safe pet nutrition advice. Before estimating specific portions or calorie targets, ask the user what species and approximate weight their pet is. NEVER assume a placeholder pet name like "Bantay" or any default profile.'
+
+  return `You are **Mealie**, the friendly AI assistant for **AniMeal** — a Filipino pet-care platform.
+>>>>>>> mealie-ai
 
 LANGUAGE RULES:
 • Respond in **Taglish** (mixed Tagalog + English) by default.
@@ -53,15 +80,13 @@ PERSONALITY:
 • Friendly, supportive, slightly playful 🐾
 • Use emoji sparingly (1-2 per message max)
 
-Active pet profile:
-- Name: Bantay
-- Species: dog
-- Breed: Aspin
-- Age: 24 months
-- Weight: 12 kg
-Always consider this pet's specific needs when answering.
+OFF-TOPIC REDIRECT:
+If the question is completely unrelated to pets, food, nutrition, or animal care, politely redirect the user back to pet-related topics.
 
-If the question is completely unrelated to pets, politely redirect the user.`
+BRAND NEUTRALITY:
+Never recommend a specific commercial brand as "the best." You may compare nutrient profiles objectively.
+${petCtx}`
+}
 
 // ─── Test result tracking ──────────────────────────────────────
 let passed = 0
@@ -84,49 +109,133 @@ async function test(name: string, fn: () => Promise<boolean>) {
   }
 }
 
+// ─── Default sample pet ────────────────────────────────────────
+const DEFAULT_PET: PetProfile = {
+  name: 'Bantay',
+  species: 'dog',
+  breed: 'Aspin',
+  ageMonths: 24,
+  weightKg: 12,
+  lifeStage: 'adult',
+  neutered: true,
+  dailyCalorieTarget: 720,
+}
+
 // ─── Chat helper ───────────────────────────────────────────────
-async function chat(userMessage: string): Promise<string> {
-  const response = await ai.models.generateContent({
-    model: MODEL,
-    contents: [{ role: 'user', parts: [{ text: userMessage }] }],
-    config: {
-      systemInstruction: SYSTEM_PROMPT,
-      temperature: 0.3,       // low temp for more deterministic guardrail tests
-      maxOutputTokens: 512,
-    },
-  })
-  return response.text ?? ''
+async function chat(userMessage: string, pet: PetProfile | undefined = DEFAULT_PET): Promise<string> {
+  const modelsToTry = [MODEL, 'gemini-2.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-2.5-flash', 'gemini-3.8-flash']
+  for (const m of modelsToTry) {
+    try {
+      const response = await ai.models.generateContent({
+        model: m,
+        contents: [{ role: 'user', parts: [{ text: userMessage }] }],
+        config: {
+          systemInstruction: buildChatSystemPrompt(pet),
+          temperature: 0.3, // low temp for more deterministic guardrail tests
+          maxOutputTokens: 512,
+        },
+      })
+      return response.text ?? ''
+    } catch (err: unknown) {
+      if (m === modelsToTry[modelsToTry.length - 1]) throw err
+    }
+  }
+  return ''
 }
 
 // ─── Scan helper ───────────────────────────────────────────────
-const SCAN_PROMPT = `You are an expert pet nutritionist AI. Analyze this pet food packaging photo.
+function buildScanPrompt(pet?: PetProfile | null): string {
+  const petCtx = pet
+    ? `\nActive pet profile: ${pet.name} (${pet.species}, ${pet.breed}, ${pet.lifeStage || 'adult'}, ${pet.weightKg} kg${pet.dietaryPreference && pet.dietaryPreference !== 'any' ? `, prefers ${pet.dietaryPreference.replace('_', ' ')}` : ''}${pet.avoidedFoods?.length ? `, avoids: ${pet.avoidedFoods.join(', ')}` : ''}).
+Evaluate suitability specifically for this pet.`
+    : `\nNo active pet profile. Evaluate general dog/cat safety. Note in suitabilityNote that registering a pet profile enables personalized life-stage and preference checks.`
 
-Extract the following information and return ONLY a valid JSON object (no markdown, no code fences):
+  return `You are an expert veterinary nutritionist AI. Analyze this image.
 
-{
-  "brand": "<brand name or 'Unknown'>",
-  "product": "<product name/variant or 'Unknown'>",
-  "caloriesPer100g": <number or null>,
-  "crudeProteinPct": <number or null>,
-  "crudeFatPct": <number or null>,
-  "crudeFiberPct": <number or null>,
-  "moisturePct": <number or null>,
-  "suitability": "<safe|caution|unsafe|unknown>",
-  "suitabilityNote": "<brief explanation why>",
-  "ingredients": ["<ingredient1>", "<ingredient2>", "..."]
+STEP 1 — CLASSIFY THE IMAGE:
+• If this image shows a pet food label, pet food packaging, or pet food product → isFoodItem: true, detectedCategory: "pet_food_label"
+• If this image shows whole food, human food, or a recognizable edible item → isFoodItem: true, detectedCategory: "whole_or_human_food"
+• If this image is NOT food at all (e.g., object, person, blank screen, landscape, non-food item) → isFoodItem: false, detectedCategory: "unrelated_image". Set all nutrition values to null, suitability to "unknown", brand to "N/A", product to "Not a food item", and suitabilityNote explaining this is not a food item.
+
+STEP 2 — If isFoodItem is true, extract nutrition data and evaluate suitability:
+• "suitability" ratings: "safe" | "caution" | "unsafe" | "unknown"
+${petCtx}
+
+Return ONLY valid JSON according to schema.`
 }
 
-RULES:
-• If a value is not visible or readable, use null.
-• "suitability" should be based on ingredient quality for dogs/cats:
-  - "safe" = standard pet food with no concerning ingredients
-  - "caution" = contains fillers, by-products, or artificial additives
-  - "unsafe" = contains known toxic ingredients for pets
-  - "unknown" = cannot determine from the image
-• List the first 10 ingredients max.
-• If this is NOT a pet food package, set suitability to "unsafe" and note it's human food.`
+const SCAN_RESPONSE_SCHEMA = {
+  type: Type.OBJECT,
+  properties: {
+    isFoodItem: { type: Type.BOOLEAN },
+    detectedCategory: {
+      type: Type.STRING,
+      enum: ['pet_food_label', 'whole_or_human_food', 'unrelated_image'],
+    },
+    brand: { type: Type.STRING },
+    product: { type: Type.STRING },
+    caloriesPer100g: { type: Type.NUMBER, nullable: true },
+    crudeProteinPct: { type: Type.NUMBER, nullable: true },
+    crudeFatPct: { type: Type.NUMBER, nullable: true },
+    crudeFiberPct: { type: Type.NUMBER, nullable: true },
+    moisturePct: { type: Type.NUMBER, nullable: true },
+    suitability: { type: Type.STRING, enum: ['safe', 'caution', 'unsafe', 'unknown'] },
+    suitabilityNote: { type: Type.STRING },
+    ingredients: { type: Type.ARRAY, items: { type: Type.STRING } },
+  },
+  required: [
+    'isFoodItem',
+    'detectedCategory',
+    'brand',
+    'product',
+    'caloriesPer100g',
+    'crudeProteinPct',
+    'crudeFatPct',
+    'crudeFiberPct',
+    'moisturePct',
+    'suitability',
+    'suitabilityNote',
+    'ingredients',
+  ],
+}
 
-async function scanImage(imagePath: string): Promise<Record<string, unknown>> {
+async function scanBase64(
+  base64: string,
+  mimeType = 'image/png',
+  pet?: PetProfile | null,
+): Promise<Record<string, unknown>> {
+  const modelsToTry = [MODEL, 'gemini-2.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-2.5-flash', 'gemini-3.8-flash']
+  for (const m of modelsToTry) {
+    try {
+      const response = await ai.models.generateContent({
+        model: m,
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              { inlineData: { mimeType, data: base64 } },
+              { text: buildScanPrompt(pet) },
+            ],
+          },
+        ],
+        config: {
+          responseMimeType: 'application/json',
+          responseSchema: SCAN_RESPONSE_SCHEMA,
+          temperature: 0.2,
+          maxOutputTokens: 1024,
+        },
+      })
+
+      const text = response.text ?? '{}'
+      return JSON.parse(text)
+    } catch (err: unknown) {
+      if (m === modelsToTry[modelsToTry.length - 1]) throw err
+    }
+  }
+  return {}
+}
+
+async function scanImage(imagePath: string, pet?: PetProfile | null): Promise<Record<string, unknown>> {
   const fullPath = path.resolve(imagePath)
   if (!fs.existsSync(fullPath)) {
     throw new Error(`Image not found: ${fullPath}`)
@@ -135,51 +244,14 @@ async function scanImage(imagePath: string): Promise<Record<string, unknown>> {
   const base64 = buffer.toString('base64')
   const ext = path.extname(fullPath).toLowerCase()
   const mimeMap: Record<string, string> = {
-    '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
-    '.png': 'image/png', '.webp': 'image/webp',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.png': 'image/png',
+    '.webp': 'image/webp',
   }
   const mimeType = mimeMap[ext] ?? 'image/jpeg'
 
-  const response = await ai.models.generateContent({
-    model: MODEL,
-    contents: [
-      {
-        role: 'user',
-        parts: [
-          { inlineData: { mimeType, data: base64 } },
-          { text: SCAN_PROMPT },
-        ],
-      },
-    ],
-    config: {
-      responseMimeType: 'application/json',
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          brand: { type: Type.STRING },
-          product: { type: Type.STRING },
-          caloriesPer100g: { type: Type.NUMBER, nullable: true },
-          crudeProteinPct: { type: Type.NUMBER, nullable: true },
-          crudeFatPct: { type: Type.NUMBER, nullable: true },
-          crudeFiberPct: { type: Type.NUMBER, nullable: true },
-          moisturePct: { type: Type.NUMBER, nullable: true },
-          suitability: { type: Type.STRING, enum: ['safe', 'caution', 'unsafe', 'unknown'] },
-          suitabilityNote: { type: Type.STRING },
-          ingredients: { type: Type.ARRAY, items: { type: Type.STRING } },
-        },
-        required: [
-          'brand', 'product', 'caloriesPer100g', 'crudeProteinPct',
-          'crudeFatPct', 'crudeFiberPct', 'moisturePct',
-          'suitability', 'suitabilityNote', 'ingredients',
-        ],
-      },
-      temperature: 0.2,
-      maxOutputTokens: 1024,
-    },
-  })
-
-  const text = response.text ?? '{}'
-  return JSON.parse(text)
+  return scanBase64(base64, mimeType, pet)
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -244,8 +316,54 @@ async function main() {
     return lower.includes('para') || lower.includes('ang') || lower.includes('ng') || lower.includes('mo') || lower.includes('yung')
   })
 
+  await test('Zero-pet chat handling: asks for species/weight, no assumed Bantay profile', async () => {
+    const reply = await chat('Gaano karami dapat ipakain ko sa alaga ko araw-araw?', undefined)
+    console.log(dim(`\n     Reply: ${reply.slice(0, 140)}…`))
+    const lower = reply.toLowerCase()
+    const mentionsBantay = lower.includes('bantay')
+    const asksOrMentionsDetails =
+      lower.includes('timbang') ||
+      lower.includes('weight') ||
+      lower.includes('species') ||
+      lower.includes('aso') ||
+      lower.includes('pusa') ||
+      lower.includes('size') ||
+      lower.includes('edad') ||
+      lower.includes('kg')
+    return !mentionsBantay && asksOrMentionsDetails
+  })
+
+  await test('Dietary preference adherence: respects wet-only preference & avoided foods', async () => {
+    const pickyPet: PetProfile = {
+      name: 'Mochi',
+      species: 'cat',
+      breed: 'Persian',
+      ageMonths: 18,
+      weightKg: 4,
+      lifeStage: 'adult',
+      neutered: true,
+      dietaryPreference: 'wet_only',
+      avoidedFoods: ['beef'],
+    }
+    const reply = await chat('Anong paboritong food style ang bagay sa kanya ayon sa profile niya?', pickyPet)
+    console.log(dim(`\n     Reply: ${reply.slice(0, 140)}…`))
+    const lower = reply.toLowerCase()
+    const respectsWetOrAvoidsBeef =
+      (lower.includes('wet') || lower.includes('canned') || lower.includes('basa')) &&
+      !lower.includes('beef steak')
+    return respectsWetOrAvoidsBeef
+  })
+
   // ── Section 2: Food Scanner ─────────────────────────────────
   console.log(cyan('\n── Food Scanner (Image Analysis) ─────────────\n'))
+
+  await test('Food scanner rejects non-food / unrelated blank image', async () => {
+    // 1x1 transparent png
+    const blank1x1Png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+    const result = await scanBase64(blank1x1Png, 'image/png')
+    console.log(dim(`\n     Result: ${JSON.stringify(result).slice(0, 150)}…`))
+    return result.isFoodItem === false && result.detectedCategory === 'unrelated_image'
+  })
 
   const testImagePath = path.join(__dirname, 'sample-label.jpg')
   if (fs.existsSync(testImagePath)) {

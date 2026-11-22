@@ -42,13 +42,24 @@ export default function ExtractedDataEditor({
   }
 
   const handleSave = () => {
+    const calories = formData.calories !== null && formData.calories !== undefined ? Number(formData.calories) : null
+    const protein = formData.protein !== null && formData.protein !== undefined ? Number(formData.protein) : null
+    const fat = formData.fat !== null && formData.fat !== undefined ? Number(formData.fat) : null
+    const fiber = formData.fiber !== null && formData.fiber !== undefined ? Number(formData.fiber) : null
+    const moisture = formData.moisture !== null && formData.moisture !== undefined ? Number(formData.moisture) : null
+
     onUpdate({
       ...formData,
-      calories: formData.calories ? Number(formData.calories) : null,
-      protein: formData.protein !== null ? Number(formData.protein) : null,
-      fat: formData.fat !== null ? Number(formData.fat) : null,
-      fiber: formData.fiber !== null ? Number(formData.fiber) : null,
-      moisture: formData.moisture !== null ? Number(formData.moisture) : null,
+      calories,
+      caloriesPer100g: calories,
+      protein,
+      crudeProteinPct: protein,
+      fat,
+      crudeFatPct: fat,
+      fiber,
+      crudeFiberPct: fiber,
+      moisture,
+      moisturePct: moisture,
       packageWeight: formData.packageWeight ? Number(formData.packageWeight) : null,
       price: formData.price !== null ? Number(formData.price) : null,
     })
@@ -148,7 +159,7 @@ export default function ExtractedDataEditor({
                 {data.brand || 'Unbranded'}
               </span>
               <h3 className="font-display text-lg font-bold text-brand-dark sm:text-xl">
-                {data.productName}
+                {data.productName || data.product || 'Scanned Pet Food'}
               </h3>
             </div>
             <div className="flex items-center gap-2 self-start sm:self-auto">
@@ -176,7 +187,7 @@ export default function ExtractedDataEditor({
                 </div>
                 <div className="mt-2 flex items-baseline gap-1">
                   <span className="text-2xl font-extrabold text-brand-dark">
-                    {data.protein ?? '—'}
+                    {data.protein ?? data.crudeProteinPct ?? '—'}
                   </span>
                   <span className="text-xs font-bold text-brand-dark/70">%</span>
                 </div>
@@ -191,7 +202,7 @@ export default function ExtractedDataEditor({
                 </div>
                 <div className="mt-2 flex items-baseline gap-1">
                   <span className="text-2xl font-extrabold text-brand-dark">
-                    {data.fat ?? '—'}
+                    {data.fat ?? data.crudeFatPct ?? '—'}
                   </span>
                   <span className="text-xs font-bold text-brand-dark/70">%</span>
                 </div>
@@ -206,7 +217,7 @@ export default function ExtractedDataEditor({
                 </div>
                 <div className="mt-2 flex items-baseline gap-1">
                   <span className="text-2xl font-extrabold text-brand-dark">
-                    {data.fiber ?? '—'}
+                    {data.fiber ?? data.crudeFiberPct ?? '—'}
                   </span>
                   <span className="text-xs font-bold text-brand-dark/70">%</span>
                 </div>
@@ -221,7 +232,7 @@ export default function ExtractedDataEditor({
                 </div>
                 <div className="mt-2 flex items-baseline gap-1">
                   <span className="text-2xl font-extrabold text-brand-dark">
-                    {data.moisture ?? '—'}
+                    {data.moisture ?? data.moisturePct ?? '—'}
                   </span>
                   <span className="text-xs font-bold text-brand-dark/70">%</span>
                 </div>
@@ -239,7 +250,7 @@ export default function ExtractedDataEditor({
               <div>
                 <p className="text-xs text-brand-dark/60">Energy Density</p>
                 <p className="text-sm font-bold text-brand-dark">
-                  {data.calories ? `${data.calories} kcal` : 'Estimated ~340 kcal'}{' '}
+                  {data.calories ?? data.caloriesPer100g ? `${data.calories ?? data.caloriesPer100g} kcal` : 'Estimated ~340 kcal'}{' '}
                   <span className="text-xs font-normal text-brand-dark/60">/ 100g</span>
                 </p>
               </div>
