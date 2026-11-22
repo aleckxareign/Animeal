@@ -51,7 +51,7 @@ type PetProfile = {
   avoidedFoods?: string[]
 }
 
-function buildChatSystemPrompt(pet?: PetProfile): string {
+function buildChatSystemPrompt(pet?: PetProfile | null): string {
   const petCtx = pet
     ? `\nActive pet profile:\n- Name: ${pet.name}\n- Species: ${pet.species}\n- Breed: ${pet.breed}\n- Age: ${pet.ageMonths} months\n- Weight: ${pet.weightKg} kg${pet.lifeStage ? `\n- Life stage: ${pet.lifeStage}` : ''}${pet.neutered !== undefined ? `\n- Neutered: ${pet.neutered ? 'Yes' : 'No'}` : ''}${pet.dailyCalorieTarget ? `\n- Daily calorie target: ${pet.dailyCalorieTarget} kcal` : ''}${pet.dietaryPreference && pet.dietaryPreference !== 'any' ? `\n- Dietary preference: ${pet.dietaryPreference.replace('_', ' ')}` : ''}${pet.preferredFoods?.length ? `\n- Preferred/favorite foods: ${pet.preferredFoods.join(', ')}` : ''}${pet.avoidedFoods?.length ? `\n- Foods to avoid: ${pet.avoidedFoods.join(', ')}` : ''}\nAlways tailor portion sizes, food choices, and recommendations to this pet's specific needs. Respect their dietary preferences and avoid suggesting foods they don't like.`
     : '\nNo active pet profile is provided. Give general safe pet nutrition advice. Before estimating specific portions or calorie targets, ask the user what species and approximate weight their pet is. NEVER assume a placeholder pet name like "Bantay" or any default profile.'
@@ -117,7 +117,7 @@ const DEFAULT_PET: PetProfile = {
 }
 
 // ─── Chat helper ───────────────────────────────────────────────
-async function chat(userMessage: string, pet: PetProfile | undefined = DEFAULT_PET): Promise<string> {
+async function chat(userMessage: string, pet: PetProfile | null = DEFAULT_PET): Promise<string> {
   const modelsToTry = [MODEL, 'gemini-2.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-2.5-flash', 'gemini-3.8-flash']
   for (const m of modelsToTry) {
     try {
@@ -312,7 +312,7 @@ async function main() {
   })
 
   await test('Zero-pet chat handling: asks for species/weight, no assumed Bantay profile', async () => {
-    const reply = await chat('Gaano karami dapat ipakain ko sa alaga ko araw-araw?', undefined)
+    const reply = await chat('Gaano karami dapat ipakain ko sa alaga ko araw-araw?', null)
     console.log(dim(`\n     Reply: ${reply.slice(0, 140)}…`))
     const lower = reply.toLowerCase()
     const mentionsBantay = lower.includes('bantay')
