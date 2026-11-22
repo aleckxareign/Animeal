@@ -51,7 +51,7 @@ export default function CareSchedulePage() {
     if (perm === 'granted') {
       setHasNotificationPermission(true)
       addToast('Browser reminders enabled! You will be notified when care tasks are due.', 'success')
-      new Notification('AniMeal Care Schedule Active', {
+      new Notification('Animeal Care Schedule Active', {
         body: 'You will receive reminders for scheduled pet tasks and feeding.',
         icon: '/favicon.svg',
       })

@@ -38,7 +38,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       if (permission === 'granted') {
         setNotificationsEnabled(true)
         addToast('Push notifications enabled for pet feeding reminders! 🔔', 'success')
-        new Notification('AniMeal Pet Care', {
+        new Notification('Animeal Pet Care', {
           body: 'Feeding and care reminders are now active for your household!',
           icon: '/favicon.svg',
         })

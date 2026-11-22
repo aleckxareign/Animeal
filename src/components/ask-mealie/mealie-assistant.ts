@@ -74,7 +74,7 @@ const extendedTopics: Array<{
     keywords: ['affordable', 'mura', 'budget', 'presyo', 'tipid', 'cheap food', 'best affordable'],
     severity: 'info',
     answer:
-      '💡 **Choosing Affordable & Nutritious Pet Food (Tipid Tips):**\n\n1. **Check Price-per-Calorie (₱/kcal):** Some budget kibbles have low nutrient density, meaning you need to feed double portions. AniMeal calculates price-per-calorie automatically in the Food Library!\n2. **Look for Real Animal Protein:** The first 2 ingredients should clearly state poultry or meat (e.g., chicken meal, deboned salmon).\n3. **Buy in Bigger Bags (Bulk):** 10–15 kg sacks save 20–35% compared to small 1 kg pouches.\n4. **Supplement with Safe Budget Whole Foods:** Boil cheap chicken liver, squash (kalabasa), or carrots with rice as nutrient-dense meal toppers.',
+      '💡 **Choosing Affordable & Nutritious Pet Food (Tipid Tips):**\n\n1. **Check Price-per-Calorie (₱/kcal):** Some budget kibbles have low nutrient density, meaning you need to feed double portions. Animeal calculates price-per-calorie automatically in the Food Library!\n2. **Look for Real Animal Protein:** The first 2 ingredients should clearly state poultry or meat (e.g., chicken meal, deboned salmon).\n3. **Buy in Bigger Bags (Bulk):** 10–15 kg sacks save 20–35% compared to small 1 kg pouches.\n4. **Supplement with Safe Budget Whole Foods:** Boil cheap chicken liver, squash (kalabasa), or carrots with rice as nutrient-dense meal toppers.',
     actions: [
       { label: '🔍 Compare Foods in Library', type: 'link', value: '/food-library' },
       { label: '📊 Track Meal Expenses', type: 'link', value: '/meal-tracker' },

@@ -13,7 +13,7 @@ import type {
 
 /**
  * Type-safe, high-performance database service mapping Supabase PostgreSQL tables
- * to AniMeal frontend models with snake_case <-> camelCase mapping, query bounding,
+ * to Animeal frontend models with snake_case <-> camelCase mapping, query bounding,
  * and robust error handling.
  */
 export const supabaseDb = {
@@ -172,6 +172,7 @@ export const supabaseDb = {
         fat: Number(row.fat_g || 0),
         fiber: Number(row.fiber_g || 0),
         fedBy: row.fed_by_name || 'Owner',
+        undone: Boolean(row.undone),
         timestamp: row.fed_at,
       }))
     } catch (err) {
@@ -212,6 +213,7 @@ export const supabaseDb = {
         fat: Number(row.fat_g || 0),
         fiber: Number(row.fiber_g || 0),
         fedBy: row.fed_by_name || 'Owner',
+        undone: Boolean(row.undone),
         timestamp: row.fed_at,
       }))
     } catch (err) {
@@ -284,6 +286,7 @@ export const supabaseDb = {
       if (updates.fiber !== undefined) payload.fiber_g = Math.max(0, updates.fiber)
       if (updates.foodName !== undefined) payload.food_name = updates.foodName
       if (updates.fedBy !== undefined) payload.fed_by_name = updates.fedBy
+      if (updates.undone !== undefined) payload.undone = updates.undone
 
       const { error } = await supabase.from('feeding_logs').update(payload).eq('id', feedingId)
       if (error) throw error
@@ -750,6 +753,10 @@ export const supabaseDb = {
         name: row.name,
         color: row.color || '#44632f',
         isOwner: Boolean(row.is_owner),
+        role: row.role || 'caregiver',
+        email: row.email,
+        status: row.status || 'active',
+        avatarUrl: row.avatar_url,
       }))
     } catch (err) {
       console.error('Failed to load household members from Supabase:', err)

@@ -59,7 +59,7 @@ export const generalTopics: KBEntry[] = [
   {
     keywords: ['how much', 'magkano', 'how many', 'portion', 'serving', 'gaano karami'],
     answer:
-      'The right amount of food depends on your pet\'s **weight, age, activity level, and the specific food** you\'re using. As a general guide:\n\n🐕 **Dogs:** Check the feeding guide on your food\'s packaging — it usually recommends grams per day based on weight.\n🐱 **Cats:** Most adult cats need about 200–300 kcal per day, but this varies.\n\nYou can use AniMeal\'s **Calorie Calculator** in your pet\'s profile to get an estimate. Remember, these are guidelines — your vet can give the best advice for your pet.',
+      'The right amount of food depends on your pet\'s **weight, age, activity level, and the specific food** you\'re using. As a general guide:\n\n🐕 **Dogs:** Check the feeding guide on your food\'s packaging — it usually recommends grams per day based on weight.\n🐱 **Cats:** Most adult cats need about 200–300 kcal per day, but this varies.\n\nYou can use Animeal\'s **Calorie Calculator** in your pet\'s profile to get an estimate. Remember, these are guidelines — your vet can give the best advice for your pet.',
     severity: 'info',
   },
   {

@@ -8,12 +8,12 @@ interface HelpCenterModalProps {
 
 const FAQS = [
   {
-    q: 'How does AniMeal calculate Resting Energy Requirement (RER)?',
-    a: 'AniMeal uses the veterinary gold-standard formula: RER (kcal/day) = 70 × (Weight in kg)^0.75. We then multiply this by your pet\'s life stage, neuter status, and activity level multiplier to calculate their Daily Energy Requirement (DER).',
+    q: 'How does Animeal calculate Resting Energy Requirement (RER)?',
+    a: 'Animeal uses the veterinary gold-standard formula: RER (kcal/day) = 70 × (Weight in kg)^0.75. We then multiply this by your pet\'s life stage, neuter status, and activity level multiplier to calculate their Daily Energy Requirement (DER).',
   },
   {
     q: 'How does the AI Food Label Scanner work?',
-    a: 'Snap or upload a photo of your pet food packaging. AniMeal extracts the Guaranteed Analysis (Crude Protein, Crude Fat, Moisture, Crude Fiber) and Net Weight, compares them against AAFCO nutritional standards, and calculates cost-per-calorie in Philippine Pesos (₱).',
+    a: 'Snap or upload a photo of your pet food packaging. Animeal extracts the Guaranteed Analysis (Crude Protein, Crude Fat, Moisture, Crude Fiber) and Net Weight, compares them against AAFCO nutritional standards, and calculates cost-per-calorie in Philippine Pesos (₱).',
   },
   {
     q: 'How does Shared Household work?',
@@ -21,7 +21,7 @@ const FAQS = [
   },
   {
     q: 'Are the veterinary recommendations final medical advice?',
-    a: 'AniMeal and Mealie AI provide evidence-grounded nutritional and wellness guidance, but do not replace professional physical examinations by a licensed veterinarian. For poisoning or medical emergencies, consult a clinic immediately.',
+    a: 'Animeal and Mealie AI provide evidence-grounded nutritional and wellness guidance, but do not replace professional physical examinations by a licensed veterinarian. For poisoning or medical emergencies, consult a clinic immediately.',
   },
 ]
 

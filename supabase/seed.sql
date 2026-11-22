@@ -1,5 +1,5 @@
 -- ==============================================================================
--- AniMeal Production Seed Data for Supabase
+-- Animeal Production Seed Data for Supabase
 -- Run this in the Supabase SQL Editor AFTER running schema.sql:
 -- Dashboard -> SQL Editor -> New Query -> Run
 -- ==============================================================================
@@ -326,7 +326,7 @@ INSERT INTO public.foods (
 ),
 (
   'Boiled Kalabasa & Flaked Chicken Breast (Homemade)',
-  'AniMeal Kitchen',
+  'Animeal Kitchen',
   ARRAY['dog', 'cat'],
   'homemade',
   ARRAY['puppy', 'kitten', 'adult', 'senior'],

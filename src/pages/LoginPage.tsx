@@ -192,14 +192,14 @@ export default function LoginPage() {
           <Link
             to="/"
             className="group relative z-10 my-auto py-10 text-center flex flex-col items-center cursor-pointer transition-transform hover:scale-[1.01]"
-            title="Bumalik sa AniMeal Home"
+            title="Bumalik sa Animeal Home"
           >
             {/* Mascot Icon Container */}
             <div className="relative mb-6">
               <div className="size-24 sm:size-28 rounded-3xl bg-white keep-white p-3.5 shadow-2xl flex items-center justify-center transition-transform group-hover:scale-105 duration-300 ring-4 ring-white/10">
                 <img
                   src="/images/logo-only.svg"
-                  alt="AniMeal Logo"
+                  alt="Animeal Logo"
                   className="w-full h-full object-contain"
                   onError={(e) => {
                     // Fallback to text logo if SVG fails
@@ -213,7 +213,7 @@ export default function LoginPage() {
 
             {/* Brand Title */}
             <h1 className="font-display text-4xl sm:text-5xl font-black tracking-tight text-white group-hover:text-emerald-100 transition-colors">
-              AniMeal
+              Animeal
             </h1>
 
             {/* Tagline */}
@@ -434,7 +434,7 @@ export default function LoginPage() {
 
               {/* Terms of Service notice */}
               <p className="text-[11px] text-center text-slate-400 leading-normal pt-1">
-                By signing in you agree to AniMeal's terms of service, privacy policy, and cookie usage.
+                By signing in you agree to Animeal's terms of service, privacy policy, and cookie usage.
               </p>
             </form>
           </div>

@@ -9,7 +9,7 @@ interface ProfileModalProps {
 }
 
 const PRESET_AVATARS = [
-  { label: 'Fur Parent', url: 'https://api.dicebear.com/7.x/bottts/svg?seed=AniMealOwner' },
+  { label: 'Fur Parent', url: 'https://api.dicebear.com/7.x/bottts/svg?seed=AnimealOwner' },
   { label: 'Cat Lover', url: 'https://api.dicebear.com/7.x/adventurer/svg?seed=CatMom' },
   { label: 'Dog Lover', url: 'https://api.dicebear.com/7.x/adventurer/svg?seed=DogDad' },
   { label: 'Vet Hero', url: 'https://api.dicebear.com/7.x/bottts/svg?seed=PinoyVet' },

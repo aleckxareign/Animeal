@@ -36,7 +36,7 @@ export default function Footer() {
           <Link to="/" className="group inline-flex items-center py-0.5">
             <img
               src="/images/logo-white.svg"
-              alt="AniMeal"
+              alt="Animeal"
               className="h-11 sm:h-12 w-auto transition-transform group-hover:scale-[1.02]"
             />
           </Link>
@@ -79,7 +79,7 @@ export default function Footer() {
 
             <a
               href="mailto:hello@animeal.ph"
-              aria-label="Email AniMeal"
+              aria-label="Email Animeal"
               className="flex size-10 sm:size-11 items-center justify-center rounded-full border border-white/20 text-white/85 transition hover:border-white hover:bg-white/10 hover:text-white"
             >
               <Mail size={18} />
@@ -132,7 +132,7 @@ export default function Footer() {
       <div className="relative z-10 border-t border-white/15">
         <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-3 px-4 sm:px-8 lg:px-12 py-5 text-sm text-white/70">
           <p>
-            © {new Date().getFullYear()} AniMeal. All Rights Reserved.
+            © {new Date().getFullYear()} Animeal. All Rights Reserved.
           </p>
 
           <p className="flex flex-wrap items-center gap-x-3 gap-y-1">

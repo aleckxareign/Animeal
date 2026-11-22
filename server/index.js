@@ -296,7 +296,7 @@ app.get('/', (req, res) => {
   res.send(`
     <html>
       <body style="font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 90vh; background: #f6f3ec; color: #164040;">
-        <h1>🐾 AniMeal Backend API is Running</h1>
+        <h1>🐾 Animeal Backend API is Running</h1>
         <p>This is the backend server (port 3001). To view the actual website, open:</p>
         <p><a href="http://localhost:5173" style="font-size: 1.25rem; font-weight: bold; color: #44632f;">👉 http://localhost:5173</a></p>
       </body>
@@ -308,7 +308,7 @@ app.get('/', (req, res) => {
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    service: 'AniMeal Backend API',
+    service: 'Animeal Backend API',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
   })
@@ -624,7 +624,7 @@ app.post('/api/mealie/chat', (req, res) => {
     return res.json({
       role: 'mealie',
       severity: 'info',
-      content: `For ${petName} (${petContext?.weight ? `${petContext.weight} kg` : ''} ${petSpecies}), daily food intake depends on calculated Resting Energy Requirements (RER).\n\n💡 **AniMeal Recommendation:**\n• Estimated target: **${petContext?.dailyCalorieTarget || '600–750'} kcal per day**\n• Divide portions across **2 to 3 balanced meals**\n• Adjust if ${petName} is unusually active or recovering.\n\nCheck your **Meal Tracker** to log meals with automatic portion calculation!`,
+      content: `For ${petName} (${petContext?.weight ? `${petContext.weight} kg` : ''} ${petSpecies}), daily food intake depends on calculated Resting Energy Requirements (RER).\n\n💡 **Animeal Recommendation:**\n• Estimated target: **${petContext?.dailyCalorieTarget || '600–750'} kcal per day**\n• Divide portions across **2 to 3 balanced meals**\n• Adjust if ${petName} is unusually active or recovering.\n\nCheck your **Meal Tracker** to log meals with automatic portion calculation!`,
       actions: [
         { label: '🍲 Open Meal Tracker', type: 'link', value: '/meal-tracker' },
         { label: '📖 Explore Food Library', type: 'link', value: '/food-library' },
@@ -671,7 +671,7 @@ function buildServerMealiePrompt(pet) {
     ? `\nActive pet profile:\n- Name: ${pet.name || 'Pet'}\n- Species: ${pet.species || 'dog'}\n- Breed: ${pet.breed || 'Mixed'}\n- Age: ${pet.age ? `${pet.age} years` : '1 year'}\n- Weight: ${pet.weight || pet.weightKg || '5'} kg\nAlways tailor advice to this pet's exact profile.`
     : '\nNo pet profile is active. Ask the user about their pet when relevant.'
 
-  return `You are **Mealie**, the friendly AI pet nutrition & care assistant for **AniMeal** — a Filipino pet-care platform.
+  return `You are **Mealie**, the friendly AI pet nutrition & care assistant for **Animeal** — a Filipino pet-care platform.
 
 LANGUAGE RULES:
 • Respond in natural **Taglish** (conversational mixed Tagalog and English).
@@ -819,6 +819,6 @@ app.use((err, req, res, _next) => {
 
 // Start Express Server
 app.listen(PORT, () => {
-  console.log(`🐾 AniMeal Backend Server running on http://localhost:${PORT}`)
+  console.log(`🐾 Animeal Backend Server running on http://localhost:${PORT}`)
 })
 

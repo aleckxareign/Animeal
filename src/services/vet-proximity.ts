@@ -80,7 +80,7 @@ export async function reverseGeocodeCoords(
       signal: controller.signal,
       headers: {
         Accept: 'application/json',
-        'User-Agent': 'AniMeal-Pet-Care-App/1.0',
+        'User-Agent': 'Animeal-Pet-Care-App/1.0',
       },
     })
     clearTimeout(timer)
@@ -136,7 +136,7 @@ export async function geocodeLocationName(
       signal: controller.signal,
       headers: {
         Accept: 'application/json',
-        'User-Agent': 'AniMeal-Pet-Care-App/1.0',
+        'User-Agent': 'Animeal-Pet-Care-App/1.0',
       },
     })
     clearTimeout(timer)
@@ -185,7 +185,7 @@ export async function geocodeLocationName(
 }
 
 /**
- * Parse an OpenStreetMap item into an AniMeal Vet object.
+ * Parse an OpenStreetMap item into an Animeal Vet object.
  */
 function parseOsmToVet(item: Record<string, unknown>, originLat?: number, originLon?: number, idx = 0): Vet {
   const lat = Number(item.lat)
@@ -282,7 +282,7 @@ export async function autocompleteLocation(
       signal: controller.signal,
       headers: {
         Accept: 'application/json',
-        'User-Agent': 'AniMeal-Pet-Care-App/1.0',
+        'User-Agent': 'Animeal-Pet-Care-App/1.0',
       },
     })
     clearTimeout(timer)
@@ -346,7 +346,7 @@ export async function fetchLiveNearbyVetsFromApi(
       signal: controller.signal,
       headers: {
         Accept: 'application/json',
-        'User-Agent': 'AniMeal-Pet-Care-App/1.0',
+        'User-Agent': 'Animeal-Pet-Care-App/1.0',
       },
     })
     clearTimeout(timer)

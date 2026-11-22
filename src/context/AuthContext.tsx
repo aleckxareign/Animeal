@@ -32,7 +32,7 @@ const DEMO_USER: AuthUser = {
   id: 'demo-user-id',
   email: 'petparent@animeal.ph',
   fullName: 'Pinoy Pet Parent',
-  avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=AniMealOwner',
+  avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=AnimealOwner',
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {

@@ -72,7 +72,7 @@ export default function PetOnboardingModal({
       avatarEmoji,
     })
 
-    addToast(`Welcome ${name.trim()} to AniMeal! 🐾`, 'success')
+    addToast(`Welcome ${name.trim()} to Animeal! 🐾`, 'success')
     if (onClose) onClose()
   }
 

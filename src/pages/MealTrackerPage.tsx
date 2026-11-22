@@ -47,7 +47,7 @@ export default function MealTrackerPage() {
           <div className="space-y-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-sage/15 px-3 py-1 text-xs font-bold text-brand-sage uppercase tracking-wider">
               <Sparkles className="h-3.5 w-3.5" />
-              Welcome to AniMeal
+              Welcome to Animeal
             </span>
             <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-brand-dark">
               Let's set up your pet's meal tracker
@@ -117,7 +117,7 @@ export default function MealTrackerPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <span className="text-sm font-bold uppercase tracking-wider text-brand-sage">
-                {greeting}, Ka-AniMeal! 👋
+                {greeting}, Ka-Animeal! 👋
               </span>
               <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-brand-dark tracking-tight">
                 Meal Tracker & Dashboard

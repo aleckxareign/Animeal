@@ -34,7 +34,7 @@ function buildChatSystemPrompt(pet?: PetProfile): string {
     ? `\nActive pet profile:\n- Name: ${pet.name}\n- Species: ${pet.species}\n- Breed: ${pet.breed}\n- Age: ${pet.ageMonths} months\n- Weight: ${pet.weightKg} kg\nAlways consider this pet's specific needs when answering.`
     : '\nNo pet profile is active. Ask the user about their pet when relevant.'
 
-  return `You are **Mealie**, the friendly AI assistant for **AniMeal** — a Filipino pet-care platform.
+  return `You are **Mealie**, the friendly AI assistant for **Animeal** — a Filipino pet-care platform.
 
 LANGUAGE RULES:
 • Respond in **Taglish** (mixed Tagalog + English) by default.

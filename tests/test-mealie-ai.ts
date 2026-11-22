@@ -34,7 +34,7 @@ const ai = new GoogleGenAI({ apiKey: API_KEY })
 const MODEL = 'gemini-2.0-flash'
 
 // ─── System prompt (duplicated from gemini.ts so tests run independently) ──
-const SYSTEM_PROMPT = `You are **Mealie**, the friendly AI assistant for **AniMeal** — a Filipino pet-care platform.
+const SYSTEM_PROMPT = `You are **Mealie**, the friendly AI assistant for **Animeal** — a Filipino pet-care platform.
 
 LANGUAGE RULES:
 • Respond in **Taglish** (mixed Tagalog + English) by default.

@@ -44,7 +44,7 @@ export default function ToolShowcase() {
               </h2>
 
               <p className="mt-4 text-base leading-relaxed text-brand-dark/80 sm:text-lg">
-                Don&apos;t get misled by confusing marketing jargon. AniMeal&apos;s AI reads any pet food packaging label, verifies AAFCO nutritional adequacy, detects harmful additives, and calculates true cost-per-calorie in Philippine Pesos.
+                Don&apos;t get misled by confusing marketing jargon. Animeal&apos;s AI reads any pet food packaging label, verifies AAFCO nutritional adequacy, detects harmful additives, and calculates true cost-per-calorie in Philippine Pesos.
               </p>
 
               <ul className="mt-6 space-y-3.5 text-sm sm:text-base text-brand-dark/85">
@@ -281,7 +281,7 @@ export default function ToolShowcase() {
               </h2>
 
               <p className="mt-4 text-base leading-relaxed text-brand-dark/80 sm:text-lg">
-                Overfeeding and underfeeding lead to joint problems, lethargy, and diabetes. AniMeal calculates your pet&apos;s Resting Energy Requirements (RER) with clinical veterinary formulas and helps multi-caregiver families stay in sync.
+                Overfeeding and underfeeding lead to joint problems, lethargy, and diabetes. Animeal calculates your pet&apos;s Resting Energy Requirements (RER) with clinical veterinary formulas and helps multi-caregiver families stay in sync.
               </p>
 
               <ul className="mt-6 space-y-3.5 text-sm sm:text-base text-brand-dark/85">
@@ -590,7 +590,7 @@ export default function ToolShowcase() {
               </h2>
 
               <p className="mt-4 text-base leading-relaxed text-brand-dark/80 sm:text-lg">
-                Dehydration is one of the most common causes of feline urinary tract issues and canine kidney stress in warm climates. AniMeal keeps water targets clear, records weigh-in trends, and manages preventative medication schedules.
+                Dehydration is one of the most common causes of feline urinary tract issues and canine kidney stress in warm climates. Animeal keeps water targets clear, records weigh-in trends, and manages preventative medication schedules.
               </p>
 
               <ul className="mt-6 space-y-3.5 text-sm sm:text-base text-brand-dark/85">

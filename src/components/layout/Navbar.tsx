@@ -113,7 +113,7 @@ export default function Navbar() {
           <Link to="/" onClick={closeAll} className="shrink-0 flex items-center group py-0.5">
             <img
               src="/images/logo.svg"
-              alt="AniMeal"
+              alt="Animeal"
               className="h-11 sm:h-12 w-auto transition-transform group-hover:scale-[1.02]"
             />
           </Link>
