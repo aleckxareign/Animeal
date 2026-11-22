@@ -1,17 +1,25 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import Navbar from './Navbar'
 import Footer from './Footer'
 import ScrollToHash from './ScrollToHash'
+import NewUserTourModal from '../onboarding/NewUserTourModal'
+import FloatingMealieBubble from '../ask-mealie/FloatingMealieBubble'
 
 export default function Layout() {
+  const { pathname } = useLocation()
+  const isChatPage = pathname === '/ask-mealie'
+
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className={`flex min-h-screen flex-col ${isChatPage ? 'h-screen overflow-hidden' : ''}`}>
       <ScrollToHash />
       <Navbar />
-      <main className="flex-1">
+      <main key={pathname} className={`page-enter flex-1 ${isChatPage ? 'flex overflow-hidden' : ''}`}>
         <Outlet />
       </main>
-      <Footer />
+      {!isChatPage && <Footer />}
+      <NewUserTourModal />
+      <FloatingMealieBubble />
     </div>
   )
 }
+

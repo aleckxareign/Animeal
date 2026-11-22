@@ -1,48 +1,143 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
+import { useLayoutEffect, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
+import {
+  ArrowRight,
+  CalendarDays,
+  BookOpen,
+  ScanLine,
+  HeartPulse,
+} from 'lucide-react'
 import SectionHeading from '../ui/SectionHeading'
-import { features } from '../../data/features'
+import { Card } from '../ui/Card'
+import { AppProvider } from '../../context/AppContext'
+import MealTrackerPage from '../../pages/MealTrackerPage'
+import FoodLibraryPage from '../../pages/FoodLibraryPage'
+import FoodScannerPage from '../../pages/FoodScannerPage'
+import PetWellnessPage from '../../pages/PetWellnessPage'
+
+const cardClassName = 'flex flex-col justify-between gap-0 p-0 border-border/60 bg-white shadow-sm transition-shadow hover:shadow-md'
+const linkClassName = 'group mt-3 inline-flex min-h-11 items-center gap-2 font-bold text-brand-sage transition-colors hover:text-brand-dark text-sm'
+
+function FeatureScreenPreview({ children }: { children: ReactNode }) {
+  const frameRef = useRef<HTMLDivElement>(null)
+  const [scale, setScale] = useState(0)
+
+  useLayoutEffect(() => {
+    const frame = frameRef.current
+    if (!frame) return
+
+    const observer = new ResizeObserver(() => setScale(frame.clientWidth / 1280))
+    observer.observe(frame)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <div ref={frameRef} aria-hidden="true" inert className="relative aspect-[1280/850] min-w-0 overflow-hidden rounded-xl border border-border/70 bg-white shadow-inner">
+      <div className="absolute left-0 top-0 h-[850px] w-[1280px] origin-top-left" style={{ transform: `scale(${scale})` }}>
+        {children}
+      </div>
+    </div>
+  )
+}
 
 export default function FeatureCards() {
   return (
-    <section className="bg-white">
-      <div className="mx-auto max-w-7xl px-6 py-16">
+    <section className="bg-white py-12 sm:py-16 lg:py-20">
+      <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
         <SectionHeading
           eyebrow="Explore Animeal"
           title="A closer look at smarter pet care."
-          subtitle="Discover the tools that help you plan meals, understand pet food, and keep track of your pet's health."
+          subtitle="Discover the tools that help you plan meals, understand pet food, and keep track of your pet's health with modern precision."
         />
 
-        <div className="grid gap-6 md:grid-cols-2">
-          {features.map((feature) => {
-            const Icon = feature.icon
-            return (
-              <article
-                key={feature.title}
-                className="grid gap-6 rounded-lg border-2 border-gray-200 bg-white p-6 sm:grid-cols-2"
-              >
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-sage/30 text-brand-dark">
-                      <Icon size={22} />
-                    </span>
-                    <h3 className="font-display text-2xl text-brand-dark">{feature.title}</h3>
-                  </div>
-                  <p className="mt-4 text-gray-600">{feature.description}</p>
-                  <Link
-                    to={feature.to}
-                    className="mt-6 inline-flex items-center gap-2 font-semibold text-brand-sage hover:underline sm:mt-auto"
-                  >
-                    {feature.linkLabel} <ArrowRight size={18} />
-                  </Link>
+        <AppProvider preview>
+          <div className="mt-8 grid gap-5 lg:gap-6 md:grid-cols-2">
+          <Card className={cardClassName}>
+            <div className="grid grid-cols-1 gap-4 p-4 sm:p-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2.5">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-sage/20 text-brand-sage">
+                    <CalendarDays className="size-4.5" />
+                  </span>
+                  <h3 className="font-display text-lg font-bold text-brand-dark">Meal Tracker</h3>
                 </div>
+                <p className="mt-3 text-sm text-brand-dark/75 leading-relaxed">
+                  Log meals, record portions, and see how much of your pet's daily calorie target remains.
+                </p>
+                <Link to="/meal-tracker" className={linkClassName}>
+                  Log a meal <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
 
-                {/* PLACEHOLDER: replace this box with the real {feature.title} interface */}
-                <div className="min-h-40 rounded-lg border border-gray-100 bg-white shadow-lg" />
-              </article>
-            )
-          })}
-        </div>
+              <FeatureScreenPreview><MealTrackerPage /></FeatureScreenPreview>
+            </div>
+          </Card>
+
+          <Card className={cardClassName}>
+            <div className="grid grid-cols-1 gap-4 p-4 sm:p-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2.5">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-sage/20 text-brand-sage">
+                    <BookOpen className="size-4.5" />
+                  </span>
+                  <h3 className="font-display text-lg font-bold text-brand-dark">Food Library</h3>
+                </div>
+                <p className="mt-3 text-sm text-brand-dark/75 leading-relaxed">
+                  Explore local pet foods and compare nutrition, ingredients, and cost per calorie.
+                </p>
+                <Link to="/food-library" className={linkClassName}>
+                  Explore pet foods <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
+
+              <FeatureScreenPreview><FoodLibraryPage /></FeatureScreenPreview>
+            </div>
+          </Card>
+
+          <Card className={cardClassName}>
+            <div className="grid grid-cols-1 gap-4 p-4 sm:p-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2.5">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-sage/20 text-brand-sage">
+                    <ScanLine className="size-4.5" />
+                  </span>
+                  <h3 className="font-display text-lg font-bold text-brand-dark">Food Scanner</h3>
+                </div>
+                <p className="mt-3 text-sm text-brand-dark/75 leading-relaxed">
+                  Scan or upload a food label to understand its nutrition and suitability.
+                </p>
+                <Link to="/food-scanner" className={linkClassName}>
+                  Scan a food label <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
+
+              <FeatureScreenPreview><FoodScannerPage /></FeatureScreenPreview>
+            </div>
+          </Card>
+
+          <Card className={cardClassName}>
+            <div className="grid grid-cols-1 gap-4 p-4 sm:p-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2.5">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-sage/20 text-brand-sage">
+                    <HeartPulse className="size-4.5" />
+                  </span>
+                  <h3 className="font-display text-lg font-bold text-brand-dark">Pet Wellness</h3>
+                </div>
+                <p className="mt-3 text-sm text-brand-dark/75 leading-relaxed">
+                  Track weight, hydration, health records, and care reminders.
+                </p>
+                <Link to="/pet-wellness" className={linkClassName}>
+                  View wellness records <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
+
+              <FeatureScreenPreview><PetWellnessPage /></FeatureScreenPreview>
+            </div>
+          </Card>
+          </div>
+        </AppProvider>
       </div>
     </section>
   )

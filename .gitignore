@@ -20,6 +20,11 @@ dist-ssr
 # Licensed (non-redistributable) fonts - keep these out of the public repo
 src/assets/fonts/TT-Ramillas-*
 
+# Internal prompt specifications and planning documents
+AniMeal_Complete_Development_Prompt.md
+AniMeal_Project_Overview.md
+IMPLEMENTATION_PLAN.md
+
 # OS / misc
 Thumbs.db
 coverage

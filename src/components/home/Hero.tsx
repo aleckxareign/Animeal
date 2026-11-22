@@ -1,50 +1,57 @@
-import { CheckCircle2, Play, Sparkles } from 'lucide-react'
-import Button from '../ui/Button'
+import { Sparkles, Heart, ShieldCheck, ArrowRight } from 'lucide-react'
+import Button from '../ui/button'
+import { Badge } from '../ui/badge'
 
-const perks = [
-  'Personalized nutrition',
-  'Food comparisons',
-  'Wellness tracking',
-]
-
-export default function Hero() {
+export default function Hero({ className = '' }: { className?: string }) {
   return (
-    <section className="overflow-x-clip bg-brand-cream">
-      <div className="mx-auto grid max-w-7xl items-center gap-6 px-6 py-8 md:grid-cols-2 md:py-10">
+    <section className={`bg-brand-cream py-8 sm:py-10 lg:py-12 landing-wide:pt-3 landing-wide:pb-6 flex-1 flex flex-col justify-center ${className}`}>
+      <div className="mx-auto grid w-full max-w-[98.5rem] items-center gap-8 px-5 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-10 lg:px-10 landing-wide:gap-12">
 
-        <div>
-          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-brand-dark/70 sm:text-sm">
-            Pet nutrition, made simpler
-          </p>
+        {/* Left Column (Hero Content) */}
+        <div className="min-w-0 landing-wide:pt-6">
+          <Badge
+            variant="outline"
+            className="mb-5 h-auto max-w-full gap-2.5 rounded-full border-brand-sage/30 bg-brand-sage/10 px-3 py-1 text-xs font-semibold whitespace-normal text-brand-sage sm:text-sm landing-wide:px-4 landing-wide:text-base landing-wide:leading-none"
+          >
+            <Sparkles aria-hidden="true" className="shrink-0" />
+            AI-Powered Pet Nutrition & Care Platform
+          </Badge>
 
-          <h1 className="font-display text-4xl leading-tight sm:text-5xl md:text-6xl">
-            <span className="block text-brand-sage">Better meals.</span>
+          <h1 className="font-display text-[clamp(2.375rem,4vw,4.375rem)] leading-[1.08] font-extrabold tracking-[-0.02em] text-brand-dark">
+            <span className="block text-brand-sage/85">Better meals.</span>
             <span className="block text-brand-dark">Happier Tails.</span>
           </h1>
 
-          <p className="mt-5 max-w-md text-gray-700">
-            Make everyday pet nutrition feel less complicated. Track meals, understand food
-            labels, monitor your pet's wellness, and get helpful AI-powered guidance, all in one
-            friendly place.
+          <p className="mt-5 max-w-[44rem] text-base leading-relaxed text-brand-dark/80 sm:text-lg landing-wide:mt-5 landing-wide:text-[1.3125rem] landing-wide:leading-[1.6]">
+            Make everyday pet care effortless. Estimate scientific calorie budgets with Resting Energy Requirements (RER), compare local Filipino pet food prices, scan packaging labels, and chat with Mealie — all in one synchronized dashboard.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3 sm:gap-4">
-            <Button to="/meal-tracker">
-              <span className="text-white">Get Started Free</span>
+          <div className="mt-6 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center landing-wide:mt-6 landing-wide:gap-4">
+            <Button to="/meal-tracker" size="lg" className="font-semibold landing-wide:h-13 landing-wide:gap-3 landing-wide:rounded-[1.25rem] landing-wide:px-6 landing-wide:text-lg">
+              <span>Get Started Free</span>
+              <ArrowRight className="size-5" />
             </Button>
+          </div>
 
-            <Button to="/#how-it-works" variant="outline">
-              <Play size={14} className="mr-2" fill="currentColor" />
-              Watch Demo
-            </Button>
+          <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-medium text-brand-dark/75 landing-wide:mt-5 landing-wide:text-base">
+            <div className="flex items-center gap-2 landing-wide:text-base">
+              <ShieldCheck className="size-5 shrink-0 text-brand-sage" />
+              <span>Zero setup fees • Offline ready</span>
+            </div>
+            <div className="flex items-center gap-2 landing-wide:text-base">
+              <Heart className="size-5 shrink-0 text-brand-alert fill-brand-alert" />
+              <span>Dedicated to Pinoy pet parents</span>
+            </div>
           </div>
         </div>
 
-        {/* right column: image box + card are siblings, so the card can't stretch the image box */}
-        <div className="relative mx-auto w-full max-w-lg md:max-w-none">
-          <div className="relative aspect-square w-full">
+        {/* Right Column: Hero Visual Showcase */}
+        <div className="relative mx-auto grid w-full min-w-0 max-w-2xl gap-4 sm:grid-cols-2 lg:max-w-none lg:grid-cols-1 xl:grid-cols-2 landing-wide:min-h-[clamp(34rem,33vw,40rem)] landing-wide:place-items-center">
+          <div className="relative mx-auto flex aspect-[5/4] w-full max-w-lg items-center justify-center sm:col-span-2 lg:col-span-1 xl:col-span-2 landing-wide:aspect-square landing-wide:max-w-[35rem] landing-wide:translate-y-3">
+
+            {/* Organic Background Blob */}
             <div
-              className="absolute inset-0 bg-brand-sage"
+              className="absolute inset-0 bg-brand-sage/70"
               style={{
                 maskImage: "url('/images/hero-blob.svg')",
                 maskSize: '100% 100%',
@@ -52,14 +59,15 @@ export default function Hero() {
                 WebkitMaskImage: "url('/images/hero-blob.svg')",
                 WebkitMaskSize: '100% 100%',
                 WebkitMaskRepeat: 'no-repeat',
-                transform: 'scale(1.20)',
               }}
             />
 
+            {/* Mascot Image */}
             <img
               src="/images/hero.webp"
-              alt="A cat and a dog resting together"
-              className="absolute left-[2%] top-[8%] h-[81%] w-[94%] object-contain"
+              alt="A happy cat and dog resting together"
+              fetchPriority="high"
+              className="relative h-[86%] w-[94%] object-cover landing-wide:object-contain"
               style={{
                 maskImage: "url('/images/hero-photo-mask.svg')",
                 maskSize: '100% 100%',
@@ -67,33 +75,40 @@ export default function Hero() {
                 WebkitMaskImage: "url('/images/hero-photo-mask.svg')",
                 WebkitMaskSize: '100% 100%',
                 WebkitMaskRepeat: 'no-repeat',
-                transform: 'scale(1.12)',
               }}
             />
           </div>
 
-          {/* phones: below the photo (mt-10 clears the scaled blob). 640px+: floats top-right */}
-          <div className="mt-10 w-full max-w-xs rounded-2xl bg-white p-4 shadow-lg sm:absolute sm:right-0 sm:top-0 sm:z-10 sm:mt-0 sm:w-60">
-            <div className="mb-3 flex items-center gap-2.5">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-sage/30">
-                <Sparkles size={20} className="text-brand-dark" />
+          {/* Floating Live Metric Card (Floats on wide screens) */}
+          <div className="min-w-0 rounded-2xl bg-white p-4 shadow-md landing-wide:absolute landing-wide:bottom-0 landing-wide:left-5 landing-wide:z-10 landing-wide:w-[23rem] landing-wide:rounded-[1.75rem] landing-wide:px-5 landing-wide:py-5 landing-wide:shadow-2xl">
+            <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-2 text-sm landing-wide:text-base">
+              <div className="flex items-center gap-2.5">
+                <span className="flex size-8 shrink-0 items-center landing-wide:size-10 justify-center rounded-full bg-amber-100 text-base">
+                  🐕
+                </span>
+                <div>
+                  <p className="font-bold text-brand-dark leading-none">Bruno's Plate</p>
+                  <p className="text-xs text-brand-dark/75 landing-wide:text-sm mt-0.5">Golden Retriever • 12 kg</p>
+                </div>
               </div>
-              <p className="text-sm font-bold leading-snug text-brand-dark">
-                Everything your pet needs
-              </p>
+              <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-800">
+                Target Met
+              </span>
             </div>
 
-            <ul className="space-y-2 text-xs text-gray-700">
-              {perks.map((perk) => (
-                <li key={perk} className="flex items-center gap-2">
-                  <CheckCircle2 size={18} className="shrink-0 text-brand-sage" />
-                  {perk}
-                </li>
-              ))}
-            </ul>
+            <div className="mt-3.5 flex flex-wrap items-center justify-between gap-x-2 gap-y-2 font-mono text-sm font-bold text-brand-dark landing-wide:mt-5 landing-wide:text-base">
+              <span className="font-sans text-xs font-medium text-brand-dark/75 landing-wide:text-sm">Calories Today</span>
+              <span>540 / 720 kcal</span>
+            </div>
+            <div className="mt-2 h-2.5 landing-wide:h-3 w-full rounded-full bg-brand-dark/10 overflow-hidden">
+              <div className="h-full rounded-full bg-brand-sage" style={{ width: '75%' }} />
+            </div>
+            <p className="mt-2.5 flex flex-wrap items-center justify-between gap-x-2 text-xs text-brand-dark/75 landing-wide:text-sm">
+              <span>Hydration: 450ml / 600ml</span>
+              <span className="text-brand-sage font-bold">Healthy Range ✓</span>
+            </p>
           </div>
         </div>
-
       </div>
     </section>
   )
