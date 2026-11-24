@@ -52,7 +52,7 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
-              className="flex size-10 sm:size-11 items-center justify-center rounded-full border border-white/20 text-white/85 transition hover:border-white hover:bg-white/10 hover:text-white"
+              className="flex size-10 sm:size-11 items-center justify-center rounded-full border border-white/20 text-white/85 transition hover:border-white hover:bg-card/10 hover:text-white"
             >
               <FaFacebookF size={18} />
             </a>
@@ -62,7 +62,7 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
-              className="flex size-10 sm:size-11 items-center justify-center rounded-full border border-white/20 text-white/85 transition hover:border-white hover:bg-white/10 hover:text-white"
+              className="flex size-10 sm:size-11 items-center justify-center rounded-full border border-white/20 text-white/85 transition hover:border-white hover:bg-card/10 hover:text-white"
             >
               <FaInstagram size={18} />
             </a>
@@ -72,7 +72,7 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="TikTok"
-              className="flex size-10 sm:size-11 items-center justify-center rounded-full border border-white/20 text-white/85 transition hover:border-white hover:bg-white/10 hover:text-white"
+              className="flex size-10 sm:size-11 items-center justify-center rounded-full border border-white/20 text-white/85 transition hover:border-white hover:bg-card/10 hover:text-white"
             >
               <SiTiktok size={17} />
             </a>
@@ -80,7 +80,7 @@ export default function Footer() {
             <a
               href="mailto:hello@animeal.ph"
               aria-label="Email Animeal"
-              className="flex size-10 sm:size-11 items-center justify-center rounded-full border border-white/20 text-white/85 transition hover:border-white hover:bg-white/10 hover:text-white"
+              className="flex size-10 sm:size-11 items-center justify-center rounded-full border border-white/20 text-white/85 transition hover:border-white hover:bg-card/10 hover:text-white"
             >
               <Mail size={18} />
             </a>

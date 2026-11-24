@@ -172,16 +172,16 @@ export default function SharedHousehold({ pet }: SharedHouseholdProps) {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Overview & Quick Status Banner */}
-      <div className="bg-white rounded-2xl p-5 sm:p-7 border border-stone-100 shadow-xs space-y-4">
+      <div className="bg-card rounded-2xl p-5 sm:p-7 border border-border shadow-xs space-y-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-dark/10 text-brand-dark border border-brand-dark/20 mb-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-dark/10 text-foreground border border-foreground/20 mb-2">
             <HeartHandshake className="w-3.5 h-3.5" />
             Family Sync & Shared Care
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-brand-dark tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
             Shared Household for {pet.name}
           </h2>
-          <p className="text-sm text-stone-600 max-w-2xl mt-1">
+          <p className="text-sm text-muted-foreground max-w-2xl mt-1">
             Keep your whole family in sync so {pet.name} never gets double-fed or missed. Real-time updates let everyone see who fed or walked {pet.name} last.
           </p>
         </div>
@@ -190,33 +190,33 @@ export default function SharedHousehold({ pet }: SharedHouseholdProps) {
         <div
           className={`rounded-2xl p-5 sm:p-6 border transition-all ${
             todayFeedings.length > 0
-              ? 'bg-linear-to-r from-emerald-50 via-teal-50 to-white border-emerald-200'
-              : 'bg-linear-to-r from-amber-50 via-orange-50 to-white border-amber-200'
+              ? 'bg-linear-to-r from-emerald-50 via-teal-50 to-card dark:from-background dark:via-muted dark:to-card border-emerald-200 dark:border-emerald-400/30'
+              : 'bg-linear-to-r from-amber-50 via-orange-50 to-card dark:from-background dark:via-muted dark:to-card border-amber-200 dark:border-amber-400/30'
           }`}
         >
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
             <div className="space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-stone-500">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Philippine Household Check
               </span>
-              <h3 className="text-xl sm:text-2xl font-extrabold text-brand-dark flex items-center gap-2">
+              <h3 className="text-xl sm:text-2xl font-extrabold text-foreground flex items-center gap-2">
                 Napakain na ba si {pet.name}?
               </h3>
 
               {todayFeedings.length > 0 && latestFeeding ? (
-                <div className="flex items-center gap-2 text-sm font-semibold text-emerald-800 bg-white/80 backdrop-blur-xs px-3.5 py-2 rounded-xl border border-emerald-200/80 shadow-2xs w-fit">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                <div className="flex items-center gap-2 text-sm font-semibold text-emerald-800 dark:text-emerald-300 bg-card/80 backdrop-blur-xs px-3.5 py-2 rounded-xl border border-emerald-200/80 dark:border-emerald-400/30 shadow-2xs w-fit">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-300 shrink-0" />
                   <span>
                     ✅ Fed {timeAgo(latestFeeding.timestamp)} by{' '}
-                    <strong className="text-emerald-950 font-bold">{latestFeeding.fedBy}</strong>
+                    <strong className="text-emerald-950 dark:text-emerald-300 font-bold">{latestFeeding.fedBy}</strong>
                   </span>
-                  <span className="text-xs text-stone-400 font-normal">
+                  <span className="text-xs text-muted-foreground font-normal">
                     ({latestFeeding.portion} {latestFeeding.unit} of {latestFeeding.foodName})
                   </span>
                 </div>
               ) : (
-                <div className="flex items-center gap-2 text-sm font-semibold text-amber-900 bg-white/80 backdrop-blur-xs px-3.5 py-2 rounded-xl border border-amber-200/80 shadow-2xs w-fit">
-                  <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
+                <div className="flex items-center gap-2 text-sm font-semibold text-amber-900 dark:text-amber-300 bg-card/80 backdrop-blur-xs px-3.5 py-2 rounded-xl border border-amber-200/80 dark:border-amber-400/30 shadow-2xs w-fit">
+                  <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-300 shrink-0" />
                   <span>⚠️ Not fed yet today! Gutom pa si {pet.name}.</span>
                 </div>
               )}
@@ -224,12 +224,12 @@ export default function SharedHousehold({ pet }: SharedHouseholdProps) {
 
             {/* Quick Button + Who is feeding */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-stone-200 text-xs text-stone-600 shadow-2xs">
+              <div className="flex items-center gap-2 bg-card px-3 py-2 rounded-xl border border-border text-xs text-muted-foreground shadow-2xs">
                 <span>Who&apos;s feeding:</span>
                 <select
                   value={activeFeeder}
                   onChange={(e) => setActiveFeeder(e.target.value)}
-                  className="font-bold text-brand-dark bg-transparent focus:outline-none cursor-pointer"
+                  className="font-bold text-foreground bg-transparent focus:outline-none cursor-pointer"
                 >
                   {household.map((m) => (
                     <option key={m.id} value={m.name}>
@@ -253,21 +253,21 @@ export default function SharedHousehold({ pet }: SharedHouseholdProps) {
       </div>
 
       {/* Household Members List Section */}
-      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-stone-100 shadow-xs space-y-4">
-        <div className="flex items-center justify-between">
+      <div className="bg-card rounded-2xl p-5 sm:p-6 border border-border shadow-xs space-y-4">
+        <div className="flex max-sm:flex-wrap max-sm:gap-3 items-center justify-between">
           <div>
-            <h3 className="text-base font-bold text-brand-dark flex items-center gap-2">
-              <Users className="w-4 h-4 text-brand-sage" />
+            <h3 className="text-base font-bold text-foreground flex items-center gap-2">
+              <Users className="w-4 h-4 text-brand-accent" />
               Household Caretakers
             </h3>
-            <p className="text-xs text-stone-500">
+            <p className="text-xs text-muted-foreground">
               Family members and caretakers who care for {pet.name}
             </p>
           </div>
           <button
             type="button"
             onClick={() => setIsAddModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-brand-dark text-xs font-semibold transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-muted hover:bg-accent text-foreground text-xs font-semibold transition-colors"
           >
             <UserPlus className="w-3.5 h-3.5" />
             + Add Member
@@ -284,7 +284,7 @@ export default function SharedHousehold({ pet }: SharedHouseholdProps) {
             return (
               <div
                 key={member.id}
-                className="relative bg-stone-50/70 hover:bg-stone-50 border border-stone-200/70 rounded-xl p-4 flex items-center justify-between gap-3 transition-colors"
+                className="relative bg-muted/70 hover:bg-muted border border-border/70 rounded-xl p-4 flex max-sm:flex-wrap max-sm:gap-3 items-center justify-between gap-3 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   {/* Avatar */}
@@ -297,19 +297,19 @@ export default function SharedHousehold({ pet }: SharedHouseholdProps) {
 
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-sm text-brand-dark">{member.name}</span>
+                      <span className="font-bold text-sm text-foreground">{member.name}</span>
                       <span
                         className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
                           member.isOwner
-                            ? 'bg-brand-sage/15 text-brand-sage'
-                            : 'bg-stone-200 text-stone-700'
+                            ? 'bg-brand-sage/15 text-brand-accent'
+                            : 'bg-muted text-muted-foreground'
                         }`}
                       >
                         {member.isOwner ? 'Owner' : 'Family Member'}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-3 mt-1 text-[11px] text-stone-500">
+                    <div className="flex items-center gap-3 mt-1 text-[11px] text-muted-foreground">
                       <span>{memberFeedings} feedings</span>
                       <span>•</span>
                       <span>{memberTasks} tasks done</span>
@@ -321,7 +321,7 @@ export default function SharedHousehold({ pet }: SharedHouseholdProps) {
                   <button
                     type="button"
                     onClick={() => handleRemoveMember(member.id, member.name)}
-                    className="text-stone-300 hover:text-brand-alert p-1.5 rounded-md transition-colors"
+                    className="text-stone-300 hover:text-destructive p-1.5 rounded-md transition-colors"
                     title={`Remove ${member.name}`}
                   >
                     <Trash2 className="w-4 h-4" />
@@ -334,32 +334,32 @@ export default function SharedHousehold({ pet }: SharedHouseholdProps) {
       </div>
 
       {/* Shared Activity Feed */}
-      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-stone-100 shadow-xs space-y-4">
-        <div className="flex items-center justify-between">
+      <div className="bg-card rounded-2xl p-5 sm:p-6 border border-border shadow-xs space-y-4">
+        <div className="flex max-sm:flex-wrap max-sm:gap-3 items-center justify-between">
           <div>
-            <h3 className="text-base font-bold text-brand-dark flex items-center gap-2">
-              <Activity className="w-4 h-4 text-brand-dark" />
+            <h3 className="text-base font-bold text-foreground flex items-center gap-2">
+              <Activity className="w-4 h-4 text-foreground" />
               Shared Activity Feed
             </h3>
-            <p className="text-xs text-stone-500">
+            <p className="text-xs text-muted-foreground">
               Live chronological timeline of household care for {pet.name}
             </p>
           </div>
-          <span className="text-xs font-semibold text-stone-500 bg-stone-100 px-2.5 py-1 rounded-md">
+          <span className="text-xs font-semibold text-muted-foreground bg-muted px-2.5 py-1 rounded-md">
             {activityTimeline.length} events
           </span>
         </div>
 
         {activityTimeline.length === 0 ? (
-          <div className="py-10 text-center text-stone-400 space-y-2">
+          <div className="py-10 text-center text-muted-foreground space-y-2">
             <Activity className="w-8 h-8 mx-auto stroke-1 text-stone-300" />
             <p className="text-xs">No care activity logged yet for {pet.name}.</p>
-            <p className="text-[11px] text-stone-400">
+            <p className="text-[11px] text-muted-foreground">
               Feedings, water logs, and scheduled tasks will automatically appear here.
             </p>
           </div>
         ) : (
-          <div className="relative pl-6 space-y-4 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-stone-200">
+          <div className="relative pl-6 space-y-4 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-accent">
             {activityTimeline.slice(0, 20).map((act) => {
               return (
                 <div key={act.id} className="relative flex items-start gap-3 text-xs">
@@ -380,22 +380,22 @@ export default function SharedHousehold({ pet }: SharedHouseholdProps) {
                   </div>
 
                   {/* Activity Details Card */}
-                  <div className="flex-1 bg-stone-50/80 hover:bg-stone-50 border border-stone-200/60 p-3 rounded-xl transition-colors">
-                    <div className="flex items-center justify-between gap-2 flex-wrap">
-                      <span className="font-bold text-brand-dark text-sm">{act.title}</span>
-                      <span className="text-[11px] text-stone-400 flex items-center gap-1">
+                  <div className="flex-1 bg-muted/80 hover:bg-muted border border-border/60 p-3 rounded-xl transition-colors">
+                    <div className="flex max-sm:flex-wrap max-sm:gap-3 items-center justify-between gap-2 flex-wrap">
+                      <span className="font-bold text-foreground text-sm">{act.title}</span>
+                      <span className="text-[11px] text-muted-foreground flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {timeAgo(act.timestamp)}
                       </span>
                     </div>
 
-                    <p className="text-stone-600 mt-1">{act.description}</p>
+                    <p className="text-muted-foreground mt-1">{act.description}</p>
 
-                    <div className="mt-2 pt-2 border-t border-stone-200/50 flex items-center justify-between text-[11px] text-stone-500">
-                      <span className="font-medium text-stone-700">
-                        By: <span className="font-bold text-brand-dark">{act.performedBy}</span>
+                    <div className="mt-2 pt-2 border-t border-border/50 flex max-sm:flex-wrap max-sm:gap-3 items-center justify-between text-[11px] text-muted-foreground">
+                      <span className="font-medium text-muted-foreground">
+                        By: <span className="font-bold text-foreground">{act.performedBy}</span>
                       </span>
-                      <span className="text-stone-400">{formatDateTime(act.timestamp)}</span>
+                      <span className="text-muted-foreground">{formatDateTime(act.timestamp)}</span>
                     </div>
                   </div>
                 </div>
@@ -416,18 +416,18 @@ export default function SharedHousehold({ pet }: SharedHouseholdProps) {
             if (e.target === e.currentTarget) setIsAddModalOpen(false)
           }}
         >
-          <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-xl overflow-hidden animate-scale-in">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-stone-100 bg-brand-cream/60">
+          <div className="relative w-full max-w-sm bg-card rounded-2xl shadow-xl max-h-[calc(100dvh-2rem)] overflow-y-auto animate-scale-in">
+            <div className="flex max-sm:flex-wrap max-sm:gap-3 items-center justify-between px-5 py-4 border-b border-border bg-background/60">
               <div className="flex items-center gap-2">
-                <UserPlus className="w-5 h-5 text-brand-sage" />
-                <h3 id="add-member-title" className="font-bold text-brand-dark">
+                <UserPlus className="w-5 h-5 text-brand-accent" />
+                <h3 id="add-member-title" className="font-bold text-foreground">
                   Add Family Member
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsAddModalOpen(false)}
-                className="p-1 text-stone-400 hover:text-stone-700 rounded-lg"
+                className="p-1 text-muted-foreground hover:text-muted-foreground rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -437,7 +437,7 @@ export default function SharedHousehold({ pet }: SharedHouseholdProps) {
               <div>
                 <label
                   htmlFor="member-name-input"
-                  className="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-1"
+                  className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1"
                 >
                   Member Name
                 </label>
@@ -447,21 +447,21 @@ export default function SharedHousehold({ pet }: SharedHouseholdProps) {
                   value={newMemberName}
                   onChange={(e) => setNewMemberName(e.target.value)}
                   placeholder="e.g., Ate Maria, Kuya Paolo, Mom"
-                  className="w-full px-3.5 py-2.5 text-sm bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-sage"
+                  className="w-full px-3.5 py-2.5 text-sm bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-sage"
                   required
                   autoFocus
                 />
               </div>
 
-              <p className="text-xs text-stone-500">
+              <p className="text-xs text-muted-foreground">
                 A color-coded avatar will be automatically created so they can log feedings and complete tasks.
               </p>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-stone-100">
+              <div className="flex justify-end gap-2 pt-2 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-xl"
+                  className="px-4 py-2 text-xs font-semibold text-muted-foreground hover:bg-muted rounded-xl"
                 >
                   Cancel
                 </button>

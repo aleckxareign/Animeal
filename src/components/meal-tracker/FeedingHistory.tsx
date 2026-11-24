@@ -57,27 +57,27 @@ export default function FeedingHistory({ pet, onOpenFeedModal }: FeedingHistoryP
   }
 
   return (
-    <div className="rounded-3xl bg-white border border-brand-dark/10 shadow-sm p-6 sm:p-8 space-y-6">
+    <div className="rounded-3xl bg-card border border-foreground/10 shadow-sm p-6 sm:p-8 space-y-6">
       {/* Header & Tabs */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-brand-dark/10 pb-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-foreground/10 pb-4">
         <div>
-          <h3 className="font-display text-xl font-bold text-brand-dark flex items-center gap-2">
-            <Utensils className="h-5 w-5 text-brand-sage" />
+          <h3 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
+            <Utensils className="h-5 w-5 text-brand-accent" />
             Feeding Log & History
           </h3>
-          <p className="text-xs text-brand-dark/60 mt-0.5">
+          <p className="text-xs text-foreground/60 mt-0.5">
             Real-time meal entries logged by household members
           </p>
         </div>
 
         {/* Tab switcher: Today vs Past Days */}
-        <div className="flex items-center rounded-xl bg-brand-cream/80 p-1 border border-brand-dark/10">
+        <div className="flex items-center rounded-xl bg-background/80 p-1 border border-foreground/10">
           <button
             onClick={() => setActiveTab('today')}
             className={`flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-bold transition ${
               activeTab === 'today'
                 ? 'bg-brand-dark text-white shadow-xs'
-                : 'text-brand-dark/70 hover:text-brand-dark'
+                : 'text-foreground/70 hover:text-foreground'
             }`}
           >
             <Clock className="h-3.5 w-3.5" />
@@ -88,7 +88,7 @@ export default function FeedingHistory({ pet, onOpenFeedModal }: FeedingHistoryP
             className={`flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-bold transition ${
               activeTab === 'past'
                 ? 'bg-brand-dark text-white shadow-xs'
-                : 'text-brand-dark/70 hover:text-brand-dark'
+                : 'text-foreground/70 hover:text-foreground'
             }`}
           >
             <Calendar className="h-3.5 w-3.5" />
@@ -102,13 +102,13 @@ export default function FeedingHistory({ pet, onOpenFeedModal }: FeedingHistoryP
         <div className="space-y-3">
           {todayFeedings.length === 0 ? (
             <div className="py-12 flex flex-col items-center justify-center text-center">
-              <div className="h-16 w-16 rounded-full bg-brand-cream flex items-center justify-center text-3xl mb-3 shadow-inner">
+              <div className="h-16 w-16 rounded-full bg-background flex items-center justify-center text-3xl mb-3 shadow-inner">
                 🍲
               </div>
-              <h4 className="font-display text-base font-bold text-brand-dark">
+              <h4 className="font-display text-base font-bold text-foreground">
                 No meals logged yet today!
               </h4>
-              <p className="mt-1 text-xs text-brand-dark/60 max-w-xs">
+              <p className="mt-1 text-xs text-foreground/60 max-w-xs">
                 Has {pet.name} eaten yet? Tap below to record breakfast, dinner, or a healthy treat.
               </p>
               <button
@@ -120,26 +120,26 @@ export default function FeedingHistory({ pet, onOpenFeedModal }: FeedingHistoryP
               </button>
             </div>
           ) : (
-            <div className="divide-y divide-brand-dark/10">
+            <div className="divide-y divide-foreground/10">
               {todayFeedings.map((entry) => (
                 <div
                   key={entry.id}
-                  className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors hover:bg-brand-cream/20 px-2 rounded-xl"
+                  className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors hover:bg-background/20 px-2 rounded-xl"
                 >
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-cream text-brand-sage">
+                    <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-background text-brand-accent">
                       <Utensils className="h-4 w-4" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="font-bold text-sm text-brand-dark">
+                        <h4 className="font-bold text-sm text-foreground">
                           {entry.foodName}
                         </h4>
-                        <span className="rounded-full bg-brand-sage/10 px-2 py-0.5 text-[10px] font-extrabold text-brand-sage">
+                        <span className="rounded-full bg-brand-sage/10 px-2 py-0.5 text-[10px] font-extrabold text-brand-accent">
                           +{entry.calories} kcal
                         </span>
                       </div>
-                      <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-brand-dark/60">
+                      <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-foreground/60">
                         <span>
                           Portion: {entry.portion} {entry.unit}
                         </span>
@@ -148,16 +148,16 @@ export default function FeedingHistory({ pet, onOpenFeedModal }: FeedingHistoryP
                         <span>({formatTime(entry.timestamp)})</span>
                       </div>
                       {/* Macro pill summary */}
-                      <div className="mt-1 flex items-center gap-2 text-[11px] text-brand-dark/60">
-                        <span className="font-medium text-brand-sage">
+                      <div className="mt-1 flex items-center gap-2 text-[11px] text-foreground/60">
+                        <span className="font-medium text-brand-accent">
                           P: {entry.protein}g
                         </span>
                         <span>•</span>
-                        <span className="font-medium text-brand-alert">
+                        <span className="font-medium text-destructive">
                           F: {entry.fat}g
                         </span>
                         <span>•</span>
-                        <span className="font-medium text-[#8b6914]">
+                        <span className="font-medium text-amber-800 dark:text-amber-300">
                           Fib: {entry.fiber}g
                         </span>
                       </div>
@@ -166,7 +166,7 @@ export default function FeedingHistory({ pet, onOpenFeedModal }: FeedingHistoryP
 
                   <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pl-12 sm:pl-0">
                     {/* Fed by tag */}
-                    <div className="flex items-center gap-1.5 rounded-full bg-brand-cream px-2.5 py-1 text-xs font-medium text-brand-dark">
+                    <div className="flex items-center gap-1.5 rounded-full bg-background px-2.5 py-1 text-xs font-medium text-foreground">
                       <div
                         className="h-2 w-2 rounded-full"
                         style={{ backgroundColor: getMemberColor(entry.fedBy) }}
@@ -177,7 +177,7 @@ export default function FeedingHistory({ pet, onOpenFeedModal }: FeedingHistoryP
                     {/* Undo button */}
                     <button
                       onClick={() => handleUndo(entry)}
-                      className="inline-flex items-center gap-1 rounded-lg border border-brand-dark/15 px-2.5 py-1 text-xs font-semibold text-brand-dark/70 hover:bg-brand-alert/10 hover:border-brand-alert/30 hover:text-brand-alert transition"
+                      className="inline-flex items-center gap-1 rounded-lg border border-foreground/15 px-2.5 py-1 text-xs font-semibold text-foreground/70 hover:bg-brand-alert/10 hover:border-brand-alert/30 hover:text-destructive transition"
                       title="Undo this meal entry"
                     >
                       <RotateCcw className="h-3 w-3" />
@@ -195,10 +195,10 @@ export default function FeedingHistory({ pet, onOpenFeedModal }: FeedingHistoryP
       {activeTab === 'past' && (
         <div className="space-y-6">
           {pastFeedings.length === 0 ? (
-            <div className="py-12 text-center text-brand-dark/60">
-              <Calendar className="mx-auto h-10 w-10 text-brand-dark/30 mb-2" />
+            <div className="py-12 text-center text-foreground/60">
+              <Calendar className="mx-auto h-10 w-10 text-foreground/30 mb-2" />
               <p className="text-sm font-semibold">No past feeding history yet.</p>
-              <p className="text-xs text-brand-dark/50 mt-1">
+              <p className="text-xs text-foreground/50 mt-1">
                 Meals from previous days will automatically be cataloged here.
               </p>
             </div>
@@ -207,30 +207,30 @@ export default function FeedingHistory({ pet, onOpenFeedModal }: FeedingHistoryP
               const dayTotalCalories = entries.reduce((s, e) => s + e.calories, 0)
               return (
                 <div key={dateLabel} className="space-y-2">
-                  <div className="flex items-center justify-between border-b border-brand-dark/10 pb-1.5">
-                    <span className="text-xs font-bold text-brand-dark uppercase tracking-wider">
+                  <div className="flex items-center justify-between border-b border-foreground/10 pb-1.5">
+                    <span className="text-xs font-bold text-foreground uppercase tracking-wider">
                       {dateLabel}
                     </span>
-                    <span className="text-xs font-semibold text-brand-sage">
+                    <span className="text-xs font-semibold text-brand-accent">
                       {dayTotalCalories} kcal total ({entries.length} meals)
                     </span>
                   </div>
 
-                  <div className="divide-y divide-brand-dark/5">
+                  <div className="divide-y divide-foreground/5">
                     {entries.map((entry) => (
                       <div
                         key={entry.id}
                         className="py-2.5 flex items-center justify-between text-xs"
                       >
                         <div>
-                          <p className="font-semibold text-brand-dark">
+                          <p className="font-semibold text-foreground">
                             {entry.foodName}
                           </p>
-                          <p className="text-brand-dark/50">
+                          <p className="text-foreground/50">
                             {entry.portion} {entry.unit} • {formatTime(entry.timestamp)} • Fed by {entry.fedBy}
                           </p>
                         </div>
-                        <span className="font-bold text-brand-sage">
+                        <span className="font-bold text-brand-accent">
                           +{entry.calories} kcal
                         </span>
                       </div>

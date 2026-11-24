@@ -118,22 +118,22 @@ export default function QuickLogModal({
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-stone-200 overflow-hidden z-10 animate-scale-in my-6">
+      <div className="relative w-full max-w-md bg-card rounded-3xl shadow-2xl border border-border max-h-[calc(100dvh-2rem)] overflow-y-auto z-10 animate-scale-in my-0">
         {/* Header */}
-        <div className="p-5 pb-4 border-b border-stone-200 flex items-center justify-between gap-3 bg-stone-50">
+        <div className="p-5 pb-4 border-b border-border flex items-center justify-between gap-3 bg-background">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-brand-dark text-white flex items-center justify-center shadow-xs">
               <Utensils className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-brand-dark">Log as Meal</h2>
-              <p className="text-xs text-stone-500 line-clamp-1">{food.name}</p>
+              <h2 className="text-lg font-bold text-foreground">Log as Meal</h2>
+              <p className="text-xs text-muted-foreground line-clamp-1">{food.name}</p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="text-stone-400 hover:text-stone-700 p-2 rounded-xl hover:bg-stone-100 transition-colors"
+            className="text-muted-foreground hover:text-muted-foreground p-2 rounded-xl hover:bg-muted transition-colors"
             aria-label="Close dialog"
           >
             <X className="w-5 h-5" />
@@ -145,7 +145,7 @@ export default function QuickLogModal({
           {/* Pet Selector */}
           {pets.length > 0 ? (
             <div>
-              <label className="block text-xs font-bold text-brand-dark uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-1.5">
                 Select Pet
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -158,16 +158,16 @@ export default function QuickLogModal({
                       onClick={() => setSelectedPetId(p.id)}
                       className={`flex items-center gap-2 p-2.5 rounded-xl border text-left transition-all ${
                         isSelected
-                          ? 'border-brand-sage bg-emerald-50/70 ring-2 ring-brand-sage/20 font-semibold'
-                          : 'border-stone-200 bg-white hover:bg-stone-50'
+                          ? 'border-brand-sage bg-emerald-50/70 dark:bg-emerald-500/15 ring-2 ring-brand-sage/20 font-semibold'
+                          : 'border-border bg-card hover:bg-muted'
                       }`}
                     >
                       <span className="text-xl">{p.avatarEmoji || '🐾'}</span>
                       <div className="truncate">
-                        <div className="text-xs font-bold text-brand-dark truncate">
+                        <div className="text-xs font-bold text-foreground truncate">
                           {p.name}
                         </div>
-                        <div className="text-[10px] text-stone-500 capitalize">
+                        <div className="text-[10px] text-muted-foreground capitalize">
                           {p.species} • {p.weight}kg
                         </div>
                       </div>
@@ -178,20 +178,20 @@ export default function QuickLogModal({
 
               {/* Pet Calorie status */}
               {targetPet && (
-                <div className="mt-2.5 px-3 py-2 bg-stone-50 rounded-xl border border-stone-200/80 flex items-center justify-between text-xs">
-                  <span className="text-stone-600">Today's Total:</span>
-                  <div className="font-semibold text-brand-dark">
+                <div className="mt-2.5 px-3 py-2 bg-background rounded-xl border border-border/80 flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Today's Total:</span>
+                  <div className="font-semibold text-foreground">
                     <span>{todayCalories}</span> / {dailyTarget} kcal
                   </div>
                 </div>
               )}
             </div>
           ) : (
-            <div className="p-3.5 bg-amber-50 rounded-2xl border border-amber-200 flex items-start gap-2.5 text-xs text-amber-900">
-              <AlertCircle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+            <div className="p-3.5 bg-amber-50 dark:bg-amber-500/15 rounded-2xl border border-amber-200 dark:border-amber-400/30 flex items-start gap-2.5 text-xs text-amber-900 dark:text-amber-300">
+              <AlertCircle className="w-4 h-4 text-amber-700 dark:text-amber-300 shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">No pets registered yet</p>
-                <p className="text-amber-800 mt-0.5">
+                <p className="text-amber-800 dark:text-amber-300 mt-0.5">
                   You can register a pet in Pet Wellness or Meal Tracker to start tracking their daily calories.
                 </p>
               </div>
@@ -201,10 +201,10 @@ export default function QuickLogModal({
           {/* Portion Input */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-bold text-brand-dark uppercase tracking-wider">
+              <label className="text-xs font-bold text-foreground uppercase tracking-wider">
                 Portion Amount
               </label>
-              <span className="text-xs text-stone-500">
+              <span className="text-xs text-muted-foreground">
                 Standard: {food.servingSize}g
               </span>
             </div>
@@ -217,9 +217,9 @@ export default function QuickLogModal({
                 required
                 value={portionGrams}
                 onChange={(e) => setPortionGrams(Math.max(1, Number(e.target.value)))}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-stone-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-sage font-bold text-brand-dark"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border text-sm bg-background focus:bg-card focus:outline-none focus:ring-2 focus:ring-brand-sage font-bold text-foreground"
               />
-              <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-stone-400">
+              <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
                 grams (g)
               </span>
             </div>
@@ -234,7 +234,7 @@ export default function QuickLogModal({
                   className={`flex-1 py-1 text-xs rounded-lg border font-medium transition-colors ${
                     portionGrams === amt
                       ? 'bg-brand-sage text-white border-brand-sage'
-                      : 'bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100'
+                      : 'bg-background border-border text-muted-foreground hover:bg-muted'
                   }`}
                 >
                   {amt}g
@@ -244,34 +244,34 @@ export default function QuickLogModal({
           </div>
 
           {/* Calculated Output Card */}
-          <div className="bg-stone-50 rounded-2xl p-3.5 border border-stone-200/80">
+          <div className="bg-background rounded-2xl p-3.5 border border-border/80">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-stone-500">Nutrition for this meal</span>
-              <div className="flex items-center gap-1 font-display text-lg font-bold text-brand-dark">
+              <span className="text-xs font-semibold text-muted-foreground">Nutrition for this meal</span>
+              <div className="flex items-center gap-1 font-display text-lg font-bold text-foreground">
                 <Flame className="w-4 h-4 text-orange-500" />
                 <span>{calculatedCalories} kcal</span>
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-2 text-center text-xs">
-              <div className="p-2 rounded-xl bg-white border border-stone-200/60">
-                <span className="text-[10px] text-stone-500 block">Protein</span>
-                <span className="font-bold text-brand-sage">{calculatedProtein}g</span>
+              <div className="p-2 rounded-xl bg-card border border-border/60">
+                <span className="text-[10px] text-muted-foreground block">Protein</span>
+                <span className="font-bold text-brand-accent">{calculatedProtein}g</span>
               </div>
-              <div className="p-2 rounded-xl bg-white border border-stone-200/60">
-                <span className="text-[10px] text-stone-500 block">Fat</span>
-                <span className="font-bold text-amber-600">{calculatedFat}g</span>
+              <div className="p-2 rounded-xl bg-card border border-border/60">
+                <span className="text-[10px] text-muted-foreground block">Fat</span>
+                <span className="font-bold text-amber-600 dark:text-amber-300">{calculatedFat}g</span>
               </div>
-              <div className="p-2 rounded-xl bg-white border border-stone-200/60">
-                <span className="text-[10px] text-stone-500 block">Fiber</span>
-                <span className="font-bold text-stone-600">{calculatedFiber}g</span>
+              <div className="p-2 rounded-xl bg-card border border-border/60">
+                <span className="text-[10px] text-muted-foreground block">Fiber</span>
+                <span className="font-bold text-muted-foreground">{calculatedFiber}g</span>
               </div>
             </div>
           </div>
 
           {/* Fed By */}
           <div>
-            <label className="block text-xs font-bold text-brand-dark uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-1.5">
               Fed By
             </label>
             <input
@@ -279,16 +279,16 @@ export default function QuickLogModal({
               value={fedBy}
               onChange={(e) => setFedBy(e.target.value)}
               placeholder="e.g. Me, Mom, Kuya"
-              className="w-full px-3.5 py-2 rounded-xl border border-stone-200 text-sm bg-stone-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-sage"
+              className="w-full px-3.5 py-2 rounded-xl border border-border text-sm bg-background focus:bg-card focus:outline-none focus:ring-2 focus:ring-brand-sage"
             />
           </div>
 
           {/* Action Buttons */}
-          <div className="pt-3 border-t border-stone-200 flex items-center justify-end gap-2.5">
+          <div className="pt-3 border-t border-border flex items-center justify-end gap-2.5">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-stone-600 hover:text-stone-900 transition-colors"
+              className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
             >
               Cancel
             </button>

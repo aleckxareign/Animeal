@@ -51,12 +51,12 @@ export default function QuickReminders({ pet }: QuickRemindersProps) {
   }
 
   return (
-    <div className="rounded-3xl bg-white border border-brand-dark/10 shadow-sm p-6 sm:p-8 space-y-5">
+    <div className="rounded-3xl bg-card border border-foreground/10 shadow-sm p-6 sm:p-8 space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-brand-dark/10 pb-4">
+      <div className="flex items-center justify-between border-b border-foreground/10 pb-4">
         <div className="flex items-center gap-2">
-          <Bell className="h-5 w-5 text-brand-sage" />
-          <h3 className="font-display text-xl font-bold text-brand-dark">
+          <Bell className="h-5 w-5 text-brand-accent" />
+          <h3 className="font-display text-xl font-bold text-foreground">
             Today's Care Tasks
           </h3>
         </div>
@@ -64,14 +64,14 @@ export default function QuickReminders({ pet }: QuickRemindersProps) {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowQuickAdd((prev) => !prev)}
-            className="inline-flex items-center gap-1 rounded-xl bg-brand-cream px-3 py-1.5 text-xs font-bold text-brand-dark hover:bg-brand-dark/10 transition"
+            className="inline-flex items-center gap-1 rounded-xl bg-background px-3 py-1.5 text-xs font-bold text-foreground hover:bg-brand-dark/10 transition"
           >
             <Plus className="h-3.5 w-3.5" />
             <span>Add Task</span>
           </button>
           <Link
             to="/pet-wellness"
-            className="inline-flex items-center gap-1 text-xs font-semibold text-brand-sage hover:underline"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-brand-accent hover:underline"
           >
             <span>Full Schedule</span>
             <ExternalLink className="h-3 w-3" />
@@ -83,16 +83,16 @@ export default function QuickReminders({ pet }: QuickRemindersProps) {
       {showQuickAdd && (
         <form
           onSubmit={handleAddTask}
-          className="rounded-2xl bg-brand-cream/40 border border-brand-dark/10 p-4 space-y-3 animate-slide-up"
+          className="rounded-2xl bg-background/40 border border-foreground/10 p-4 space-y-3 animate-slide-up"
         >
           <div className="flex justify-between items-center">
-            <span className="text-xs font-bold uppercase tracking-wider text-brand-dark/70">
+            <span className="text-xs font-bold uppercase tracking-wider text-foreground/70">
               New Reminder for {pet.name}
             </span>
             <button
               type="button"
               onClick={() => setShowQuickAdd(false)}
-              className="text-xs text-brand-dark/50 hover:text-brand-dark"
+              className="text-xs text-foreground/50 hover:text-foreground"
             >
               ✕
             </button>
@@ -105,13 +105,13 @@ export default function QuickReminders({ pet }: QuickRemindersProps) {
               placeholder="e.g. Evening Kibble, Dewormer, Walk"
               value={taskTitle}
               onChange={(e) => setTaskTitle(e.target.value)}
-              className="sm:col-span-2 rounded-xl border border-brand-dark/20 bg-white px-3 py-2 text-xs font-medium text-brand-dark focus:border-brand-sage focus:outline-none"
+              className="sm:col-span-2 rounded-xl border border-foreground/20 bg-card px-3 py-2 text-xs font-medium text-foreground focus:border-brand-sage focus:outline-none"
             />
             <input
               type="time"
               value={taskTime}
               onChange={(e) => setTaskTime(e.target.value)}
-              className="rounded-xl border border-brand-dark/20 bg-white px-3 py-2 text-xs font-medium text-brand-dark focus:border-brand-sage focus:outline-none"
+              className="rounded-xl border border-foreground/20 bg-card px-3 py-2 text-xs font-medium text-foreground focus:border-brand-sage focus:outline-none"
             />
           </div>
 
@@ -125,7 +125,7 @@ export default function QuickReminders({ pet }: QuickRemindersProps) {
                   className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold capitalize transition ${
                     taskType === t
                       ? 'bg-brand-sage text-white'
-                      : 'bg-white text-brand-dark/60 hover:bg-brand-cream'
+                      : 'bg-card text-foreground/60 hover:bg-background'
                   }`}
                 >
                   {t}
@@ -146,13 +146,13 @@ export default function QuickReminders({ pet }: QuickRemindersProps) {
       {/* Task List */}
       {pendingTasks.length === 0 ? (
         <div className="py-6 flex flex-col items-center justify-center text-center">
-          <div className="h-12 w-12 rounded-full bg-brand-sage/10 flex items-center justify-center text-brand-sage mb-2">
+          <div className="h-12 w-12 rounded-full bg-brand-sage/10 flex items-center justify-center text-brand-accent mb-2">
             <Sparkles className="h-5 w-5" />
           </div>
-          <h4 className="font-semibold text-sm text-brand-dark">
+          <h4 className="font-semibold text-sm text-foreground">
             All caught up for today!
           </h4>
-          <p className="text-xs text-brand-dark/60 mt-0.5">
+          <p className="text-xs text-foreground/60 mt-0.5">
             No pending tasks for {pet.name}. Tap "+ Add Task" to set a feeding or medication reminder.
           </p>
         </div>
@@ -161,23 +161,23 @@ export default function QuickReminders({ pet }: QuickRemindersProps) {
           {pendingTasks.slice(0, 5).map((task) => (
             <div
               key={task.id}
-              className="flex items-center justify-between gap-3 rounded-2xl border border-brand-dark/10 bg-brand-cream/20 p-3.5 transition hover:bg-brand-cream/40"
+              className="flex items-center justify-between gap-3 rounded-2xl border border-foreground/10 bg-background/20 p-3.5 transition hover:bg-background/40"
             >
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => handleComplete(task.id, task.title)}
-                  className="text-brand-dark/30 hover:text-brand-sage transition transform hover:scale-110"
+                  className="text-foreground/30 hover:text-brand-accent transition transform hover:scale-110"
                   aria-label={`Mark ${task.title} as completed`}
                 >
                   <Circle className="h-5 w-5" />
                 </button>
 
                 <div>
-                  <h4 className="text-sm font-semibold text-brand-dark">
+                  <h4 className="text-sm font-semibold text-foreground">
                     {task.title}
                   </h4>
-                  <div className="flex items-center gap-2 text-[11px] text-brand-dark/60 mt-0.5">
-                    <span className="capitalize text-brand-sage font-medium">
+                  <div className="flex items-center gap-2 text-[11px] text-foreground/60 mt-0.5">
+                    <span className="capitalize text-brand-accent font-medium">
                       {task.type}
                     </span>
                     <span>•</span>
@@ -191,7 +191,7 @@ export default function QuickReminders({ pet }: QuickRemindersProps) {
 
               <button
                 onClick={() => handleComplete(task.id, task.title)}
-                className="shrink-0 rounded-xl bg-white border border-brand-dark/10 px-3 py-1.5 text-xs font-semibold text-brand-dark hover:bg-brand-sage hover:text-white transition shadow-2xs"
+                className="shrink-0 rounded-xl bg-card border border-foreground/10 px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-brand-sage hover:text-white transition shadow-2xs"
               >
                 Done
               </button>
@@ -202,7 +202,7 @@ export default function QuickReminders({ pet }: QuickRemindersProps) {
             <div className="text-center pt-2">
               <Link
                 to="/pet-wellness"
-                className="text-xs font-bold text-brand-sage hover:underline"
+                className="text-xs font-bold text-brand-accent hover:underline"
               >
                 + {pendingTasks.length - 5} more tasks on Wellness Schedule →
               </Link>

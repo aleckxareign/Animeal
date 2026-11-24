@@ -33,7 +33,7 @@ function FormattedContent({
   const paragraphs = content.split(/\n\n+/)
 
   return (
-    <div className={`space-y-2.5 leading-relaxed text-sm ${isUser ? 'text-white' : 'text-brand-dark dark:text-slate-100'}`}>
+    <div className={`min-w-0 [overflow-wrap:anywhere] space-y-2.5 leading-relaxed text-sm ${isUser ? 'text-white' : 'text-foreground dark:text-slate-100'}`}>
       {paragraphs.map((p, pIdx) => {
         const lines = p.split('\n')
 
@@ -49,7 +49,7 @@ function FormattedContent({
                   <li key={lIdx} className="flex items-start gap-2">
                     <span
                       className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${
-                        isUser ? 'bg-white/80' : 'bg-brand-sage'
+                        isUser ? 'bg-card/80' : 'bg-brand-sage'
                       }`}
                     />
                     <span className="flex-1">{renderInlineText(cleaned, isUser)}</span>
@@ -66,7 +66,7 @@ function FormattedContent({
             <hr
               key={pIdx}
               className={`my-2 border-t ${
-                isUser ? 'border-white/20' : 'border-brand-dark/15'
+                isUser ? 'border-white/20' : 'border-foreground/15'
               }`}
             />
           )
@@ -93,7 +93,7 @@ function renderInlineText(text: string, isUser: boolean) {
       return (
         <strong
           key={index}
-          className={`font-semibold ${isUser ? 'text-white underline decoration-white/30' : 'text-brand-dark dark:text-white font-bold'}`}
+          className={`font-semibold ${isUser ? 'text-white underline decoration-white/30' : 'text-foreground dark:text-white font-bold'}`}
         >
           {inner}
         </strong>
@@ -123,11 +123,11 @@ export default function MessageBubble({
           <div className="rounded-2xl rounded-tr-xs bg-brand-sage px-4 py-3 text-white shadow-sm ring-1 ring-black/5">
             <FormattedContent content={message.content} isUser={true} />
           </div>
-          <span className="mt-1 text-[11px] text-brand-dark/50 px-1 font-mono">
+          <span className="mt-1 text-[11px] text-foreground/50 px-1 font-mono">
             {formattedTime}
           </span>
         </div>
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-sage/15 text-brand-sage shadow-xs mt-1">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-sage/15 text-brand-accent shadow-xs mt-1">
           <User size={15} />
         </div>
       </div>
@@ -136,17 +136,17 @@ export default function MessageBubble({
 
   // Mealie response styling according to severity
   const containerClasses = isEmergency
-    ? 'border-2 border-red-500 bg-red-50/80 shadow-md ring-1 ring-red-400/30'
+    ? 'border-2 border-red-500 bg-red-50/80 dark:bg-red-500/15 shadow-md ring-1 ring-red-400/30'
     : isCaution
-      ? 'border border-amber-300 bg-amber-50/60 shadow-xs'
-      : 'border border-border/70 bg-white dark:bg-slate-800/90 shadow-xs'
+      ? 'border border-amber-300 dark:border-amber-400/30 bg-amber-50/60 dark:bg-amber-500/15 shadow-xs'
+      : 'border border-border/70 bg-card dark:bg-card/90 shadow-xs'
 
   return (
     <div id={`msg-${message.id}`} className="flex justify-start gap-2.5 animate-slide-up pr-6 sm:pr-14">
       {/* Mealie Avatar */}
       <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-cream ring-1 ring-brand-sage/30 shadow-xs mt-1">
         <img
-          src="/images/mealie.svg"
+          src="/images/logo-only.svg"
           alt="Mealie"
           className="h-6 w-6 object-contain"
           onError={(e) => {
@@ -181,8 +181,8 @@ export default function MessageBubble({
 
           {/* Caution Banner Header */}
           {isCaution && (
-            <div className="mb-2.5 flex items-center gap-1.5 rounded-lg bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-900">
-              <AlertTriangle size={15} className="shrink-0 text-amber-700" />
+            <div className="mb-2.5 flex items-center gap-1.5 rounded-lg bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-900 dark:text-amber-300">
+              <AlertTriangle size={15} className="shrink-0 text-amber-700 dark:text-amber-300" />
               <span>Pet Care Advisory • Monitor Carefully</span>
             </div>
           )}
@@ -192,9 +192,9 @@ export default function MessageBubble({
 
           {/* Emergency Urgent Action Box */}
           {isEmergency && (
-            <div className="mt-3.5 rounded-xl border border-red-300 bg-white/90 p-3">
-              <div className="flex items-start gap-2 text-xs text-red-900">
-                <AlertCircle size={16} className="mt-0.5 shrink-0 text-red-600" />
+            <div className="mt-3.5 rounded-xl border border-red-300 dark:border-red-400/30 bg-card/90 p-3">
+              <div className="flex items-start gap-2 text-xs text-red-900 dark:text-red-300">
+                <AlertCircle size={16} className="mt-0.5 shrink-0 text-red-600 dark:text-red-300" />
                 <div>
                   <span className="font-semibold">Do not wait if severe symptoms persist:</span>{' '}
                   Toxic ingestion, breathing difficulty, or trauma require prompt clinical diagnosis.
@@ -214,7 +214,7 @@ export default function MessageBubble({
 
           {/* Action Buttons */}
           {message.actions && message.actions.length > 0 && (
-            <div className="mt-3.5 flex flex-wrap gap-2 border-t border-brand-dark/10 pt-3">
+            <div className="mt-3.5 flex flex-wrap gap-2 border-t border-foreground/10 pt-3">
               {message.actions.map((action, idx) => {
                 const isEmergencyAction =
                   action.label.includes('Emergency') ||
@@ -228,7 +228,7 @@ export default function MessageBubble({
                       className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all shadow-xs ${
                         isEmergencyAction
                           ? 'bg-brand-alert text-white hover:bg-brand-alert/90'
-                          : 'border border-brand-dark/15 bg-white text-brand-dark hover:border-brand-sage hover:bg-brand-sage/5 hover:text-brand-sage'
+                          : 'border border-foreground/15 bg-card text-foreground hover:border-brand-sage hover:bg-brand-sage/5 hover:text-brand-accent'
                       }`}
                     >
                       <span>{action.label}</span>
@@ -242,7 +242,7 @@ export default function MessageBubble({
                     key={idx}
                     type="button"
                     onClick={() => onActionClick?.(action)}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-brand-sage/30 bg-brand-sage/10 px-3 py-1.5 text-xs font-semibold text-brand-sage transition-all hover:bg-brand-sage hover:text-white shadow-xs"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-brand-sage/30 bg-brand-sage/10 px-3 py-1.5 text-xs font-semibold text-brand-accent transition-all hover:bg-brand-sage hover:text-white shadow-xs"
                   >
                     <Sparkles size={12} />
                     <span>{action.label}</span>
@@ -254,7 +254,7 @@ export default function MessageBubble({
         </div>
 
         {/* Timestamp */}
-        <span className="mt-1 text-[11px] text-brand-dark/50 px-1">
+        <span className="mt-1 text-[11px] text-foreground/50 px-1">
           Mealie • {formattedTime}
         </span>
       </div>

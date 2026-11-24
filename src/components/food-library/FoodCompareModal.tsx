@@ -80,18 +80,18 @@ export default function FoodCompareModal({
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-stone-200 overflow-hidden z-10 animate-scale-in my-6 max-h-[92vh] flex flex-col">
+      <div className="relative w-full max-w-5xl bg-card rounded-3xl shadow-2xl border border-border overflow-hidden z-10 animate-scale-in my-0 max-h-[min(92vh,calc(100dvh-2rem))] flex flex-col">
         {/* Header */}
-        <div className="p-5 sm:p-6 pb-4 border-b border-stone-200 flex items-center justify-between gap-4 bg-stone-50">
+        <div className="p-5 sm:p-6 pb-4 border-b border-border flex items-center justify-between gap-4 bg-background">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-brand-sage/10 text-brand-sage flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-brand-sage/10 text-brand-accent flex items-center justify-center">
               <Scale className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-brand-dark">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground">
                 Product Comparison
               </h2>
-              <p className="text-xs sm:text-sm text-stone-500">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Comparing {comparedFoods.length} {comparedFoods.length === 1 ? 'item' : 'items'} side-by-side
               </p>
             </div>
@@ -102,7 +102,7 @@ export default function FoodCompareModal({
               <button
                 type="button"
                 onClick={onClearAll}
-                className="inline-flex items-center gap-1 text-xs font-semibold text-brand-alert hover:text-brand-alert/80 px-2.5 py-1.5 rounded-lg hover:bg-stone-200/50 transition-colors"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-destructive hover:text-destructive/80 px-2.5 py-1.5 rounded-lg hover:bg-accent/50 transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 Clear all
@@ -110,7 +110,7 @@ export default function FoodCompareModal({
             )}
             <button
               onClick={onClose}
-              className="text-stone-400 hover:text-stone-700 p-2 rounded-xl hover:bg-stone-100 transition-colors"
+              className="text-muted-foreground hover:text-muted-foreground p-2 rounded-xl hover:bg-muted transition-colors"
               aria-label="Close dialog"
             >
               <X className="w-5 h-5" />
@@ -123,8 +123,8 @@ export default function FoodCompareModal({
           {comparedFoods.length === 0 ? (
             <div className="text-center py-12">
               <Scale className="w-12 h-12 text-stone-300 mx-auto mb-3" />
-              <p className="text-base font-semibold text-brand-dark">No foods selected to compare</p>
-              <p className="text-xs text-stone-500 mt-1">
+              <p className="text-base font-semibold text-foreground">No foods selected to compare</p>
+              <p className="text-xs text-muted-foreground mt-1">
                 Select up to 3 foods in the library to see their nutritional and price comparison.
               </p>
             </div>
@@ -137,7 +137,7 @@ export default function FoodCompareModal({
                 }}
               >
                 {/* Header Row (Product Titles & Highlights) */}
-                <div className="p-3 font-bold text-xs uppercase tracking-wider text-stone-400 self-end">
+                <div className="p-3 font-bold text-xs uppercase tracking-wider text-muted-foreground self-end">
                   Product
                 </div>
                 {comparedFoods.map((food) => {
@@ -149,16 +149,16 @@ export default function FoodCompareModal({
                       key={food.id}
                       className={`relative p-4 rounded-2xl border flex flex-col justify-between transition-all ${
                         isBestValue
-                          ? 'border-emerald-300 bg-emerald-50/30'
+                          ? 'border-emerald-300 dark:border-emerald-400/30 bg-emerald-50/30 dark:bg-emerald-500/15'
                           : isHighestProtein
-                            ? 'border-amber-300 bg-amber-50/20'
-                            : 'border-stone-200 bg-stone-50/50'
+                            ? 'border-amber-300 dark:border-amber-400/30 bg-amber-50/20 dark:bg-amber-500/15'
+                            : 'border-border bg-muted/50'
                       }`}
                     >
                       {/* Remove Button */}
                       <button
                         onClick={() => onRemoveFromCompare(food.id)}
-                        className="absolute top-2.5 right-2.5 text-stone-400 hover:text-stone-700 p-1 rounded-md hover:bg-white"
+                        className="absolute top-2.5 right-2.5 text-muted-foreground hover:text-muted-foreground p-1 rounded-md hover:bg-card"
                         title="Remove from comparison"
                       >
                         <X className="w-4 h-4" />
@@ -167,23 +167,23 @@ export default function FoodCompareModal({
                       {/* Badges */}
                       <div className="space-y-1 mb-2 pr-6">
                         {isBestValue && (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
-                            <TrendingDown className="w-3 h-3 text-emerald-600" />
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-400/30">
+                            <TrendingDown className="w-3 h-3 text-emerald-600 dark:text-emerald-300" />
                             Best Value
                           </span>
                         )}
                         {isHighestProtein && (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300 ml-1">
-                            <Award className="w-3 h-3 text-amber-700" />
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-900 dark:text-amber-300 bg-amber-100 dark:bg-amber-500/15 px-2 py-0.5 rounded-full border border-amber-300 dark:border-amber-400/30 ml-1">
+                            <Award className="w-3 h-3 text-amber-700 dark:text-amber-300" />
                             Highest Protein
                           </span>
                         )}
                       </div>
 
-                      <div className="text-xs font-semibold text-stone-500 uppercase tracking-wide">
+                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                         {food.brand}
                       </div>
-                      <h4 className="font-bold text-brand-dark text-sm leading-snug line-clamp-2 mt-1 mb-3">
+                      <h4 className="font-bold text-foreground text-sm leading-snug line-clamp-2 mt-1 mb-3">
                         {food.name}
                       </h4>
 
@@ -203,36 +203,36 @@ export default function FoodCompareModal({
                 })}
 
                 {/* Section Divider */}
-                <div className="col-span-full pt-3 pb-1 border-t border-stone-200">
-                  <span className="text-xs font-bold text-brand-dark uppercase tracking-wider">
+                <div className="col-span-full pt-3 pb-1 border-t border-border">
+                  <span className="text-xs font-bold text-foreground uppercase tracking-wider">
                     Pricing & Value
                   </span>
                 </div>
 
                 {/* Package Price */}
-                <div className="p-3 text-xs font-semibold text-stone-600 self-center">
+                <div className="p-3 text-xs font-semibold text-muted-foreground self-center">
                   Package Price
                 </div>
                 {comparedFoods.map((f) => (
-                  <div key={f.id} className="p-3 text-sm font-bold text-brand-dark self-center">
+                  <div key={f.id} className="p-3 text-sm font-bold text-foreground self-center">
                     {formatMoney(f.price)}
                   </div>
                 ))}
 
                 {/* Package Size */}
-                <div className="p-3 text-xs font-semibold text-stone-600 self-center">
+                <div className="p-3 text-xs font-semibold text-muted-foreground self-center">
                   Package Size
                 </div>
                 {comparedFoods.map((f) => (
-                  <div key={f.id} className="p-3 text-xs font-medium text-stone-700 self-center">
+                  <div key={f.id} className="p-3 text-xs font-medium text-muted-foreground self-center">
                     {f.packageSize >= 1000 ? `${f.packageSize / 1000} kg` : `${f.packageSize} g`}
                   </div>
                 ))}
 
                 {/* Price per 100 kcal (Highlighted) */}
-                <div className="p-3 text-xs font-bold text-emerald-800 self-center flex items-center gap-1">
+                <div className="p-3 text-xs font-bold text-emerald-800 dark:text-emerald-300 self-center flex items-center gap-1">
                   <span>Price / 100 kcal</span>
-                  <span className="text-[10px] text-emerald-600 font-normal">(budget metric)</span>
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-300 font-normal">(budget metric)</span>
                 </div>
                 {comparedFoods.map((f) => {
                   const val = calcPricePer100Kcal(f.price, f.packageSize, f.caloriesPer100g)
@@ -241,37 +241,37 @@ export default function FoodCompareModal({
                     <div
                       key={f.id}
                       className={`p-3 self-center rounded-xl ${
-                        isBest ? 'bg-emerald-100/90 font-bold text-emerald-900' : 'text-xs text-stone-700'
+                        isBest ? 'bg-emerald-100/90 dark:bg-emerald-500/15 font-bold text-emerald-900 dark:text-emerald-300' : 'text-xs text-muted-foreground'
                       }`}
                     >
                       <span className="text-sm font-bold">
                         {val ? `${formatMoney(val)}` : 'N/A'}
                       </span>
-                      <span className="text-[10px] text-stone-500 block">per 100 kcal</span>
+                      <span className="text-[10px] text-muted-foreground block">per 100 kcal</span>
                     </div>
                   )
                 })}
 
                 {/* Section Divider: Nutrition */}
-                <div className="col-span-full pt-4 pb-1 border-t border-stone-200">
-                  <span className="text-xs font-bold text-brand-dark uppercase tracking-wider">
+                <div className="col-span-full pt-4 pb-1 border-t border-border">
+                  <span className="text-xs font-bold text-foreground uppercase tracking-wider">
                     Nutritional Breakdown
                   </span>
                 </div>
 
                 {/* Calories per 100g */}
-                <div className="p-3 text-xs font-semibold text-stone-600 self-center">
+                <div className="p-3 text-xs font-semibold text-muted-foreground self-center">
                   Calories / 100g
                 </div>
                 {comparedFoods.map((f) => (
-                  <div key={f.id} className="p-3 text-sm font-bold text-brand-dark self-center flex items-center gap-1">
+                  <div key={f.id} className="p-3 text-sm font-bold text-foreground self-center flex items-center gap-1">
                     <Flame className="w-4 h-4 text-orange-500" />
                     <span>{f.caloriesPer100g} kcal</span>
                   </div>
                 ))}
 
                 {/* Crude Protein */}
-                <div className="p-3 text-xs font-semibold text-stone-600 self-center">
+                <div className="p-3 text-xs font-semibold text-muted-foreground self-center">
                   Crude Protein
                 </div>
                 {comparedFoods.map((f) => {
@@ -280,74 +280,74 @@ export default function FoodCompareModal({
                     <div
                       key={f.id}
                       className={`p-3 self-center rounded-xl ${
-                        isHighest ? 'bg-amber-100 font-bold text-amber-900' : 'text-xs text-stone-700'
+                        isHighest ? 'bg-amber-100 dark:bg-amber-500/15 font-bold text-amber-900 dark:text-amber-300' : 'text-xs text-muted-foreground'
                       }`}
                     >
-                      <span className="text-sm font-bold text-brand-sage">{f.protein}%</span>
+                      <span className="text-sm font-bold text-brand-accent">{f.protein}%</span>
                     </div>
                   )
                 })}
 
                 {/* Crude Fat */}
-                <div className="p-3 text-xs font-semibold text-stone-600 self-center">
+                <div className="p-3 text-xs font-semibold text-muted-foreground self-center">
                   Crude Fat
                 </div>
                 {comparedFoods.map((f) => (
-                  <div key={f.id} className="p-3 text-xs font-semibold text-amber-700 self-center">
+                  <div key={f.id} className="p-3 text-xs font-semibold text-amber-700 dark:text-amber-300 self-center">
                     {f.fat}%
                   </div>
                 ))}
 
                 {/* Crude Fiber */}
-                <div className="p-3 text-xs font-semibold text-stone-600 self-center">
+                <div className="p-3 text-xs font-semibold text-muted-foreground self-center">
                   Crude Fiber
                 </div>
                 {comparedFoods.map((f) => (
-                  <div key={f.id} className="p-3 text-xs font-medium text-stone-600 self-center">
+                  <div key={f.id} className="p-3 text-xs font-medium text-muted-foreground self-center">
                     {f.fiber}%
                   </div>
                 ))}
 
                 {/* Moisture */}
-                <div className="p-3 text-xs font-semibold text-stone-600 self-center">
+                <div className="p-3 text-xs font-semibold text-muted-foreground self-center">
                   Moisture
                 </div>
                 {comparedFoods.map((f) => (
-                  <div key={f.id} className="p-3 text-xs font-medium text-sky-700 self-center">
+                  <div key={f.id} className="p-3 text-xs font-medium text-sky-700 dark:text-sky-300 self-center">
                     {f.moisture}%
                   </div>
                 ))}
 
                 {/* Section Divider: Suitability */}
-                <div className="col-span-full pt-4 pb-1 border-t border-stone-200">
-                  <span className="text-xs font-bold text-brand-dark uppercase tracking-wider">
+                <div className="col-span-full pt-4 pb-1 border-t border-border">
+                  <span className="text-xs font-bold text-foreground uppercase tracking-wider">
                     Suitability & Feeding
                   </span>
                 </div>
 
                 {/* Category */}
-                <div className="p-3 text-xs font-semibold text-stone-600 self-center">
+                <div className="p-3 text-xs font-semibold text-muted-foreground self-center">
                   Category
                 </div>
                 {comparedFoods.map((f) => (
-                  <div key={f.id} className="p-3 text-xs uppercase font-medium text-stone-700 self-center">
+                  <div key={f.id} className="p-3 text-xs uppercase font-medium text-muted-foreground self-center">
                     {f.category}
                   </div>
                 ))}
 
                 {/* Species */}
-                <div className="p-3 text-xs font-semibold text-stone-600 self-center">
+                <div className="p-3 text-xs font-semibold text-muted-foreground self-center">
                   Target Pet
                 </div>
                 {comparedFoods.map((f) => (
                   <div key={f.id} className="p-3 text-xs self-center flex items-center gap-1.5">
                     {f.species.includes('dog') && (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-500/15 px-2 py-0.5 rounded-md border border-amber-200 dark:border-amber-400/30">
                         <Dog className="w-3 h-3" /> Dog
                       </span>
                     )}
                     {f.species.includes('cat') && (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-800 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-800 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/15 px-2 py-0.5 rounded-md border border-indigo-200 dark:border-indigo-400/30">
                         <Cat className="w-3 h-3" /> Cat
                       </span>
                     )}
@@ -355,7 +355,7 @@ export default function FoodCompareModal({
                 ))}
 
                 {/* Life Stages */}
-                <div className="p-3 text-xs font-semibold text-stone-600 self-center">
+                <div className="p-3 text-xs font-semibold text-muted-foreground self-center">
                   Life Stage
                 </div>
                 {comparedFoods.map((f) => (
@@ -363,7 +363,7 @@ export default function FoodCompareModal({
                     {f.lifeStageSuitability.map((st) => (
                       <span
                         key={st}
-                        className="capitalize px-2 py-0.5 bg-stone-100 rounded text-[11px] text-stone-700"
+                        className="capitalize px-2 py-0.5 bg-muted rounded text-[11px] text-muted-foreground"
                       >
                         {st}
                       </span>
@@ -372,11 +372,11 @@ export default function FoodCompareModal({
                 ))}
 
                 {/* Serving guideline */}
-                <div className="p-3 text-xs font-semibold text-stone-600 self-center">
+                <div className="p-3 text-xs font-semibold text-muted-foreground self-center">
                   Serving Guideline
                 </div>
                 {comparedFoods.map((f) => (
-                  <div key={f.id} className="p-3 text-xs text-stone-600 self-center leading-relaxed">
+                  <div key={f.id} className="p-3 text-xs text-muted-foreground self-center leading-relaxed">
                     {f.servingSize} {f.servingUnit}
                   </div>
                 ))}
@@ -386,7 +386,7 @@ export default function FoodCompareModal({
         </div>
 
         {/* Footer */}
-        <div className="p-4 sm:p-5 bg-stone-50 border-t border-stone-200 flex items-center justify-end">
+        <div className="p-4 sm:p-5 bg-background border-t border-border flex items-center justify-end">
           <button
             type="button"
             onClick={onClose}
@@ -422,7 +422,7 @@ export function FoodCompareBar({
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-2xl animate-slide-up">
       <div className="bg-brand-dark text-white rounded-2xl shadow-2xl p-3 sm:p-4 border border-emerald-950 flex flex-col sm:flex-row items-center justify-between gap-3">
         {/* Left: Selected food chips */}
-        <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto py-1">
+        <div className="flex min-w-0 items-center gap-2 overflow-x-auto w-full sm:w-auto py-1">
           <div className="flex items-center gap-1.5 shrink-0 pr-2 border-r border-stone-700">
             <Scale className="w-4 h-4 text-emerald-400" />
             <span className="text-xs font-bold">Compare ({comparedFoods.length}/3):</span>
@@ -438,7 +438,7 @@ export function FoodCompareBar({
                 <button
                   type="button"
                   onClick={() => onRemove(food.id)}
-                  className="text-stone-400 hover:text-white shrink-0 p-0.5 rounded-full hover:bg-stone-700"
+                  className="text-muted-foreground hover:text-white shrink-0 p-0.5 rounded-full hover:bg-stone-700"
                   aria-label={`Remove ${food.name}`}
                 >
                   <X className="w-3 h-3" />
@@ -453,7 +453,7 @@ export function FoodCompareBar({
           <button
             type="button"
             onClick={onClear}
-            className="text-xs text-stone-400 hover:text-stone-200 px-2 py-1.5 transition-colors"
+            className="text-xs text-muted-foreground hover:text-stone-200 px-2 py-1.5 transition-colors"
           >
             Clear
           </button>

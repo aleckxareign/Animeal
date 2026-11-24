@@ -41,6 +41,10 @@ export const supabaseDb = {
         weight: Number(row.weight_kg),
         age: Number(row.age_years),
         neutered: Boolean(row.neutered),
+        sex: row.sex || 'unknown',
+        dietaryPreference: row.dietary_preference || 'any',
+        preferredFoods: row.preferred_foods || [],
+        avoidedFoods: row.avoided_foods || [],
         lifeStage: row.life_stage,
         avatarEmoji: row.avatar_emoji || (row.species === 'cat' ? '🐱' : '🐕'),
         dailyCalorieTarget: Number(row.daily_rer_target),
@@ -66,6 +70,10 @@ export const supabaseDb = {
           weight_kg: pet.weight,
           age_years: pet.age,
           neutered: pet.neutered,
+          sex: pet.sex || 'unknown',
+          dietary_preference: pet.dietaryPreference || 'any',
+          preferred_foods: pet.preferredFoods || [],
+          avoided_foods: pet.avoidedFoods || [],
           life_stage: pet.lifeStage,
           avatar_emoji: pet.avatarEmoji,
           daily_rer_target: pet.dailyCalorieTarget,
@@ -85,6 +93,10 @@ export const supabaseDb = {
         weight: Number(data.weight_kg),
         age: Number(data.age_years),
         neutered: Boolean(data.neutered),
+        sex: data.sex || 'unknown',
+        dietaryPreference: data.dietary_preference || 'any',
+        preferredFoods: data.preferred_foods || [],
+        avoidedFoods: data.avoided_foods || [],
         lifeStage: data.life_stage,
         avatarEmoji: data.avatar_emoji,
         dailyCalorieTarget: Number(data.daily_rer_target),
@@ -107,6 +119,10 @@ export const supabaseDb = {
       if (updates.weight !== undefined) payload.weight_kg = updates.weight
       if (updates.age !== undefined) payload.age_years = updates.age
       if (updates.neutered !== undefined) payload.neutered = updates.neutered
+      if (updates.sex !== undefined) payload.sex = updates.sex
+      if (updates.dietaryPreference !== undefined) payload.dietary_preference = updates.dietaryPreference
+      if (updates.preferredFoods !== undefined) payload.preferred_foods = updates.preferredFoods
+      if (updates.avoidedFoods !== undefined) payload.avoided_foods = updates.avoidedFoods
       if (updates.lifeStage !== undefined) payload.life_stage = updates.lifeStage
       if (updates.avatarEmoji !== undefined) payload.avatar_emoji = updates.avatarEmoji
       if (updates.dailyCalorieTarget !== undefined) payload.daily_rer_target = updates.dailyCalorieTarget

@@ -12,6 +12,7 @@
   --color-brand-sage: #44632f;
   --color-brand-cream: #f6f3ec;
   --color-brand-alert: #b5432f;
+  --color-brand-accent: var(--brand-accent);
   --font-display: "TT Ramillas", Georgia, serif;
 }
 
@@ -24,6 +25,8 @@
 }
 
 :root {
+  color-scheme: light;
+  --brand-accent: #44632f;
   font-family: "Inter", Arial, sans-serif;
   color: #164040;
   background-color: #f6f3ec;
@@ -61,13 +64,15 @@
 }
 
 .dark {
+  color-scheme: dark;
+  --brand-accent: #a8cd8e;
   --background: #0d1717;
   --foreground: #f6f3ec;
   --card: #132525;
   --card-foreground: #f6f3ec;
   --popover: #132525;
   --popover-foreground: #f6f3ec;
-  --primary: #5ea340;
+  --primary: #44632f;
   --primary-foreground: #ffffff;
   --secondary: #1a3333;
   --secondary-foreground: #f6f3ec;
@@ -79,6 +84,14 @@
   --border: rgba(255, 255, 255, 0.1);
   --input: rgba(255, 255, 255, 0.15);
   --ring: #5ea340;
+  --sidebar: #132525;
+  --sidebar-foreground: #f6f3ec;
+  --sidebar-primary: #44632f;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #214343;
+  --sidebar-accent-foreground: #f6f3ec;
+  --sidebar-border: rgba(255, 255, 255, 0.12);
+  --sidebar-ring: #a8cd8e;
   color: #f6f3ec;
   background-color: #0d1717;
 }
@@ -112,6 +125,16 @@ body {
   display: flex;
   flex-direction: column;
   overflow-x: clip;
+}
+
+/* Let grid content shrink inside its column instead of widening the page. */
+#root :where(.grid) > * {
+  min-width: 0;
+}
+
+#root :where(input, textarea, select) {
+  min-width: 0;
+  max-width: 100%;
 }
 
 button,
@@ -241,9 +264,82 @@ button {
 
 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: #16404040; border-radius: 9999px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--foreground) 25%, transparent); border-radius: 9999px; }
 
 /* Tab transitions */
+/* Keep selection controls consistent with the native pet sex/gender selector. */
+#root select {
+  appearance: auto;
+  min-height: 44px;
+  min-width: 0;
+  max-width: 100%;
+  flex-shrink: 1;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--input);
+  border-radius: 0.75rem;
+  background-color: var(--card);
+  color: var(--foreground);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+#root select:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+#root option {
+  background-color: var(--popover);
+  color: var(--popover-foreground);
+}
+
+/* Modern native pickers allow long lists to scroll without covering the form. */
+@supports (appearance: base-select) {
+  #root select,
+  #root select::picker(select) {
+    appearance: base-select;
+  }
+
+  #root select::picker(select) {
+    max-height: min(18rem, 50dvh);
+    max-width: calc(100vw - 2rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    margin-block: 4px;
+    padding: 4px;
+    border: 1px solid var(--input);
+    border-radius: 0.75rem;
+    background: var(--popover);
+    color: var(--popover-foreground);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 18%);
+  }
+
+  #root select option {
+    min-height: 44px;
+    padding: 0.625rem 0.75rem;
+    border-radius: 0.5rem;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  #root select option:is(:checked, :hover, :focus) {
+    background: var(--accent);
+    color: var(--accent-foreground);
+  }
+}
+
+.pet-profile-form input {
+  min-width: 0;
+}
+
+.pet-profile-form select[aria-label='Age unit'] {
+  flex-shrink: 0;
+}
+
 .tab-content { animation: fade-in 0.2s ease-out; }
 
 @theme inline {
@@ -303,180 +399,4 @@ button {
   html {
     @apply font-sans;
   }
-}
-
-/* ==========================================================================
-   ANIMEAL DARK MODE COMPREHENSIVE UI & FONT COLOR SYSTEM
-   Ensures cards, metric tiles, text, headings, badges, tooltips, and inputs
-   match dark mode with crisp contrast and high legibility.
-   ========================================================================== */
-
-/* ── 1. Page Backgrounds in Dark Mode ── */
-.dark body,
-.dark #root,
-.dark .min-h-screen.bg-brand-cream\/30,
-.dark .min-h-screen.bg-brand-cream\/40,
-.dark .min-h-\[85vh\].bg-brand-cream\/40,
-.dark .bg-brand-cream\/30,
-.dark .bg-brand-cream\/40,
-.dark .bg-brand-cream\/50,
-.dark .bg-\[\#edf2f7\] {
-  background-color: #0d1717 !important;
-}
-
-.dark section.bg-brand-cream,
-.dark section.bg-white,
-.dark section[class*="bg-brand-cream"],
-.dark section[class*="bg-white"] {
-  background-color: #0d1717 !important;
-}
-
-/* ── 2. Cards, Modals & Elevated Surfaces in Dark Mode ── */
-.dark .bg-white:not(.keep-white),
-.dark [data-slot="card"],
-.dark .card {
-  background-color: #132525 !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  color: #f6f3ec !important;
-}
-
-/* ── 3. Nested Tiles, Metric Chips & Sub-Containers ── */
-.dark .bg-slate-100,
-.dark .bg-slate-50,
-.dark .bg-stone-100,
-.dark .bg-stone-50 {
-  background-color: #0e1d1d !important;
-  color: #f6f3ec !important;
-}
-
-.dark .bg-brand-cream,
-.dark [class*="bg-brand-cream\/10"],
-.dark [class*="bg-brand-cream\/20"],
-.dark [class*="bg-brand-cream\/30"],
-.dark [class*="bg-brand-cream\/40"],
-.dark [class*="bg-brand-cream\/50"],
-.dark [class*="bg-brand-cream\/60"],
-.dark [class*="bg-brand-cream\/70"],
-.dark [class*="bg-brand-cream\/80"] {
-  background-color: #1a3333 !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-  color: #f6f3ec !important;
-}
-
-/* ── 4. Typography & Font Colors in Dark Mode ── */
-.dark h1,
-.dark h2,
-.dark h3,
-.dark h4,
-.dark h5,
-.dark h6,
-.dark .font-display {
-  color: #ffffff !important;
-}
-
-/* Primary brand dark text becomes crisp white/cream */
-.dark .text-brand-dark,
-.dark .text-slate-900,
-.dark .text-stone-900,
-.dark .text-gray-900 {
-  color: #ffffff !important;
-}
-
-/* Opacity levels for brand dark text */
-.dark [class*="text-brand-dark\/80"],
-.dark [class*="text-brand-dark\/75"],
-.dark [class*="text-brand-dark\/70"],
-.dark .text-slate-700,
-.dark .text-stone-700 {
-  color: #d8e8e8 !important;
-}
-
-.dark [class*="text-brand-dark\/60"],
-.dark [class*="text-brand-dark\/50"],
-.dark .text-slate-500,
-.dark .text-stone-500 {
-  color: #9cb6b6 !important;
-}
-
-.dark [class*="text-brand-dark\/40"],
-.dark [class*="text-brand-dark\/30"],
-.dark .text-slate-400,
-.dark .text-stone-400 {
-  color: #728d8d !important;
-}
-
-/* ── 5. Dark Action Buttons & Tooltips ── */
-.dark .bg-brand-dark {
-  background-color: #1e3d3d !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-}
-
-.dark .bg-brand-dark:hover {
-  background-color: #274f4f !important;
-}
-
-/* ── 6. Vibrant Sage Accents & Primary Buttons ── */
-.dark .text-brand-sage {
-  color: #6fc248 !important;
-}
-
-.dark .bg-brand-sage {
-  background-color: #4a8030 !important;
-  color: #ffffff !important;
-}
-
-.dark .bg-brand-sage:hover {
-  background-color: #559338 !important;
-}
-
-.dark [class*="bg-brand-sage\/10"],
-.dark [class*="bg-brand-sage\/15"],
-.dark [class*="bg-brand-sage\/20"] {
-  background-color: rgba(78, 128, 53, 0.25) !important;
-}
-
-/* ── 7. Alert Badges & Highlights ── */
-.dark .text-brand-alert {
-  color: #f87171 !important;
-}
-
-.dark [class*="bg-brand-alert\/10"],
-.dark [class*="bg-brand-alert\/15"] {
-  background-color: rgba(220, 68, 68, 0.22) !important;
-}
-
-/* ── 8. Form Inputs, Selects & Textareas ── */
-.dark input:not([type="checkbox"]):not([type="radio"]),
-.dark textarea,
-.dark select {
-  background-color: #0f1d1d !important;
-  color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.16) !important;
-}
-
-.dark input::placeholder,
-.dark textarea::placeholder {
-  color: #637e7e !important;
-}
-
-/* ── 9. Borders & Dividers ── */
-.dark [class*="border-brand-dark\/"],
-.dark [class*="border-border\/"],
-.dark .border-border,
-.dark [class*="divide-brand-dark\/"],
-.dark [class*="divide-border\/"],
-.dark .border-stone-200,
-.dark .border-slate-200 {
-  border-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-/* ── 10. Water metric quick buttons ── */
-.dark .bg-cyan-100\/80,
-.dark .bg-cyan-100 {
-  background-color: rgba(6, 182, 212, 0.2) !important;
-  color: #67e8f9 !important;
-}
-.dark .bg-cyan-100\/80:hover {
-  background-color: rgba(6, 182, 212, 0.3) !important;
 }

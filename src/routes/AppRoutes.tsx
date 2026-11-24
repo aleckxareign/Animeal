@@ -23,7 +23,7 @@ export default function AppRoutes() {
         path="/login"
         element={
           loading ? (
-            <div className="min-h-screen flex items-center justify-center bg-[#edf2f7]">
+            <div className="min-h-screen flex items-center justify-center bg-background">
               <div className="size-10 rounded-full border-4 border-brand-sage/20 border-t-brand-sage animate-spin" />
             </div>
           ) : isLoggedIn ? (
@@ -45,7 +45,7 @@ export default function AppRoutes() {
           path="/"
           element={
             loading ? (
-              <div className="min-h-screen flex items-center justify-center bg-[#edf2f7]">
+              <div className="min-h-screen flex items-center justify-center bg-background">
                 <div className="size-10 rounded-full border-4 border-brand-sage/20 border-t-brand-sage animate-spin" />
               </div>
             ) : isLoggedIn ? (

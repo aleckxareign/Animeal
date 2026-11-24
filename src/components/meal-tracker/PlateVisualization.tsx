@@ -30,25 +30,25 @@ export default function PlateVisualization({
   // Empty state if no meals logged
   if (feedings.length === 0 || totalMacroG === 0) {
     return (
-      <div className="rounded-3xl bg-white border border-brand-dark/10 shadow-sm p-6 sm:p-8">
-        <div className="flex items-center justify-between pb-4 border-b border-brand-dark/10">
+      <div className="rounded-3xl bg-card border border-foreground/10 shadow-sm p-6 sm:p-8">
+        <div className="flex items-center justify-between pb-4 border-b border-foreground/10">
           <div className="flex items-center gap-2">
-            <PieChart className="h-5 w-5 text-brand-sage" />
-            <h3 className="font-display text-xl font-bold text-brand-dark">
+            <PieChart className="h-5 w-5 text-brand-accent" />
+            <h3 className="font-display text-xl font-bold text-foreground">
               Nutrition Plate Breakdown
             </h3>
           </div>
-          <span className="text-xs font-semibold text-brand-dark/50">Today</span>
+          <span className="text-xs font-semibold text-foreground/50">Today</span>
         </div>
 
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="h-20 w-20 rounded-full bg-brand-cream/80 flex items-center justify-center text-4xl mb-4 shadow-inner">
+          <div className="h-20 w-20 rounded-full bg-background/80 flex items-center justify-center text-4xl mb-4 shadow-inner">
             🥣
           </div>
-          <h4 className="font-display text-lg font-bold text-brand-dark">
+          <h4 className="font-display text-lg font-bold text-foreground">
             No meals logged yet today!
           </h4>
-          <p className="mt-1.5 max-w-sm text-sm text-brand-dark/60">
+          <p className="mt-1.5 max-w-sm text-sm text-foreground/60">
             Feed {petName} to visualize their protein, fat, fiber, and carbohydrates balance on the plate.
           </p>
           {onOpenFeedModal && (
@@ -62,7 +62,7 @@ export default function PlateVisualization({
           )}
         </div>
 
-        <p className="mt-4 text-[11px] text-center text-brand-dark/50 italic">
+        <p className="mt-4 text-[11px] text-center text-foreground/50 italic">
           Plate ratios are visual estimates from logged food data, not veterinary guarantees.
         </p>
       </div>
@@ -85,7 +85,7 @@ export default function PlateVisualization({
       grams: proteinG,
       pct: proteinPct,
       color: '#44632f', // brand-sage
-      bgBadge: 'bg-[#44632f]/10 text-[#44632f]',
+      bgBadge: 'bg-brand-sage/10 text-brand-accent',
       description: 'Muscle building & tissue repair',
     },
     {
@@ -93,7 +93,7 @@ export default function PlateVisualization({
       grams: fatG,
       pct: fatPct,
       color: '#b5432f', // brand-alert
-      bgBadge: 'bg-[#b5432f]/10 text-[#b5432f]',
+      bgBadge: 'bg-brand-alert/10 text-destructive',
       description: 'Concentrated energy & cell health',
     },
     {
@@ -101,7 +101,7 @@ export default function PlateVisualization({
       grams: fiberG,
       pct: fiberPct,
       color: '#8b6914', // warm brown
-      bgBadge: 'bg-[#8b6914]/10 text-[#8b6914]',
+      bgBadge: 'bg-amber-500/10 text-amber-800 dark:text-amber-300',
       description: 'Healthy digestion & microbiome',
     },
     {
@@ -109,7 +109,7 @@ export default function PlateVisualization({
       grams: estimatedCarbsG,
       pct: carbsPct,
       color: '#164040', // brand-dark
-      bgBadge: 'bg-[#164040]/10 text-[#164040]',
+      bgBadge: 'bg-foreground/10 text-foreground',
       description: 'Digestible carbohydrates & minerals',
     },
   ]
@@ -117,21 +117,21 @@ export default function PlateVisualization({
   let accumulatedPct = 0
 
   return (
-    <div className="rounded-3xl bg-white border border-brand-dark/10 shadow-sm p-6 sm:p-8 space-y-6">
+    <div className="rounded-3xl bg-card border border-foreground/10 shadow-sm p-6 sm:p-8 space-y-6">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-brand-dark/10 pb-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-foreground/10 pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <PieChart className="h-5 w-5 text-brand-sage" />
-            <h3 className="font-display text-xl font-bold text-brand-dark">
+            <PieChart className="h-5 w-5 text-brand-accent" />
+            <h3 className="font-display text-xl font-bold text-foreground">
               Nutrition Plate Breakdown
             </h3>
           </div>
-          <p className="text-xs text-brand-dark/60 mt-0.5">
+          <p className="text-xs text-foreground/60 mt-0.5">
             Macronutrient balance from {feedings.length} meal{feedings.length > 1 ? 's' : ''} logged today
           </p>
         </div>
-        <span className="rounded-full bg-brand-cream px-3 py-1 text-xs font-semibold text-brand-dark">
+        <span className="rounded-full bg-background px-3 py-1 text-xs font-semibold text-foreground">
           {totalMacroG}g total nutrients
         </span>
       </div>
@@ -151,7 +151,7 @@ export default function PlateVisualization({
                 cx="90"
                 cy="90"
                 r={radius}
-                className="stroke-brand-cream"
+                className="stroke-muted"
                 strokeWidth="24"
                 fill="none"
               />
@@ -184,18 +184,18 @@ export default function PlateVisualization({
 
             {/* Inner Center Label */}
             <div className="absolute flex flex-col items-center justify-center text-center pointer-events-none">
-              <Utensils className="h-5 w-5 text-brand-dark/40 mb-0.5" />
-              <span className="font-display text-2xl font-black text-brand-dark leading-none">
+              <Utensils className="h-5 w-5 text-foreground/40 mb-0.5" />
+              <span className="font-display text-2xl font-black text-foreground leading-none">
                 {totalCalories}
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-dark/50">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/50">
                 kcal today
               </span>
             </div>
           </div>
 
           {/* Stacked Horizontal Bar below donut */}
-          <div className="w-full mt-4 flex h-3 overflow-hidden rounded-full bg-brand-cream">
+          <div className="w-full mt-4 flex h-3 overflow-hidden rounded-full bg-background">
             {segments.map((seg, idx) => (
               <div
                 key={idx}
@@ -212,7 +212,7 @@ export default function PlateVisualization({
           {segments.map((seg) => (
             <div
               key={seg.label}
-              className="rounded-2xl border border-brand-dark/10 bg-brand-cream/20 p-3.5 transition hover:bg-brand-cream/40"
+              className="rounded-2xl border border-foreground/10 bg-background/20 p-3.5 transition hover:bg-background/40"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -220,7 +220,7 @@ export default function PlateVisualization({
                     className="h-3 w-3 rounded-full shrink-0"
                     style={{ backgroundColor: seg.color }}
                   />
-                  <span className="text-xs font-bold text-brand-dark">
+                  <span className="text-xs font-bold text-foreground">
                     {seg.label}
                   </span>
                 </div>
@@ -230,15 +230,15 @@ export default function PlateVisualization({
               </div>
 
               <div className="mt-2 flex items-baseline justify-between">
-                <span className="text-lg font-extrabold text-brand-dark">
+                <span className="text-lg font-extrabold text-foreground">
                   {seg.grams}g
                 </span>
-                <span className="text-[11px] text-brand-dark/60 font-medium">
+                <span className="text-[11px] text-foreground/60 font-medium">
                   {seg.label === 'Fat' ? seg.grams * 9 : seg.grams * 4} kcal
                 </span>
               </div>
 
-              <p className="mt-1 text-[10px] text-brand-dark/60 line-clamp-1">
+              <p className="mt-1 text-[10px] text-foreground/60 line-clamp-1">
                 {seg.description}
               </p>
             </div>
@@ -247,8 +247,8 @@ export default function PlateVisualization({
       </div>
 
       {/* Mandatory Disclaimer */}
-      <div className="flex items-center gap-2 rounded-xl bg-brand-cream/50 px-4 py-2.5 text-xs text-brand-dark/70">
-        <Info className="h-4 w-4 shrink-0 text-brand-dark/50" />
+      <div className="flex items-center gap-2 rounded-xl bg-background/50 px-4 py-2.5 text-xs text-foreground/70">
+        <Info className="h-4 w-4 shrink-0 text-foreground/50" />
         <p className="italic">
           Plate ratios are visual estimates from logged food data, not veterinary guarantees. Consult your vet for medical dietary formulations.
         </p>

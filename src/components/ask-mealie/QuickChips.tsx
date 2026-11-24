@@ -36,13 +36,13 @@ export default function QuickChips({
   }
 
   return (
-    <div className="relative border-t border-brand-dark/5 bg-brand-cream/30 px-3 py-2 sm:px-6">
+    <div className="relative border-t border-foreground/5 bg-background/30 px-3 py-2 sm:px-6">
       <div className="flex items-center gap-1.5">
         {/* Left scroll button for desktop */}
         <button
           type="button"
           onClick={() => handleScroll('left')}
-          className="hidden md:flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-brand-dark/10 bg-white text-brand-dark/70 hover:bg-white hover:text-brand-dark shadow-xs"
+          className="hidden md:flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-foreground/10 bg-card text-foreground/70 hover:bg-card hover:text-foreground shadow-xs"
           aria-label="Scroll left"
         >
           <ChevronLeft size={14} />
@@ -54,8 +54,8 @@ export default function QuickChips({
           className="flex flex-1 items-center gap-2 overflow-x-auto py-1 scrollbar-none custom-scrollbar"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          <div className="flex shrink-0 items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-brand-dark/50 mr-1">
-            <Sparkles size={12} className="text-brand-sage" />
+          <div className="flex shrink-0 items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-foreground/50 mr-1">
+            <Sparkles size={12} className="text-brand-accent" />
             <span>Try:</span>
           </div>
 
@@ -65,7 +65,7 @@ export default function QuickChips({
               type="button"
               disabled={disabled}
               onClick={() => onSelectChip(chip)}
-              className="shrink-0 rounded-full border border-brand-dark/15 bg-white px-3 py-1.5 text-xs font-medium text-brand-dark transition-all hover:border-brand-sage hover:bg-brand-sage/10 hover:text-brand-sage active:scale-95 disabled:pointer-events-none disabled:opacity-40 shadow-xs"
+              className="shrink-0 rounded-full border border-foreground/15 bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-all hover:border-brand-sage hover:bg-brand-sage/10 hover:text-brand-accent active:scale-95 disabled:pointer-events-none disabled:opacity-40 shadow-xs"
             >
               {chip}
             </button>
@@ -76,7 +76,7 @@ export default function QuickChips({
         <button
           type="button"
           onClick={() => handleScroll('right')}
-          className="hidden md:flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-brand-dark/10 bg-white text-brand-dark/70 hover:bg-white hover:text-brand-dark shadow-xs"
+          className="hidden md:flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-foreground/10 bg-card text-foreground/70 hover:bg-card hover:text-foreground shadow-xs"
           aria-label="Scroll right"
         >
           <ChevronRight size={14} />

@@ -430,30 +430,30 @@ export default function ScannerUpload({ onStartScan, activePet }: ScannerUploadP
     <div className="mx-auto max-w-4xl space-y-8">
       {/* Header Banner */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 rounded-full bg-brand-sage/10 px-4 py-1.5 text-xs font-semibold text-brand-sage">
+        <div className="inline-flex items-center gap-2 rounded-full bg-brand-sage/10 px-4 py-1.5 text-xs font-semibold text-brand-accent">
           <Sparkles className="h-3.5 w-3.5" />
           <span>AI-Powered Nutrition Intelligence • Suriin ang pet food</span>
         </div>
-        <h1 className="font-display text-3xl font-extrabold tracking-tight text-brand-dark sm:text-4xl md:text-5xl">
+        <h1 className="font-display text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl md:text-5xl">
           AI Food Label Scanner
         </h1>
-        <p className="mx-auto max-w-2xl text-base text-brand-dark/75 sm:text-lg">
+        <p className="mx-auto max-w-2xl text-base text-foreground/75 sm:text-lg">
           Scan or upload a photo of your pet food packaging to analyze nutritional info, suitability, and value.
         </p>
       </div>
 
       {isAnalyzing && (
-        <div className="animate-fade-in flex items-center justify-center gap-3 rounded-2xl border border-brand-sage/30 bg-brand-sage/10 p-5 text-sm text-brand-dark shadow-sm">
-          <Loader2 className="h-6 w-6 animate-spin text-brand-sage shrink-0" />
+        <div className="animate-fade-in flex items-center justify-center gap-3 rounded-2xl border border-brand-sage/30 bg-brand-sage/10 p-5 text-sm text-foreground shadow-sm">
+          <Loader2 className="h-6 w-6 animate-spin text-brand-accent shrink-0" />
           <div>
             <p className="font-bold text-base">Analyzing packaging with Gemini Vision AI...</p>
-            <p className="text-xs text-brand-dark/70">Extracting guaranteed analysis & suitability (~1–2s)</p>
+            <p className="text-xs text-foreground/70">Extracting guaranteed analysis & suitability (~1–2s)</p>
           </div>
         </div>
       )}
 
       {uploadError && (
-        <div className="animate-fade-in flex items-center gap-3 rounded-xl border border-brand-alert/20 bg-brand-alert/10 p-4 text-sm text-brand-alert">
+        <div className="animate-fade-in flex items-center gap-3 rounded-xl border border-brand-alert/20 bg-brand-alert/10 p-4 text-sm text-destructive">
           <AlertTriangle className="h-5 w-5 shrink-0" />
           <span className="font-medium">{uploadError}</span>
         </div>
@@ -462,24 +462,24 @@ export default function ScannerUpload({ onStartScan, activePet }: ScannerUploadP
       {/* Main Upload Area */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Mode A: Real Live Camera Capture */}
-        <div className="flex flex-col justify-between rounded-2xl border-2 border-brand-dark/10 bg-white p-6 shadow-sm transition-all hover:border-brand-sage/50 hover:shadow-md">
+        <div className="flex flex-col justify-between rounded-2xl border-2 border-foreground/10 bg-card p-6 shadow-sm transition-all hover:border-brand-sage/50 hover:shadow-md">
           <div className="space-y-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-sage/15 text-brand-sage">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-sage/15 text-brand-accent">
               <Camera className="h-7 w-7" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-brand-dark">Take a Photo</h2>
-              <p className="mt-1 text-sm text-brand-dark/70">
+              <h2 className="text-lg font-bold text-foreground">Take a Photo</h2>
+              <p className="mt-1 text-sm text-foreground/70">
                 Snap the Guaranteed Analysis table and Net Weight on the back of your pet food packaging.
               </p>
             </div>
-            <ul className="space-y-1.5 text-xs text-brand-dark/60">
+            <ul className="space-y-1.5 text-xs text-foreground/60">
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-3.5 w-3.5 text-brand-sage" />
+                <CheckCircle2 className="h-3.5 w-3.5 text-brand-accent" />
                 <span>Instant camera capture on desktop, mobile & tablet</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-3.5 w-3.5 text-brand-sage" />
+                <CheckCircle2 className="h-3.5 w-3.5 text-brand-accent" />
                 <span>Live viewfinder with auto nutrient alignment guide</span>
               </li>
             </ul>
@@ -521,20 +521,20 @@ export default function ScannerUpload({ onStartScan, activePet }: ScannerUploadP
           } ${
             isDragging
               ? 'border-brand-sage bg-brand-sage/5 shadow-md scale-[1.01]'
-              : 'border-brand-dark/20 bg-white hover:border-brand-sage/60 hover:bg-brand-cream/30 hover:shadow-sm'
+              : 'border-foreground/20 bg-card hover:border-brand-sage/60 hover:bg-background/30 hover:shadow-sm'
           }`}
         >
           <div className="flex flex-col items-center justify-center space-y-3 py-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-dark/5 text-brand-dark transition group-hover:scale-105 group-hover:bg-brand-sage/10 group-hover:text-brand-sage">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-dark/5 text-foreground transition group-hover:scale-105 group-hover:bg-brand-sage/10 group-hover:text-brand-accent">
               <UploadCloud className="h-7 w-7" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-brand-dark">Upload Label Image</h2>
-              <p className="mt-1 text-sm text-brand-dark/70">
+              <h2 className="text-lg font-bold text-foreground">Upload Label Image</h2>
+              <p className="mt-1 text-sm text-foreground/70">
                 Drag & drop your food label photo here, or browse files
               </p>
             </div>
-            <p className="text-xs text-brand-dark/50">
+            <p className="text-xs text-foreground/50">
               Supports JPG, PNG, WebP up to 15MB
             </p>
           </div>
@@ -547,7 +547,7 @@ export default function ScannerUpload({ onStartScan, activePet }: ScannerUploadP
               className="hidden"
               onChange={handleFileChange}
             />
-            <div className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-dark/20 bg-brand-cream/50 px-4 py-2.5 text-xs font-semibold text-brand-dark group-hover:border-brand-sage group-hover:bg-brand-sage group-hover:text-white transition">
+            <div className="inline-flex items-center justify-center gap-2 rounded-xl border border-foreground/20 bg-background/50 px-4 py-2.5 text-xs font-semibold text-foreground group-hover:border-brand-sage group-hover:bg-brand-sage group-hover:text-white transition">
               <span>Browse Photo Library</span>
             </div>
           </div>
@@ -555,26 +555,26 @@ export default function ScannerUpload({ onStartScan, activePet }: ScannerUploadP
       </div>
 
       {/* Photography Tips & Guidelines */}
-      <div className="rounded-xl border border-brand-dark/10 bg-brand-sage/5 p-4 sm:p-5">
+      <div className="rounded-xl border border-foreground/10 bg-brand-sage/5 p-4 sm:p-5">
         <div className="flex items-start gap-3">
-          <div className="rounded-lg bg-brand-sage/15 p-2 text-brand-sage">
+          <div className="rounded-lg bg-brand-sage/15 p-2 text-brand-accent">
             <Info className="h-5 w-5" />
           </div>
           <div className="space-y-1">
-            <h2 className="text-sm font-semibold text-brand-dark">
+            <h2 className="text-sm font-semibold text-foreground">
               Tips for Best Nutritional Scanning Accuracy
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 text-xs text-brand-dark/70">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 text-xs text-foreground/70">
               <div className="flex items-center gap-1.5">
-                <ShieldCheck className="h-3.5 w-3.5 text-brand-sage shrink-0" />
+                <ShieldCheck className="h-3.5 w-3.5 text-brand-accent shrink-0" />
                 <span>Flatten label under bright, indirect light</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <ShieldCheck className="h-3.5 w-3.5 text-brand-sage shrink-0" />
+                <ShieldCheck className="h-3.5 w-3.5 text-brand-accent shrink-0" />
                 <span>Include Guaranteed Analysis (% numbers)</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <ShieldCheck className="h-3.5 w-3.5 text-brand-sage shrink-0" />
+                <ShieldCheck className="h-3.5 w-3.5 text-brand-accent shrink-0" />
                 <span>Keep Net Weight (g/kg) clearly visible</span>
               </div>
             </div>
@@ -598,7 +598,7 @@ export default function ScannerUpload({ onStartScan, activePet }: ScannerUploadP
                   type="button"
                   onClick={handleToggleFacingMode}
                   title="Switch camera"
-                  className="flex size-9 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 active:scale-95"
+                  className="flex size-9 items-center justify-center rounded-full bg-card/10 text-white transition hover:bg-card/20 active:scale-95"
                 >
                   <RefreshCw className="h-4 w-4" />
                 </button>
@@ -606,7 +606,7 @@ export default function ScannerUpload({ onStartScan, activePet }: ScannerUploadP
                 <button
                   type="button"
                   onClick={handleCloseCamera}
-                  className="flex size-9 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 active:scale-95"
+                  className="flex size-9 items-center justify-center rounded-full bg-card/10 text-white transition hover:bg-card/20 active:scale-95"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -625,7 +625,7 @@ export default function ScannerUpload({ onStartScan, activePet }: ScannerUploadP
                     <button
                       type="button"
                       onClick={() => startCamera(facingMode)}
-                      className="px-4 py-2 rounded-xl bg-white/10 text-white text-xs font-semibold hover:bg-white/20 transition"
+                      className="px-4 py-2 rounded-xl bg-card/10 text-white text-xs font-semibold hover:bg-card/20 transition"
                     >
                       Try Again
                     </button>
@@ -671,7 +671,7 @@ export default function ScannerUpload({ onStartScan, activePet }: ScannerUploadP
               <button
                 type="button"
                 onClick={handleCloseCamera}
-                className="text-xs font-semibold text-slate-400 hover:text-white transition"
+                className="text-xs font-semibold text-muted-foreground hover:text-white transition"
               >
                 Cancel
               </button>
@@ -681,7 +681,7 @@ export default function ScannerUpload({ onStartScan, activePet }: ScannerUploadP
                   type="button"
                   disabled={isCapturing}
                   onClick={handleCaptureSnapshot}
-                  className="flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-bold text-slate-900 shadow-lg transition hover:bg-slate-100 active:scale-95 disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-2 rounded-full bg-card px-6 py-2.5 text-sm font-bold text-foreground shadow-lg transition hover:bg-muted active:scale-95 disabled:opacity-50 cursor-pointer"
                 >
                   <div className="size-3.5 rounded-full bg-red-600 animate-pulse" />
                   <span>{isCapturing ? 'Processing...' : 'Snap Photo'}</span>
@@ -689,7 +689,7 @@ export default function ScannerUpload({ onStartScan, activePet }: ScannerUploadP
               )}
 
               <div className="w-12 text-right">
-                <span className="text-[11px] text-slate-500 uppercase tracking-wider font-mono">
+                <span className="text-[11px] text-muted-foreground uppercase tracking-wider font-mono">
                   {facingMode === 'environment' ? 'Rear' : 'Front'}
                 </span>
               </div>

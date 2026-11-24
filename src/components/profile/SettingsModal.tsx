@@ -58,21 +58,21 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-      <div className="relative w-full max-w-lg rounded-3xl bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-lg rounded-3xl bg-card dark:bg-card border border-border dark:border-border shadow-2xl overflow-hidden flex flex-col max-h-[min(90vh,calc(100dvh-2rem))]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200/80 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-950/40">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border/80 dark:border-border bg-muted/50 dark:bg-card/40">
           <div className="flex items-center gap-2.5">
-            <div className="size-8 rounded-full bg-brand-sage/10 text-brand-sage flex items-center justify-center">
+            <div className="size-8 rounded-full bg-brand-sage/10 text-brand-accent flex items-center justify-center">
               <Settings className="size-4" />
             </div>
             <div>
-              <h2 className="font-bold text-base text-brand-dark dark:text-white">Settings & Preferences</h2>
-              <p className="text-xs text-stone-500 dark:text-slate-400">Configure notifications, theme & units</p>
+              <h2 className="font-bold text-base text-foreground dark:text-white">Settings & Preferences</h2>
+              <p className="text-xs text-muted-foreground dark:text-muted-foreground">Configure notifications, theme & units</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="flex size-8 items-center justify-center rounded-full text-stone-400 hover:text-stone-700 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-slate-800 transition"
+            className="flex size-8 items-center justify-center rounded-full text-muted-foreground hover:text-muted-foreground dark:hover:text-white hover:bg-muted dark:hover:bg-slate-800 transition"
           >
             <X className="size-4" />
           </button>
@@ -82,7 +82,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1">
           {/* Theme Option */}
           <div className="space-y-2">
-            <h3 className="text-xs font-bold text-stone-700 dark:text-slate-300 uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-muted-foreground dark:text-muted-foreground uppercase tracking-wider">
               Display Theme
             </h3>
             <div className="grid grid-cols-2 gap-3">
@@ -91,15 +91,15 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 onClick={() => theme === 'dark' && toggleTheme()}
                 className={`flex items-center justify-between p-3.5 rounded-2xl border transition ${
                   theme === 'light'
-                    ? 'border-brand-sage bg-brand-sage/10 ring-2 ring-brand-sage/40 text-brand-dark'
-                    : 'border-stone-200 dark:border-slate-800 hover:bg-stone-50 dark:hover:bg-slate-800/60 text-stone-600 dark:text-slate-300'
+                    ? 'border-brand-sage bg-brand-sage/10 ring-2 ring-brand-sage/40 text-foreground'
+                    : 'border-border dark:border-border hover:bg-muted dark:hover:bg-slate-800/60 text-muted-foreground dark:text-muted-foreground'
                 }`}
               >
                 <div className="flex items-center gap-2.5">
                   <Sun className="size-5 text-amber-500" />
                   <span className="text-sm font-bold">Light Mode</span>
                 </div>
-                {theme === 'light' && <Check className="size-4 text-brand-sage" />}
+                {theme === 'light' && <Check className="size-4 text-brand-accent" />}
               </button>
 
               <button
@@ -108,7 +108,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 className={`flex items-center justify-between p-3.5 rounded-2xl border transition ${
                   theme === 'dark'
                     ? 'border-brand-sage bg-brand-sage/20 ring-2 ring-brand-sage/40 text-white'
-                    : 'border-stone-200 dark:border-slate-800 hover:bg-stone-50 dark:hover:bg-slate-800/60 text-stone-600 dark:text-slate-300'
+                    : 'border-border dark:border-border hover:bg-muted dark:hover:bg-slate-800/60 text-muted-foreground dark:text-muted-foreground'
                 }`}
               >
                 <div className="flex items-center gap-2.5">
@@ -122,17 +122,17 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
           {/* Notifications */}
           <div className="space-y-3">
-            <h3 className="text-xs font-bold text-stone-700 dark:text-slate-300 uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-muted-foreground dark:text-muted-foreground uppercase tracking-wider">
               Notifications & Reminders
             </h3>
 
-            <div className="rounded-2xl border border-stone-200 dark:border-slate-800 p-4 space-y-3 bg-stone-50/50 dark:bg-slate-800/40">
+            <div className="rounded-2xl border border-border dark:border-border p-4 space-y-3 bg-muted/50 dark:bg-card/40">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Bell className="size-5 text-brand-sage" />
+                  <Bell className="size-5 text-brand-accent" />
                   <div>
-                    <p className="text-sm font-bold text-brand-dark dark:text-white">Browser Push Notifications</p>
-                    <p className="text-xs text-stone-500 dark:text-slate-400">
+                    <p className="text-sm font-bold text-foreground dark:text-white">Browser Push Notifications</p>
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">
                       Alerts for meal times, hydration checks & medication
                     </p>
                   </div>
@@ -142,18 +142,18 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   onClick={handleToggleNotifications}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
                     notificationsEnabled
-                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300'
-                      : 'bg-stone-200 dark:bg-slate-700 text-stone-700 dark:text-slate-200 hover:bg-brand-sage hover:text-white'
+                      ? 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-400/30'
+                      : 'bg-muted dark:bg-slate-700 text-muted-foreground dark:text-slate-200 hover:bg-brand-sage hover:text-white'
                   }`}
                 >
                   {notificationsEnabled ? 'Enabled ✓' : 'Enable'}
                 </button>
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-stone-200/80 dark:border-slate-700">
+              <div className="flex items-center justify-between pt-2 border-t border-border/80 dark:border-border">
                 <div>
-                  <p className="text-xs font-bold text-brand-dark dark:text-white">In-App Reminder Banners</p>
-                  <p className="text-[11px] text-stone-500 dark:text-slate-400">Show reminder toasts when tasks are due</p>
+                  <p className="text-xs font-bold text-foreground dark:text-white">In-App Reminder Banners</p>
+                  <p className="text-[11px] text-muted-foreground dark:text-muted-foreground">Show reminder toasts when tasks are due</p>
                 </div>
                 <input
                   type="checkbox"
@@ -167,19 +167,19 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
           {/* Localization & Units */}
           <div className="space-y-3">
-            <h3 className="text-xs font-bold text-stone-700 dark:text-slate-300 uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-muted-foreground dark:text-muted-foreground uppercase tracking-wider">
               Localization & Units
             </h3>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-stone-500 dark:text-slate-400 mb-1">
+                <label className="block text-xs font-semibold text-muted-foreground dark:text-muted-foreground mb-1">
                   Weight Unit
                 </label>
                 <select
                   value={unit}
                   onChange={(e) => setUnit(e.target.value as 'kg' | 'lbs')}
-                  className="w-full px-3 py-2 rounded-xl border border-stone-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-bold text-brand-dark dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-sage/40"
+                  className="w-full px-3 py-2 rounded-xl border border-border dark:border-border bg-card dark:bg-card text-sm font-bold text-foreground dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-sage/40"
                 >
                   <option value="kg">Kilograms (kg)</option>
                   <option value="lbs">Pounds (lbs)</option>
@@ -187,13 +187,13 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-stone-500 dark:text-slate-400 mb-1">
+                <label className="block text-xs font-semibold text-muted-foreground dark:text-muted-foreground mb-1">
                   Language Style
                 </label>
                 <select
                   value={language}
                   onChange={(e) => setLanguage(e.target.value as 'taglish' | 'en')}
-                  className="w-full px-3 py-2 rounded-xl border border-stone-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-bold text-brand-dark dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-sage/40"
+                  className="w-full px-3 py-2 rounded-xl border border-border dark:border-border bg-card dark:bg-card text-sm font-bold text-foreground dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-sage/40"
                 >
                   <option value="taglish">Taglish (Pinoy)</option>
                   <option value="en">English (US)</option>
@@ -204,11 +204,11 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-stone-200/80 dark:border-slate-800 flex justify-end gap-3 bg-stone-50/50 dark:bg-slate-950/40">
+        <div className="p-4 border-t border-border/80 dark:border-border flex justify-end gap-3 bg-muted/50 dark:bg-card/40">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2.5 rounded-xl border border-stone-200 dark:border-slate-700 text-xs font-bold text-stone-600 dark:text-slate-300 hover:bg-stone-100 dark:hover:bg-slate-800 transition"
+            className="px-4 py-2.5 rounded-xl border border-border dark:border-border text-xs font-bold text-muted-foreground dark:text-muted-foreground hover:bg-muted dark:hover:bg-slate-800 transition"
           >
             Cancel
           </button>

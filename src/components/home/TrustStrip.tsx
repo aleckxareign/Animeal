@@ -25,7 +25,7 @@ export default function TrustStrip({ className = '' }: { className?: string }) {
         <ul className="grid gap-6 lg:grid-cols-3 lg:divide-x lg:divide-white/15">
           {items.map((item, idx) => (
             <li key={item.title} className={`flex items-start gap-3 ${idx > 0 ? 'lg:pl-6' : ''}`}>
-              <div className="mt-1 flex size-10 items-center justify-center rounded-2xl bg-white/10 border border-white/15 shrink-0">
+              <div className="mt-1 flex size-10 items-center justify-center rounded-2xl bg-card/10 border border-white/15 shrink-0">
                 {item.icon}
               </div>
               <div>

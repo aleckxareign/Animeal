@@ -31,7 +31,6 @@ export default function CareSchedule({ pet }: CareScheduleProps) {
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<FilterTab>('today')
-  const [snoozeMenuTaskId, setSnoozeMenuTaskId] = useState<string | null>(null)
   const [completerName, setCompleterName] = useState<string>('Me')
 
   // Filter tasks for this pet
@@ -89,7 +88,6 @@ export default function CareSchedule({ pet }: CareScheduleProps) {
   const handleSnooze = (taskId: string, hoursAhead: number, label: string) => {
     const futureDate = new Date(Date.now() + hoursAhead * 60 * 60 * 1000).toISOString()
     snoozeTask(taskId, futureDate)
-    setSnoozeMenuTaskId(null)
     addToast(`Task snoozed (${label})`, 'info')
   }
 
@@ -98,7 +96,6 @@ export default function CareSchedule({ pet }: CareScheduleProps) {
     tomorrow.setDate(tomorrow.getDate() + 1)
     tomorrow.setHours(9, 0, 0, 0)
     snoozeTask(taskId, tomorrow.toISOString())
-    setSnoozeMenuTaskId(null)
     addToast('Task snoozed until tomorrow 9:00 AM', 'info')
   }
 
@@ -112,29 +109,29 @@ export default function CareSchedule({ pet }: CareScheduleProps) {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header Banner */}
-      <div className="bg-white rounded-2xl p-5 sm:p-7 border border-stone-100 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-5">
+      <div className="bg-card rounded-2xl p-5 sm:p-7 border border-border shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-5">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-sage/10 text-brand-sage border border-brand-sage/20 mb-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-sage/10 text-brand-accent border border-brand-sage/20 mb-2">
             <Bell className="w-3.5 h-3.5" />
             Care Schedule & Reminders
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-brand-dark tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
             {pet.name}&apos;s Care Schedule
           </h2>
-          <p className="text-sm text-stone-600 max-w-xl mt-1">
+          <p className="text-sm text-muted-foreground max-w-xl mt-1">
             Stay on top of feedings, medication doses, vet appointments, and grooming so your household never misses a beat.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           {/* Member acting selector */}
-          <div className="flex items-center gap-1.5 bg-stone-50 border border-stone-200 px-3 py-2 rounded-xl text-xs font-medium text-stone-700">
-            <User className="w-3.5 h-3.5 text-stone-400" />
+          <div className="flex items-center gap-1.5 bg-background border border-border px-3 py-2 rounded-xl text-xs font-medium text-muted-foreground">
+            <User className="w-3.5 h-3.5 text-muted-foreground" />
             <span>Acting as:</span>
             <select
               value={completerName}
               onChange={(e) => setCompleterName(e.target.value)}
-              className="bg-transparent font-bold text-brand-dark focus:outline-none cursor-pointer"
+              className="bg-transparent font-bold text-foreground focus:outline-none cursor-pointer"
             >
               {household.map((m) => (
                 <option key={m.id} value={m.name}>
@@ -168,20 +165,19 @@ export default function CareSchedule({ pet }: CareScheduleProps) {
             type="button"
             onClick={() => {
               setActiveTab(tab.id as FilterTab)
-              setSnoozeMenuTaskId(null)
             }}
             className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap flex items-center gap-2 border ${
               activeTab === tab.id
                 ? 'bg-brand-sage text-white border-brand-sage shadow-xs'
-                : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'
+                : 'bg-card text-muted-foreground border-border hover:bg-muted'
             }`}
           >
             <span>{tab.label}</span>
             <span
               className={`px-1.5 py-0.2 rounded-full text-[11px] font-bold ${
                 activeTab === tab.id
-                  ? 'bg-white/20 text-white'
-                  : 'bg-stone-100 text-stone-600'
+                  ? 'bg-card/20 text-white'
+                  : 'bg-muted text-muted-foreground'
               }`}
             >
               {tab.count}
@@ -192,12 +188,12 @@ export default function CareSchedule({ pet }: CareScheduleProps) {
 
       {/* Task List / Empty States */}
       {filteredTasks.length === 0 ? (
-        <div className="bg-white rounded-2xl p-10 border border-stone-100 text-center space-y-3 shadow-xs">
-          <div className="w-12 h-12 mx-auto rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center">
-            <Calendar className="w-6 h-6 stroke-1 text-stone-400" />
+        <div className="bg-card rounded-2xl p-10 border border-border text-center space-y-3 shadow-xs">
+          <div className="w-12 h-12 mx-auto rounded-2xl bg-muted text-muted-foreground flex items-center justify-center">
+            <Calendar className="w-6 h-6 stroke-1 text-muted-foreground" />
           </div>
-          <h3 className="text-base font-bold text-brand-dark">No tasks in this view</h3>
-          <p className="text-xs text-stone-500 max-w-sm mx-auto">
+          <h3 className="text-base font-bold text-foreground">No tasks in this view</h3>
+          <p className="text-xs text-muted-foreground max-w-sm mx-auto">
             {activeTab === 'today'
               ? `You're all caught up for today! No pending care tasks due for ${pet.name}.`
               : activeTab === 'upcoming'
@@ -209,7 +205,7 @@ export default function CareSchedule({ pet }: CareScheduleProps) {
           <button
             type="button"
             onClick={() => setIsAddModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-brand-dark bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-foreground bg-muted hover:bg-accent rounded-xl transition-colors"
           >
             <Plus className="w-3.5 h-3.5" />
             Schedule a Task
@@ -227,12 +223,12 @@ export default function CareSchedule({ pet }: CareScheduleProps) {
             return (
               <div
                 key={task.id}
-                className={`relative bg-white rounded-2xl p-5 border transition-all duration-200 shadow-xs flex flex-col justify-between ${
+                className={`relative bg-card rounded-2xl p-5 border transition-all duration-200 shadow-xs flex flex-col justify-between ${
                   task.completed
-                    ? 'border-emerald-200/60 bg-emerald-50/20 opacity-80'
+                    ? 'border-emerald-200/60 dark:border-emerald-400/30 bg-emerald-50/20 dark:bg-emerald-500/15 opacity-80'
                     : overdue
-                      ? 'border-brand-alert/40 bg-red-50/30'
-                      : 'border-stone-100 hover:border-stone-200 hover:shadow-sm'
+                      ? 'border-brand-alert/40 bg-red-50/30 dark:bg-red-500/15'
+                      : 'border-border hover:border-border hover:shadow-sm'
                 }`}
               >
                 {/* Top badges & icon */}
@@ -251,7 +247,7 @@ export default function CareSchedule({ pet }: CareScheduleProps) {
                           >
                             {config.label}
                           </span>
-                          <span className="text-[10px] font-medium text-stone-500 bg-stone-100 px-2 py-0.5 rounded-md capitalize">
+                          <span className="text-[10px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-md capitalize">
                             {task.frequency}
                           </span>
                           {overdue && (
@@ -260,7 +256,7 @@ export default function CareSchedule({ pet }: CareScheduleProps) {
                             </span>
                           )}
                           {isSnoozed && (
-                            <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-amber-100 text-amber-800">
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-300">
                               Snoozed
                             </span>
                           )}
@@ -272,7 +268,7 @@ export default function CareSchedule({ pet }: CareScheduleProps) {
                     <button
                       type="button"
                       onClick={() => handleDelete(task.id)}
-                      className="text-stone-300 hover:text-brand-alert p-1 rounded-md transition-colors"
+                      className="text-stone-300 hover:text-destructive p-1 rounded-md transition-colors"
                       title="Delete task"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -281,29 +277,29 @@ export default function CareSchedule({ pet }: CareScheduleProps) {
 
                   {/* Title & Notes */}
                   <h4
-                    className={`text-base font-bold text-brand-dark ${
-                      task.completed ? 'line-through text-stone-500' : ''
+                    className={`text-base font-bold text-foreground ${
+                      task.completed ? 'line-through text-muted-foreground' : ''
                     }`}
                   >
                     {task.title}
                   </h4>
                   {task.notes && (
-                    <p className="text-xs text-stone-600 mt-1 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
                       {task.notes}
                     </p>
                   )}
                 </div>
 
                 {/* Footer Due info & Actions */}
-                <div className="pt-4 mt-4 border-t border-stone-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 text-xs text-stone-500">
+                <div className="pt-4 mt-4 border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-stone-400" />
+                      <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
                       {formatDate(task.dueDate)}
                     </span>
                     {task.time && (
-                      <span className="flex items-center gap-1 font-semibold text-stone-700">
-                        <Clock className="w-3.5 h-3.5 text-stone-400" />
+                      <span className="flex items-center gap-1 font-semibold text-muted-foreground">
+                        <Clock className="w-3.5 h-3.5 text-muted-foreground" />
                         {task.time}
                       </span>
                     )}
@@ -311,7 +307,7 @@ export default function CareSchedule({ pet }: CareScheduleProps) {
 
                   {/* Actions */}
                   {task.completed ? (
-                    <div className="flex items-center gap-1.5 text-xs text-emerald-700 font-semibold bg-emerald-50 px-2.5 py-1 rounded-lg">
+                    <div className="flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-300 font-semibold bg-emerald-50 dark:bg-emerald-500/15 px-2.5 py-1 rounded-lg">
                       <CheckCircle2 className="w-4 h-4" />
                       <span>
                         Done by {task.completedBy || 'Me'}{' '}
@@ -320,48 +316,21 @@ export default function CareSchedule({ pet }: CareScheduleProps) {
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 self-end sm:self-auto">
-                      {/* Snooze Dropdown */}
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setSnoozeMenuTaskId(
-                              snoozeMenuTaskId === task.id ? null : task.id,
-                            )
-                          }
-                          className="px-2.5 py-1.5 text-xs font-semibold text-stone-600 hover:text-stone-800 bg-stone-100 hover:bg-stone-200 rounded-lg transition-colors flex items-center gap-1"
-                        >
-                          <Clock className="w-3.5 h-3.5" />
-                          Snooze
-                          <ChevronDown className="w-3 h-3" />
-                        </button>
-
-                        {snoozeMenuTaskId === task.id && (
-                          <div className="absolute right-0 bottom-full mb-1 z-20 w-44 bg-white rounded-xl shadow-lg border border-stone-200 py-1.5 text-xs animate-scale-in">
-                            <button
-                              type="button"
-                              onClick={() => handleSnooze(task.id, 1, '+1 Hour')}
-                              className="w-full text-left px-3.5 py-1.5 text-stone-700 hover:bg-stone-50 hover:text-brand-dark transition-colors"
-                            >
-                              + 1 Hour
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleSnooze(task.id, 3, '+3 Hours')}
-                              className="w-full text-left px-3.5 py-1.5 text-stone-700 hover:bg-stone-50 hover:text-brand-dark transition-colors"
-                            >
-                              + 3 Hours
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleSnoozeTomorrow(task.id)}
-                              className="w-full text-left px-3.5 py-1.5 text-stone-700 hover:bg-stone-50 hover:text-brand-dark transition-colors"
-                            >
-                              Tomorrow (9:00 AM)
-                            </button>
-                          </div>
-                        )}
-                      </div>
+                      {/* Snooze selection */}
+                      <select
+                        aria-label={`Snooze ${task.title}`}
+                        value=""
+                        onChange={(event) => {
+                          if (event.target.value === 'tomorrow') handleSnoozeTomorrow(task.id)
+                          else if (event.target.value === '1') handleSnooze(task.id, 1, '+1 Hour')
+                          else if (event.target.value === '3') handleSnooze(task.id, 3, '+3 Hours')
+                        }}
+                      >
+                        <option value="" disabled>Snooze</option>
+                        <option value="1">+ 1 Hour</option>
+                        <option value="3">+ 3 Hours</option>
+                        <option value="tomorrow">Tomorrow (9:00 AM)</option>
+                      </select>
 
                       {/* Mark Done Button */}
                       <button

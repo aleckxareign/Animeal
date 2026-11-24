@@ -22,6 +22,7 @@ export type Pet = {
   weight: number
   age: number
   neutered: boolean
+  sex?: 'male' | 'female' | 'unknown'
   lifeStage: LifeStage
   avatarEmoji: string
   dailyCalorieTarget: number

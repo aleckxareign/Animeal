@@ -129,19 +129,19 @@ export default function HouseholdPage() {
   ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
 
   return (
-    <div className="min-h-screen bg-brand-cream/30 dark:bg-slate-950 py-10 px-4 sm:px-8 lg:px-12 transition-colors">
+    <div className="min-h-screen bg-background/30 dark:bg-card py-10 px-4 sm:px-8 lg:px-12 transition-colors">
       <div className="mx-auto max-w-[1600px] space-y-8">
         {/* Top Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-brand-sage/10 dark:bg-brand-sage/20 px-3.5 py-1 text-xs font-bold text-brand-sage mb-2">
+            <div className="inline-flex items-center gap-2 rounded-full bg-brand-sage/10 dark:bg-brand-sage/20 px-3.5 py-1 text-xs font-bold text-brand-accent mb-2">
               <Users className="size-3.5" />
               <span>Collaborative Pet Care Platform</span>
             </div>
-            <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-brand-dark dark:text-white tracking-tight">
+            <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-foreground dark:text-white tracking-tight">
               Shared Household Management
             </h1>
-            <p className="text-sm sm:text-base text-stone-600 dark:text-slate-400 mt-1">
+            <p className="text-sm sm:text-base text-muted-foreground dark:text-muted-foreground mt-1">
               Share pet care responsibilities with family members, roommates, and pet sitters to prevent double-feeding.
             </p>
           </div>
@@ -150,9 +150,9 @@ export default function HouseholdPage() {
             <button
               type="button"
               onClick={handleCopyInviteLink}
-              className="flex items-center gap-2 rounded-xl border border-stone-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 text-xs font-bold text-brand-dark dark:text-white hover:bg-stone-50 dark:hover:bg-slate-800 transition"
+              className="flex items-center gap-2 rounded-xl border border-border dark:border-border bg-card dark:bg-card px-4 py-2.5 text-xs font-bold text-foreground dark:text-white hover:bg-muted dark:hover:bg-slate-800 transition"
             >
-              {copiedLink ? <Check className="size-4 text-brand-sage" /> : <Copy className="size-4" />}
+              {copiedLink ? <Check className="size-4 text-brand-accent" /> : <Copy className="size-4" />}
               <span>{copiedLink ? 'Link Copied!' : 'Copy Shareable Link'}</span>
             </button>
 
@@ -170,41 +170,41 @@ export default function HouseholdPage() {
         {/* SECTION 1: Household Status & Quick Feed Widget */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Household Info Card */}
-          <div className="lg:col-span-7 rounded-3xl border border-stone-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
-            <div className="flex items-center justify-between">
+          <div className="lg:col-span-7 rounded-3xl border border-border/80 dark:border-border bg-card dark:bg-card p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="flex max-sm:flex-wrap max-sm:gap-3 items-center justify-between">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-brand-sage">
+                <span className="text-xs font-bold uppercase tracking-wider text-brand-accent">
                   Active Household
                 </span>
-                <h2 className="font-display text-2xl font-bold text-brand-dark dark:text-white mt-0.5">
+                <h2 className="font-display text-2xl font-bold text-foreground dark:text-white mt-0.5">
                   {householdName}
                 </h2>
               </div>
-              <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-xs font-bold flex items-center gap-1.5">
+              <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 dark:bg-emerald-950 dark:text-emerald-300 text-xs font-bold flex items-center gap-1.5">
                 <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>Online & Synced</span>
               </span>
             </div>
 
             {/* Quick Feeder Action Bar */}
-            <div className="rounded-2xl bg-brand-cream/60 dark:bg-slate-800/60 border border-stone-200/80 dark:border-slate-700 p-5 space-y-4">
+            <div className="rounded-2xl bg-background/60 dark:bg-card/60 border border-border/80 dark:border-border p-5 space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h3 className="font-bold text-sm text-brand-dark dark:text-white flex items-center gap-2">
-                    <Utensils className="size-4 text-brand-sage" />
+                  <h3 className="font-bold text-sm text-foreground dark:text-white flex items-center gap-2">
+                    <Utensils className="size-4 text-brand-accent" />
                     <span>Quick "Napakain Ko Na!" Logger</span>
                   </h3>
-                  <p className="text-xs text-stone-500 dark:text-slate-400 mt-0.5">
+                  <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-0.5">
                     Select your name and tap feed to notify everyone in the household instantly.
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-stone-500 dark:text-slate-400">Ako si:</span>
+                  <span className="text-xs font-semibold text-muted-foreground dark:text-muted-foreground">Ako si:</span>
                   <select
                     value={activeFeeder}
                     onChange={(e) => setActiveFeeder(e.target.value)}
-                    className="px-3 py-1.5 rounded-xl border border-stone-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-brand-dark dark:text-white"
+                    className="px-3 py-1.5 rounded-xl border border-border dark:border-border bg-card dark:bg-card text-xs font-bold text-foreground dark:text-white"
                   >
                     {household.map((m) => (
                       <option key={m.id} value={m.name}>
@@ -227,25 +227,25 @@ export default function HouseholdPage() {
 
             {/* Shared Pet Profiles in Household */}
             <div>
-              <h3 className="text-xs font-bold text-stone-600 dark:text-slate-400 uppercase tracking-wider mb-3">
+              <h3 className="text-xs font-bold text-muted-foreground dark:text-muted-foreground uppercase tracking-wider mb-3">
                 Shared Pets in this Household ({pets.length})
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {pets.map((pet) => (
                   <div
                     key={pet.id}
-                    className="flex items-center justify-between p-3.5 rounded-2xl border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/40"
+                    className="flex max-sm:flex-wrap max-sm:gap-3 items-center justify-between p-3.5 rounded-2xl border border-border dark:border-border bg-muted/50 dark:bg-card/40"
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">{pet.avatarEmoji}</span>
                       <div>
-                        <p className="text-sm font-bold text-brand-dark dark:text-white">{pet.name}</p>
-                        <p className="text-xs text-stone-500 dark:text-slate-400">
+                        <p className="text-sm font-bold text-foreground dark:text-white">{pet.name}</p>
+                        <p className="text-xs text-muted-foreground dark:text-muted-foreground">
                           {pet.species} • {pet.breed} ({pet.weight} kg)
                         </p>
                       </div>
                     </div>
-                    <span className="text-[11px] font-bold text-brand-sage bg-brand-sage/10 px-2 py-0.5 rounded-md">
+                    <span className="text-[11px] font-bold text-brand-accent bg-brand-sage/10 px-2 py-0.5 rounded-md">
                       Shared ✓
                     </span>
                   </div>
@@ -255,13 +255,13 @@ export default function HouseholdPage() {
           </div>
 
           {/* Members & Roles Column */}
-          <div className="lg:col-span-5 rounded-3xl border border-stone-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
-            <div className="flex items-center justify-between">
+          <div className="lg:col-span-5 rounded-3xl border border-border/80 dark:border-border bg-card dark:bg-card p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="flex max-sm:flex-wrap max-sm:gap-3 items-center justify-between">
               <div>
-                <h3 className="font-bold text-lg text-brand-dark dark:text-white">Household Members</h3>
-                <p className="text-xs text-stone-500 dark:text-slate-400">Roles and care permissions</p>
+                <h3 className="font-bold text-lg text-foreground dark:text-white">Household Members</h3>
+                <p className="text-xs text-muted-foreground dark:text-muted-foreground">Roles and care permissions</p>
               </div>
-              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-stone-100 dark:bg-slate-800 text-stone-600 dark:text-slate-300">
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-muted dark:bg-card text-muted-foreground dark:text-muted-foreground">
                 {household.length} active
               </span>
             </div>
@@ -271,7 +271,7 @@ export default function HouseholdPage() {
               {household.map((member) => (
                 <div
                   key={member.id}
-                  className="flex items-center justify-between p-3.5 rounded-2xl border border-stone-200/80 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/40"
+                  className="flex max-sm:flex-wrap max-sm:gap-3 items-center justify-between p-3.5 rounded-2xl border border-border/80 dark:border-border bg-muted/50 dark:bg-card/40"
                 >
                   <div className="flex items-center gap-3">
                     <div
@@ -282,14 +282,14 @@ export default function HouseholdPage() {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-bold text-brand-dark dark:text-white">{member.name}</p>
+                        <p className="text-sm font-bold text-foreground dark:text-white">{member.name}</p>
                         {member.isOwner && (
-                          <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded">
+                          <span className="text-[10px] font-bold bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-300 px-1.5 py-0.2 rounded">
                             Owner
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-stone-500 dark:text-slate-400">
+                      <p className="text-xs text-muted-foreground dark:text-muted-foreground">
                         {member.role ? member.role.toUpperCase() : member.isOwner ? 'Primary Caregiver' : 'Caregiver'}
                       </p>
                     </div>
@@ -299,7 +299,7 @@ export default function HouseholdPage() {
                     <button
                       type="button"
                       onClick={() => removeMember(member.id)}
-                      className="size-8 rounded-lg text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 flex items-center justify-center transition"
+                      className="size-8 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 flex items-center justify-center transition"
                       title="Remove member"
                     >
                       <Trash2 className="size-4" />
@@ -311,18 +311,18 @@ export default function HouseholdPage() {
 
             {/* Pending Invitations Section */}
             {invitations.length > 0 && (
-              <div className="pt-4 border-t border-stone-100 dark:border-slate-800 space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-slate-400">
+              <div className="pt-4 border-t border-border dark:border-border space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground dark:text-muted-foreground">
                   Pending Invitations ({invitations.length})
                 </h4>
                 {invitations.map((inv) => (
                   <div
                     key={inv.id}
-                    className="p-3 rounded-2xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/50 dark:bg-amber-950/20 flex items-center justify-between gap-2"
+                    className="p-3 rounded-2xl border border-amber-200 dark:border-amber-400/30 dark:border-amber-900/50 bg-amber-50/50 dark:bg-amber-500/15 dark:bg-amber-950/20 flex max-sm:flex-wrap max-sm:gap-3 items-center justify-between gap-2"
                   >
                     <div>
-                      <p className="text-xs font-bold text-brand-dark dark:text-white">{inv.email}</p>
-                      <p className="text-[11px] text-amber-800 dark:text-amber-300">
+                      <p className="text-xs font-bold text-foreground dark:text-white">{inv.email}</p>
+                      <p className="text-[11px] text-amber-800 dark:text-amber-300 dark:text-amber-300">
                         Role: {inv.role} • Invited {timeAgo(inv.invitedAt)}
                       </p>
                     </div>
@@ -338,7 +338,7 @@ export default function HouseholdPage() {
                       <button
                         type="button"
                         onClick={() => handleRejectInvitation(inv.id)}
-                        className="px-2.5 py-1 rounded-lg border border-stone-200 text-stone-600 text-xs font-bold hover:bg-white"
+                        className="px-2.5 py-1 rounded-lg border border-border text-muted-foreground text-xs font-bold hover:bg-card"
                       >
                         Decline
                       </button>
@@ -351,48 +351,48 @@ export default function HouseholdPage() {
         </div>
 
         {/* SECTION 2: Collaborative Household Activity History */}
-        <div className="rounded-3xl border border-stone-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
-          <div className="flex items-center justify-between">
+        <div className="rounded-3xl border border-border/80 dark:border-border bg-card dark:bg-card p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="flex max-sm:flex-wrap max-sm:gap-3 items-center justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <Activity className="size-5 text-brand-sage" />
-                <h3 className="font-bold text-xl text-brand-dark dark:text-white">Household Activity Log</h3>
+                <Activity className="size-5 text-brand-accent" />
+                <h3 className="font-bold text-xl text-foreground dark:text-white">Household Activity Log</h3>
               </div>
-              <p className="text-xs text-stone-500 dark:text-slate-400 mt-0.5">
+              <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-0.5">
                 Real-time chronological feed of feeding logs and care task completions.
               </p>
             </div>
-            <span className="text-xs font-bold text-brand-sage bg-brand-sage/10 px-3 py-1 rounded-full">
+            <span className="text-xs font-bold text-brand-accent bg-brand-sage/10 px-3 py-1 rounded-full">
               Live Updates
             </span>
           </div>
 
           <div className="space-y-3">
             {recentActivities.length === 0 ? (
-              <p className="text-sm text-stone-500 dark:text-slate-400 text-center py-8">
+              <p className="text-sm text-muted-foreground dark:text-muted-foreground text-center py-8">
                 No recent activity logged yet. Log a meal or complete a task above!
               </p>
             ) : (
               recentActivities.map((act) => (
                 <div
                   key={act.id}
-                  className="flex items-center justify-between p-3.5 rounded-2xl border border-stone-100 dark:border-slate-800 bg-stone-50/40 dark:bg-slate-800/30 hover:bg-white transition shadow-2xs"
+                  className="flex max-sm:flex-wrap max-sm:gap-3 items-center justify-between p-3.5 rounded-2xl border border-border dark:border-border bg-muted/40 dark:bg-card/30 hover:bg-card transition shadow-2xs"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="size-9 rounded-xl bg-brand-sage/15 text-brand-sage flex items-center justify-center">
+                    <div className="size-9 rounded-xl bg-brand-sage/15 text-brand-accent flex items-center justify-center">
                       {act.type === 'feeding' ? <Utensils className="size-4" /> : <CheckCircle2 className="size-4" />}
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-brand-dark dark:text-white">
-                        {act.title} for <span className="text-brand-sage">{act.petName}</span>
+                      <p className="text-sm font-bold text-foreground dark:text-white">
+                        {act.title} for <span className="text-brand-accent">{act.petName}</span>
                       </p>
-                      <p className="text-xs text-stone-500 dark:text-slate-400">
-                        Performed by <strong className="text-brand-dark dark:text-white">{act.performedBy}</strong>
+                      <p className="text-xs text-muted-foreground dark:text-muted-foreground">
+                        Performed by <strong className="text-foreground dark:text-white">{act.performedBy}</strong>
                       </p>
                     </div>
                   </div>
 
-                  <span className="text-xs font-medium text-stone-400 dark:text-slate-500">
+                  <span className="text-xs font-medium text-muted-foreground dark:text-muted-foreground">
                     {timeAgo(act.timestamp)}
                   </span>
                 </div>
@@ -403,8 +403,8 @@ export default function HouseholdPage() {
 
         {/* Security & RLS Compliance Notice */}
         <div className="rounded-2xl border border-brand-sage/20 bg-brand-sage/5 p-4 flex items-center gap-3">
-          <ShieldCheck className="size-5 text-brand-sage shrink-0" />
-          <p className="text-xs text-brand-dark/80 dark:text-slate-300">
+          <ShieldCheck className="size-5 text-brand-accent shrink-0" />
+          <p className="text-xs text-foreground/80 dark:text-muted-foreground">
             <strong>Row Level Security (RLS) Active:</strong> All household members share authorized access to feeding logs and health records through Supabase Cloud. Unauthorized third parties cannot view your pet profiles.
           </p>
         </div>
@@ -413,16 +413,16 @@ export default function HouseholdPage() {
       {/* Invite Member Modal */}
       {isInviteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-800 shadow-2xl p-6 space-y-5">
-            <div className="flex items-center justify-between">
-              <h3 className="font-bold text-lg text-brand-dark dark:text-white flex items-center gap-2">
-                <UserPlus className="size-5 text-brand-sage" />
+          <div className="relative w-full max-w-md rounded-3xl bg-card dark:bg-card border border-border dark:border-border shadow-2xl max-h-[calc(100dvh-2rem)] overflow-y-auto p-6 space-y-5">
+            <div className="flex max-sm:flex-wrap max-sm:gap-3 items-center justify-between">
+              <h3 className="font-bold text-lg text-foreground dark:text-white flex items-center gap-2">
+                <UserPlus className="size-5 text-brand-accent" />
                 <span>Invite Household Member</span>
               </h3>
               <button
                 type="button"
                 onClick={() => setIsInviteModalOpen(false)}
-                className="size-8 rounded-full text-stone-400 hover:text-stone-700 dark:hover:text-white flex items-center justify-center"
+                className="size-8 rounded-full text-muted-foreground hover:text-muted-foreground dark:hover:text-white flex items-center justify-center"
               >
                 ✕
               </button>
@@ -430,7 +430,7 @@ export default function HouseholdPage() {
 
             <form onSubmit={handleSendInvite} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-stone-600 dark:text-slate-300 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-bold text-muted-foreground dark:text-muted-foreground uppercase tracking-wider mb-1">
                   Email Address or Name
                 </label>
                 <input
@@ -439,18 +439,18 @@ export default function HouseholdPage() {
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   placeholder="e.g. maria.santos@gmail.com"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium text-brand-dark dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-sage/40"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border dark:border-border bg-card dark:bg-card text-sm font-medium text-foreground dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-sage/40"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-stone-600 dark:text-slate-300 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-bold text-muted-foreground dark:text-muted-foreground uppercase tracking-wider mb-1">
                   Household Role & Permissions
                 </label>
                 <select
                   value={inviteRole}
                   onChange={(e) => setInviteRole(e.target.value as any)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-bold text-brand-dark dark:text-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border dark:border-border bg-card dark:bg-card text-sm font-bold text-foreground dark:text-white"
                 >
                   <option value="caregiver">Caregiver (Can log feeding & complete tasks)</option>
                   <option value="admin">Family Admin (Full pet & schedule edit permissions)</option>
@@ -462,7 +462,7 @@ export default function HouseholdPage() {
                 <button
                   type="button"
                   onClick={() => setIsInviteModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-stone-200 text-xs font-bold text-stone-600 hover:bg-stone-50"
+                  className="px-4 py-2 rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted"
                 >
                   Cancel
                 </button>

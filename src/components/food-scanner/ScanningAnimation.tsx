@@ -81,20 +81,20 @@ export default function ScanningAnimation({
     <div className="mx-auto max-w-2xl space-y-6 py-4 animate-fade-in">
       {/* Title */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-brand-sage/10 px-3.5 py-1 text-xs font-semibold text-brand-sage">
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-brand-sage/10 px-3.5 py-1 text-xs font-semibold text-brand-accent">
           <Sparkles className="h-3.5 w-3.5 animate-spin" />
           <span>Analyzing Pet Food Label</span>
         </div>
-        <h2 className="font-display text-2xl font-bold text-brand-dark sm:text-3xl">
+        <h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">
           Scanning Guaranteed Analysis
         </h2>
-        <p className="text-sm text-brand-dark/70">
+        <p className="text-sm text-foreground/70">
           Our AI optical parser is reading the nutrient density and guaranteed ratios.
         </p>
       </div>
 
       {/* Laser Scanning Viewport */}
-      <div className="relative mx-auto aspect-[4/3] w-full max-w-lg overflow-hidden rounded-2xl border-2 border-brand-dark/15 bg-brand-dark shadow-xl">
+      <div className="relative mx-auto aspect-[4/3] w-full max-w-lg overflow-hidden rounded-2xl border-2 border-foreground/15 bg-brand-dark shadow-xl">
         {/* Background Image / Mock Label */}
         {previewUrl ? (
           <img
@@ -115,7 +115,7 @@ export default function ScanningAnimation({
                 </p>
               </div>
               <div className="text-right">
-                <span className="rounded bg-white/10 px-2 py-0.5 text-[10px] text-white/80">
+                <span className="rounded bg-card/10 px-2 py-0.5 text-[10px] text-white/80">
                   NET WT {data.packageWeight ? `${data.packageWeight}g` : '1.5 kg'}
                 </span>
               </div>
@@ -200,7 +200,7 @@ export default function ScanningAnimation({
 
       {/* Progress Bar */}
       <div className="space-y-1.5">
-        <div className="flex justify-between text-xs font-semibold text-brand-dark">
+        <div className="flex justify-between text-xs font-semibold text-foreground">
           <span>Analysis Progress</span>
           <span>{progress}%</span>
         </div>
@@ -213,7 +213,7 @@ export default function ScanningAnimation({
       </div>
 
       {/* Step Indicators */}
-      <div className="rounded-xl border border-brand-dark/10 bg-white p-4 shadow-sm space-y-3">
+      <div className="rounded-xl border border-foreground/10 bg-card p-4 shadow-sm space-y-3">
         {steps.map((s) => {
           const isDone = currentStep > s.id || progress === 100
           const isActive = currentStep === s.id && progress < 100
@@ -224,24 +224,24 @@ export default function ScanningAnimation({
               key={s.id}
               className={`flex items-start gap-3 rounded-lg p-2 transition-all ${
                 isActive
-                  ? 'bg-brand-sage/10 text-brand-dark font-medium'
+                  ? 'bg-brand-sage/10 text-foreground font-medium'
                   : isDone
-                    ? 'text-brand-dark'
-                    : 'opacity-40 text-brand-dark/60'
+                    ? 'text-foreground'
+                    : 'opacity-40 text-foreground/60'
               }`}
             >
               <div className="mt-0.5 shrink-0">
                 {isDone ? (
-                  <CheckCircle2 className="h-5 w-5 text-brand-sage" />
+                  <CheckCircle2 className="h-5 w-5 text-brand-accent" />
                 ) : isActive ? (
-                  <Loader2 className="h-5 w-5 text-brand-sage animate-spin" />
+                  <Loader2 className="h-5 w-5 text-brand-accent animate-spin" />
                 ) : (
-                  <StepIcon className="h-5 w-5 text-brand-dark/40" />
+                  <StepIcon className="h-5 w-5 text-foreground/40" />
                 )}
               </div>
               <div className="flex-1">
                 <p className="text-sm font-semibold">{s.label}</p>
-                <p className="text-xs text-brand-dark/70">{s.detail}</p>
+                <p className="text-xs text-foreground/70">{s.detail}</p>
               </div>
             </div>
           )
@@ -254,7 +254,7 @@ export default function ScanningAnimation({
           <button
             type="button"
             onClick={onCancel}
-            className="text-xs font-semibold text-brand-dark/60 hover:text-brand-alert transition"
+            className="text-xs font-semibold text-foreground/60 hover:text-destructive transition"
           >
             Cancel Scan
           </button>
@@ -264,7 +264,7 @@ export default function ScanningAnimation({
         <button
           type="button"
           onClick={onComplete}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-sage hover:underline"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-accent hover:underline"
         >
           <span>Skip to results</span>
           <span>→</span>

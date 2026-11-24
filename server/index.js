@@ -348,6 +348,7 @@ app.post('/api/pets', (req, res) => {
     weight: weightNum,
     age: Number(age) || 12,
     neutered: Boolean(neutered),
+    sex: ['male', 'female'].includes(req.body.sex) ? req.body.sex : 'unknown',
     lifeStage: lifeStage || 'adult',
     avatarEmoji: avatarEmoji || (species === 'cat' ? '🐱' : '🐕'),
     dailyCalorieTarget,

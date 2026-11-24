@@ -161,24 +161,24 @@ export default function FoodScannerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-brand-cream/30 pb-20 pt-8 sm:pt-12 px-4 sm:px-8 lg:px-12">
+    <div className="min-h-screen bg-background/30 pb-20 pt-8 sm:pt-12 px-4 sm:px-8 lg:px-12">
       <div className="mx-auto max-w-[1600px]">
         {/* Top Navigation & Pet Header */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-brand-dark/10 pb-4">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-foreground/10 pb-4">
           <div className="flex items-center gap-2">
             {mode === 'results' ? (
               <button
                 type="button"
                 onClick={handleReset}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-brand-dark/15 bg-white px-3 py-2 text-xs font-semibold text-brand-dark shadow-xs hover:bg-brand-cream/50 transition"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-foreground/15 bg-card px-3 py-2 text-xs font-semibold text-foreground shadow-xs hover:bg-background/50 transition"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span>Scan Another Label</span>
               </button>
             ) : (
-              <div className="inline-flex items-center gap-2 text-sm text-brand-dark/60">
-                <ScanLine className="h-4 w-4 text-brand-sage" />
-                <span className="font-semibold text-brand-dark">Nutrition Scanner</span>
+              <div className="inline-flex items-center gap-2 text-sm text-foreground/60">
+                <ScanLine className="h-4 w-4 text-brand-accent" />
+                <span className="font-semibold text-foreground">Nutrition Scanner</span>
                 <ChevronRight className="h-3.5 w-3.5" />
                 <span>{mode === 'upload' ? 'Upload Label' : 'Analyzing'}</span>
               </div>
@@ -187,14 +187,14 @@ export default function FoodScannerPage() {
 
           {/* Active Pet Selector */}
           {pets.length > 0 && (
-            <div className="flex items-center gap-2.5 rounded-2xl border border-brand-dark/10 bg-white px-3.5 py-1.5 shadow-xs">
-              <span className="text-xs font-medium text-brand-dark/60">Scanning for:</span>
+            <div className="flex items-center gap-2.5 rounded-2xl border border-foreground/10 bg-card px-3.5 py-1.5 shadow-xs">
+              <span className="text-xs font-medium text-foreground/60">Scanning for:</span>
               <div className="flex items-center gap-1.5">
                 <span className="text-base">{activePet?.avatarEmoji || '🐾'}</span>
                 <select
                   value={activePet?.id || ''}
                   onChange={(e) => setActivePet(e.target.value)}
-                  className="rounded-lg bg-transparent text-xs font-bold text-brand-dark focus:outline-none cursor-pointer"
+                  className="rounded-lg bg-transparent text-xs font-bold text-foreground focus:outline-none cursor-pointer"
                 >
                   {pets.map((p) => (
                     <option key={p.id} value={p.id}>
@@ -230,15 +230,15 @@ export default function FoodScannerPage() {
         {mode === 'results' && scannedData && (
           <div className="animate-slide-up space-y-8">
             {scannedData.isFoodItem === false ? (
-              <div className="rounded-2xl border-2 border-amber-300 bg-amber-50/90 p-8 text-center shadow-sm space-y-4 max-w-xl mx-auto my-8">
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-100 text-amber-600">
+              <div className="rounded-2xl border-2 border-amber-300 dark:border-amber-400/30 bg-amber-50/90 dark:bg-amber-500/15 p-8 text-center shadow-sm space-y-4 max-w-xl mx-auto my-8">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-100 dark:bg-amber-500/15 text-amber-600 dark:text-amber-300">
                   <AlertTriangle className="h-8 w-8" />
                 </div>
                 <div className="space-y-1.5">
-                  <h2 className="font-display text-2xl font-bold text-amber-950">
+                  <h2 className="font-display text-2xl font-bold text-amber-950 dark:text-amber-300">
                     Not a Food Item Detected
                   </h2>
-                  <p className="text-sm text-amber-900/80 leading-relaxed">
+                  <p className="text-sm text-amber-900/80 dark:text-amber-300 leading-relaxed">
                     {scannedData.suitabilityNote ||
                       'The uploaded image does not appear to be a pet food packaging or food product. Please upload a clear photo of an actual pet food label or nutrition guaranteed analysis table.'}
                   </p>
@@ -257,19 +257,19 @@ export default function FoodScannerPage() {
             ) : (
               <>
                 {/* Action Bar Header */}
-                <div className="rounded-2xl border border-brand-dark/10 bg-white p-4 sm:p-5 shadow-sm">
+                <div className="rounded-2xl border border-foreground/10 bg-card p-4 sm:p-5 shadow-sm">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-brand-sage/10 px-2.5 py-0.5 text-xs font-bold text-brand-sage">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-brand-sage/10 px-2.5 py-0.5 text-xs font-bold text-brand-accent">
                           <Sparkles className="h-3.5 w-3.5" />
                           Analysis Completed
                         </span>
-                        <span className="text-xs text-brand-dark/50">
+                        <span className="text-xs text-foreground/50">
                           ID: #{Math.abs(scannedData.productName.length * 4829).toString().slice(0, 5)}
                         </span>
                       </div>
-                      <h1 className="font-display mt-1 text-xl font-bold text-brand-dark sm:text-2xl">
+                      <h1 className="font-display mt-1 text-xl font-bold text-foreground sm:text-2xl">
                         {scannedData.productName}
                       </h1>
                     </div>
@@ -281,18 +281,18 @@ export default function FoodScannerPage() {
                         disabled={isSavedToLibrary}
                         className={`inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-xs font-bold transition shadow-xs ${
                           isSavedToLibrary
-                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 cursor-default'
-                            : 'border border-brand-dark/20 bg-white text-brand-dark hover:border-brand-sage hover:bg-brand-cream/50'
+                            ? 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-400/30 cursor-default'
+                            : 'border border-foreground/20 bg-card text-foreground hover:border-brand-sage hover:bg-background/50'
                         }`}
                       >
                         {isSavedToLibrary ? (
                           <>
-                            <CheckCircle className="h-4 w-4 text-emerald-700" />
+                            <CheckCircle className="h-4 w-4 text-emerald-700 dark:text-emerald-300" />
                             <span>Saved in Library</span>
                           </>
                         ) : (
                           <>
-                            <BookmarkPlus className="h-4 w-4 text-brand-sage" />
+                            <BookmarkPlus className="h-4 w-4 text-brand-accent" />
                             <span>Save to Food Library</span>
                           </>
                         )}
@@ -310,7 +310,7 @@ export default function FoodScannerPage() {
                       <button
                         type="button"
                         onClick={handleReset}
-                        className="inline-flex items-center gap-1.5 rounded-xl border border-brand-dark/15 bg-white p-2.5 text-xs font-medium text-brand-dark hover:bg-brand-cream/60 transition"
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-foreground/15 bg-card p-2.5 text-xs font-medium text-foreground hover:bg-background/60 transition"
                         title="Scan another label"
                       >
                         <RotateCcw className="h-4 w-4" />
@@ -325,13 +325,13 @@ export default function FoodScannerPage() {
                   <div className="space-y-6 lg:col-span-5">
                     {/* Photo Thumbnail / Label Snapshot Card */}
                     {previewUrl ? (
-                      <div className="overflow-hidden rounded-2xl border border-brand-dark/10 bg-white shadow-sm">
-                        <div className="border-b border-brand-dark/10 px-4 py-2.5 text-xs font-bold text-brand-dark flex items-center justify-between">
+                      <div className="overflow-hidden rounded-2xl border border-foreground/10 bg-card shadow-sm">
+                        <div className="border-b border-foreground/10 px-4 py-2.5 text-xs font-bold text-foreground flex items-center justify-between">
                           <span className="flex items-center gap-1.5">
-                            <Layers className="h-3.5 w-3.5 text-brand-sage" />
+                            <Layers className="h-3.5 w-3.5 text-brand-accent" />
                             Scanned Packaging Snapshot
                           </span>
-                          <span className="text-[11px] text-brand-dark/50 font-normal">
+                          <span className="text-[11px] text-foreground/50 font-normal">
                             Original Photo
                           </span>
                         </div>
@@ -344,13 +344,13 @@ export default function FoodScannerPage() {
                         </div>
                       </div>
                     ) : (
-                      <div className="rounded-2xl border border-brand-dark/10 bg-gradient-to-r from-brand-sage/15 to-brand-dark/5 p-4 text-xs text-brand-dark flex items-center gap-3">
-                        <div className="rounded-xl bg-brand-sage/20 p-2 text-brand-sage">
+                      <div className="rounded-2xl border border-foreground/10 bg-gradient-to-r from-brand-sage/15 to-brand-dark/5 p-4 text-xs text-foreground flex items-center gap-3">
+                        <div className="rounded-xl bg-brand-sage/20 p-2 text-brand-accent">
                           <Sparkles className="h-5 w-5" />
                         </div>
                         <div>
                           <p className="font-bold">Sample Preset Loaded</p>
-                          <p className="text-brand-dark/70">
+                          <p className="text-foreground/70">
                             {scannedData.sampleLabel || 'Pre-verified nutritional package profile'}
                           </p>
                         </div>
@@ -364,8 +364,8 @@ export default function FoodScannerPage() {
                     />
 
                     {/* Helpful Philippine Tip */}
-                    <div className="rounded-2xl border border-brand-dark/10 bg-white p-4 text-xs text-brand-dark/70 flex items-start gap-2.5 shadow-xs">
-                      <Info className="h-4 w-4 text-brand-sage shrink-0 mt-0.5" />
+                    <div className="rounded-2xl border border-foreground/10 bg-card p-4 text-xs text-foreground/70 flex items-start gap-2.5 shadow-xs">
+                      <Info className="h-4 w-4 text-brand-accent shrink-0 mt-0.5" />
                       <p>
                         <strong>Tip sa pagpapakain:</strong> You can edit any value in the form above if your package has different numbers. Your verdict and price per calorie recalculate in real-time.
                       </p>

@@ -34,8 +34,8 @@ export default function PetSwitcher({ onAddPet, onEditPet }: PetSwitcherProps) {
               onClick={() => setActivePet(pet.id)}
               className={`group flex items-center gap-2.5 shrink-0 rounded-2xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
                 isActive
-                  ? 'bg-brand-dark text-white shadow-md ring-2 ring-brand-dark/20 scale-[1.02]'
-                  : 'bg-white text-brand-dark/80 hover:bg-brand-cream border border-brand-dark/10 hover:border-brand-dark/25'
+                  ? 'bg-brand-dark text-white shadow-md ring-2 ring-foreground/20 scale-[1.02]'
+                  : 'bg-card text-foreground/80 hover:bg-background border border-foreground/10 hover:border-foreground/25'
               }`}
             >
               <span className="text-xl leading-none">{pet.avatarEmoji || (pet.species === 'dog' ? '🐶' : '🐱')}</span>
@@ -43,12 +43,12 @@ export default function PetSwitcher({ onAddPet, onEditPet }: PetSwitcherProps) {
                 <div className="flex items-center gap-1.5">
                   <span className="font-bold tracking-tight">{pet.name}</span>
                   {pet.species === 'dog' ? (
-                    <Dog className={`h-3 w-3 ${isActive ? 'text-brand-cream/80' : 'text-brand-sage'}`} />
+                    <Dog className={`h-3 w-3 ${isActive ? 'text-brand-cream/80' : 'text-brand-accent'}`} />
                   ) : (
-                    <Cat className={`h-3 w-3 ${isActive ? 'text-brand-cream/80' : 'text-brand-sage'}`} />
+                    <Cat className={`h-3 w-3 ${isActive ? 'text-brand-cream/80' : 'text-brand-accent'}`} />
                   )}
                 </div>
-                <div className={`text-[11px] ${isActive ? 'text-brand-cream/70' : 'text-brand-dark/50'}`}>
+                <div className={`text-[11px] ${isActive ? 'text-brand-cream/70' : 'text-foreground/50'}`}>
                   {pet.weight} kg • {pet.breed || pet.species}
                 </div>
               </div>
@@ -59,7 +59,7 @@ export default function PetSwitcher({ onAddPet, onEditPet }: PetSwitcherProps) {
         {/* Add Pet Pill */}
         <button
           onClick={onAddPet}
-          className="flex items-center gap-2 shrink-0 rounded-2xl border-2 border-dashed border-brand-dark/20 px-4 py-2.5 text-sm font-semibold text-brand-dark/70 hover:border-brand-sage hover:bg-brand-sage/5 hover:text-brand-sage transition"
+          className="flex items-center gap-2 shrink-0 rounded-2xl border-2 border-dashed border-foreground/20 px-4 py-2.5 text-sm font-semibold text-foreground/70 hover:border-brand-sage hover:bg-brand-sage/5 hover:text-brand-accent transition"
         >
           <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-dark/5 group-hover:bg-brand-sage/10">
             <Plus className="h-3.5 w-3.5" />
@@ -70,24 +70,24 @@ export default function PetSwitcher({ onAddPet, onEditPet }: PetSwitcherProps) {
 
       {/* Active Pet Quick Stats Card */}
       {activePet && (
-        <div className="rounded-2xl bg-white border border-brand-dark/10 shadow-xs p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
+        <div className="rounded-2xl bg-card border border-foreground/10 shadow-xs p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-cream text-2xl shadow-xs">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-background text-2xl shadow-xs">
               {activePet.avatarEmoji || (activePet.species === 'dog' ? '🐶' : '🐱')}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-display text-lg font-bold text-brand-dark">
+                <h3 className="font-display text-lg font-bold text-foreground">
                   {activePet.name}
                 </h3>
-                <span className="rounded-full bg-brand-sage/10 px-2.5 py-0.5 text-xs font-semibold text-brand-sage capitalize">
+                <span className="rounded-full bg-brand-sage/10 px-2.5 py-0.5 text-xs font-semibold text-brand-accent capitalize">
                   {activePet.lifeStage} {activePet.species}
                 </span>
-                <span className="rounded-full bg-brand-cream px-2 py-0.5 text-[11px] font-medium text-brand-dark/70">
+                <span className="rounded-full bg-background px-2 py-0.5 text-[11px] font-medium text-foreground/70">
                   {activePet.neutered ? 'Kapon / Neutered' : 'Intact'}
                 </span>
               </div>
-              <p className="text-xs text-brand-dark/60 mt-0.5">
+              <p className="text-xs text-foreground/60 mt-0.5">
                 {activePet.breed} • {formatPetAge(activePet.age)} old • {activePet.weight} kg
               </p>
             </div>
@@ -103,14 +103,14 @@ export default function PetSwitcher({ onAddPet, onEditPet }: PetSwitcherProps) {
                 onClick={() => setShowTooltip((prev) => !prev)}
               >
                 <div className="text-right">
-                  <span className="block text-[10px] font-bold uppercase tracking-wider text-brand-sage">
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-brand-accent">
                     Target
                   </span>
-                  <span className="text-sm font-extrabold text-brand-dark">
+                  <span className="text-sm font-extrabold text-foreground">
                     {activePet.dailyCalorieTarget} kcal/day
                   </span>
                 </div>
-                <Info className="h-4 w-4 text-brand-sage opacity-70" />
+                <Info className="h-4 w-4 text-brand-accent opacity-70" />
               </div>
 
               {/* RER Tooltip */}
@@ -130,9 +130,9 @@ export default function PetSwitcher({ onAddPet, onEditPet }: PetSwitcherProps) {
             {/* Edit Pet Button */}
             <button
               onClick={() => onEditPet(activePet)}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-brand-dark/15 px-3 py-2 text-xs font-semibold text-brand-dark hover:bg-brand-cream transition"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-foreground/15 px-3 py-2 text-xs font-semibold text-foreground hover:bg-background transition"
             >
-              <Edit3 className="h-3.5 w-3.5 text-brand-dark/60" />
+              <Edit3 className="h-3.5 w-3.5 text-foreground/60" />
               <span>Edit</span>
             </button>
           </div>

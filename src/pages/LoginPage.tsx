@@ -131,8 +131,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#edf2f7] dark:bg-[#071010] flex items-center justify-center p-4 sm:p-6 lg:p-10 font-sans antialiased text-slate-900 dark:text-slate-100 transition-colors duration-300">
-      <div className="w-full max-w-5xl rounded-[36px] bg-white dark:bg-[#132525] shadow-2xl overflow-hidden border border-slate-200/70 dark:border-slate-800 grid grid-cols-1 lg:grid-cols-12 min-h-[640px] transition-colors duration-300">
+    <div className="min-h-screen w-full bg-background dark:bg-[#071010] flex items-center justify-center p-4 sm:p-6 lg:p-10 font-sans antialiased text-foreground dark:text-slate-100 transition-colors duration-300">
+      <div className="w-full max-w-5xl rounded-[36px] bg-card dark:bg-[#132525] shadow-2xl overflow-hidden border border-border/70 dark:border-border grid grid-cols-1 lg:grid-cols-12 min-h-[640px] transition-colors duration-300">
         
         {/* ── LEFT CARD: Dark Brand Showcase ── */}
         <div className="lg:col-span-5 bg-[#164040] text-white p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden">
@@ -142,7 +142,7 @@ export default function LoginPage() {
 
           {/* Top header row: Pill badge on left, Dark/Light Mode Toggle Switch on right */}
           <div className="relative z-10 flex items-center justify-between gap-3">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1 text-xs font-semibold text-emerald-200 backdrop-blur-sm">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-card/10 px-3.5 py-1 text-xs font-semibold text-emerald-200 backdrop-blur-sm">
               <Sparkles className="size-3.5 text-amber-300 animate-pulse" />
               Pinoy Pet Care Platform
             </span>
@@ -154,7 +154,7 @@ export default function LoginPage() {
               className={`group relative inline-flex h-8 w-16 shrink-0 items-center rounded-full p-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-300/50 cursor-pointer shadow-md ${
                 theme === 'dark'
                   ? 'bg-[#18181b] border border-white/20'
-                  : 'bg-[#e2e8f0] border border-slate-300/80'
+                  : 'bg-[#e2e8f0] border border-border/80'
               }`}
               aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
               title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
@@ -164,15 +164,15 @@ export default function LoginPage() {
                 <Sun
                   className={`size-3.5 transition-all duration-300 ${
                     theme === 'light'
-                      ? 'text-slate-800 scale-100 opacity-100'
-                      : 'text-slate-500 scale-75 opacity-0'
+                      ? 'text-foreground scale-100 opacity-100'
+                      : 'text-muted-foreground scale-75 opacity-0'
                   }`}
                 />
                 <Moon
                   className={`size-3.5 transition-all duration-300 ${
                     theme === 'dark'
                       ? 'text-white scale-100 opacity-100'
-                      : 'text-slate-400 scale-75 opacity-0'
+                      : 'text-muted-foreground scale-75 opacity-0'
                   }`}
                 />
               </div>
@@ -181,7 +181,7 @@ export default function LoginPage() {
               <span
                 className={`relative z-10 inline-block size-6 transform rounded-full shadow-md transition-transform duration-300 ease-in-out ${
                   theme === 'dark'
-                    ? 'translate-x-0 bg-white ring-1 ring-black/10'
+                    ? 'translate-x-0 bg-card ring-1 ring-black/10'
                     : 'translate-x-8 bg-[#1e293b] ring-1 ring-white/10'
                 }`}
               />
@@ -233,11 +233,11 @@ export default function LoginPage() {
         </div>
 
         {/* ── RIGHT CARD: Floating Authentication Form ── */}
-        <div className="lg:col-span-7 p-6 sm:p-10 lg:p-12 flex flex-col justify-center bg-white dark:bg-[#132525] transition-colors duration-300">
+        <div className="lg:col-span-7 p-6 sm:p-10 lg:p-12 flex flex-col justify-center bg-card dark:bg-[#132525] transition-colors duration-300">
           <div className="w-full max-w-md mx-auto">
             
             {/* Top Segmented Pill Tabs */}
-            <div className="mb-6 flex rounded-full bg-slate-100 dark:bg-[#0e1d1d] p-1 text-xs font-bold text-slate-600 dark:text-slate-400 shadow-inner">
+            <div className="mb-6 flex rounded-full bg-muted dark:bg-[#0e1d1d] p-1 text-xs font-bold text-muted-foreground dark:text-muted-foreground shadow-inner">
               <button
                 type="button"
                 onClick={() => {
@@ -247,8 +247,8 @@ export default function LoginPage() {
                 }}
                 className={`flex-1 rounded-full py-2.5 transition-all duration-200 text-center cursor-pointer ${
                   mode === 'signin'
-                    ? 'bg-white dark:bg-[#1a3333] text-slate-900 dark:text-white shadow-sm'
-                    : 'hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-card dark:bg-[#1a3333] text-foreground dark:text-white shadow-sm'
+                    : 'hover:text-foreground dark:hover:text-white'
                 }`}
               >
                 Sign in
@@ -262,8 +262,8 @@ export default function LoginPage() {
                 }}
                 className={`flex-1 rounded-full py-2.5 transition-all duration-200 text-center cursor-pointer ${
                   mode === 'signup'
-                    ? 'bg-white dark:bg-[#1a3333] text-slate-900 dark:text-white shadow-sm'
-                    : 'hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-card dark:bg-[#1a3333] text-foreground dark:text-white shadow-sm'
+                    : 'hover:text-foreground dark:hover:text-white'
                 }`}
               >
                 Sign up
@@ -277,7 +277,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={handleGoogleLogin}
                 disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-2.5 rounded-full border border-slate-300/90 dark:border-slate-700 bg-white dark:bg-[#1a3333] py-2.5 px-4 text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-[#203f3f] shadow-xs transition-all disabled:opacity-50 cursor-pointer"
+                className="w-full flex items-center justify-center gap-2.5 rounded-full border border-border/90 dark:border-border bg-card dark:bg-[#1a3333] py-2.5 px-4 text-xs font-bold text-foreground dark:text-slate-100 hover:bg-muted dark:hover:bg-[#203f3f] shadow-xs transition-all disabled:opacity-50 cursor-pointer"
               >
                 {/* Standard Google "G" SVG */}
                 <svg className="size-4 shrink-0" viewBox="0 0 24 24">
@@ -304,16 +304,16 @@ export default function LoginPage() {
 
             {/* Divider */}
             <div className="relative my-6 text-center">
-              <hr className="border-slate-200 dark:border-slate-700" />
-              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-[#132525] px-3 text-xs font-semibold text-slate-400 dark:text-slate-500">
+              <hr className="border-border dark:border-border" />
+              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card dark:bg-[#132525] px-3 text-xs font-semibold text-muted-foreground dark:text-muted-foreground">
                 or
               </span>
             </div>
 
             {/* Alert Notifications */}
             {errorMessage && (
-              <div className="mb-4 flex items-start gap-2.5 rounded-2xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/40 p-3.5 text-xs text-rose-800 dark:text-rose-300">
-                <AlertCircle className="size-4 shrink-0 text-rose-600 dark:text-rose-400 mt-0.5" />
+              <div className="mb-4 flex items-start gap-2.5 rounded-2xl border border-rose-200 dark:border-rose-400/30 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-500/15 dark:bg-rose-950/40 p-3.5 text-xs text-rose-800 dark:text-rose-300 dark:text-rose-300">
+                <AlertCircle className="size-4 shrink-0 text-rose-600 dark:text-rose-300 dark:text-rose-400 mt-0.5" />
                 <div className="flex-1 leading-relaxed">{errorMessage}</div>
                 <button
                   type="button"
@@ -326,8 +326,8 @@ export default function LoginPage() {
             )}
 
             {successMessage && (
-              <div className="mb-4 flex items-start gap-2.5 rounded-2xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50 dark:bg-emerald-950/40 p-3.5 text-xs text-emerald-800 dark:text-emerald-300">
-                <CheckCircle2 className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400 mt-0.5" />
+              <div className="mb-4 flex items-start gap-2.5 rounded-2xl border border-emerald-200 dark:border-emerald-400/30 dark:border-emerald-900/60 bg-emerald-50 dark:bg-emerald-500/15 dark:bg-emerald-950/40 p-3.5 text-xs text-emerald-800 dark:text-emerald-300 dark:text-emerald-300">
+                <CheckCircle2 className="size-4 shrink-0 text-emerald-600 dark:text-emerald-300 dark:text-emerald-400 mt-0.5" />
                 <div className="flex-1 leading-relaxed">{successMessage}</div>
               </div>
             )}
@@ -336,46 +336,46 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit} className="space-y-3.5">
               {mode === 'signup' && (
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-bold text-muted-foreground dark:text-muted-foreground mb-1">
                     Pangalan (Full Name)
                   </label>
                   <div className="relative">
-                    <UserIcon className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                    <UserIcon className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                     <input
                       type="text"
                       required
                       placeholder="e.g. Maria Santos"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-[#0e1d1d] py-2.5 pl-10 pr-4 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-brand-sage focus:bg-white dark:focus:bg-[#0e1d1d] focus:outline-none focus:ring-2 focus:ring-brand-sage/20 transition-all"
+                      className="w-full rounded-xl border border-border dark:border-border bg-muted/60 dark:bg-[#0e1d1d] py-2.5 pl-10 pr-4 text-sm text-foreground dark:text-white placeholder:text-muted-foreground dark:placeholder:text-muted-foreground focus:border-brand-sage focus:bg-card dark:focus:bg-[#0e1d1d] focus:outline-none focus:ring-2 focus:ring-brand-sage/20 transition-all"
                     />
                   </div>
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-muted-foreground dark:text-muted-foreground mb-1">
                   Email
                 </label>
                 <div className="relative">
-                  <Mail className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                  <Mail className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <input
                     type="email"
                     required
                     placeholder="ikaw@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-[#0e1d1d] py-2.5 pl-10 pr-4 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-brand-sage focus:bg-white dark:focus:bg-[#0e1d1d] focus:outline-none focus:ring-2 focus:ring-brand-sage/20 transition-all"
+                    className="w-full rounded-xl border border-border dark:border-border bg-muted/60 dark:bg-[#0e1d1d] py-2.5 pl-10 pr-4 text-sm text-foreground dark:text-white placeholder:text-muted-foreground dark:placeholder:text-muted-foreground focus:border-brand-sage focus:bg-card dark:focus:bg-[#0e1d1d] focus:outline-none focus:ring-2 focus:ring-brand-sage/20 transition-all"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-muted-foreground dark:text-muted-foreground mb-1">
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                  <Lock className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
@@ -383,12 +383,12 @@ export default function LoginPage() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-[#0e1d1d] py-2.5 pl-10 pr-10 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-brand-sage focus:bg-white dark:focus:bg-[#0e1d1d] focus:outline-none focus:ring-2 focus:ring-brand-sage/20 transition-all"
+                    className="w-full rounded-xl border border-border dark:border-border bg-muted/60 dark:bg-[#0e1d1d] py-2.5 pl-10 pr-10 text-sm text-foreground dark:text-white placeholder:text-muted-foreground dark:placeholder:text-muted-foreground focus:border-brand-sage focus:bg-card dark:focus:bg-[#0e1d1d] focus:outline-none focus:ring-2 focus:ring-brand-sage/20 transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground dark:hover:text-slate-200 cursor-pointer"
                   >
                     {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                   </button>
@@ -397,12 +397,12 @@ export default function LoginPage() {
 
               {/* Sub-row: Remember me & Forgot Password */}
               <div className="flex items-center justify-between pt-1 text-xs">
-                <label className="flex items-center gap-2 text-slate-600 dark:text-slate-400 cursor-pointer select-none">
+                <label className="flex items-center gap-2 text-muted-foreground dark:text-muted-foreground cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="size-4 rounded border-slate-300 text-brand-sage focus:ring-brand-sage"
+                    className="size-4 rounded border-border text-brand-accent focus:ring-brand-sage"
                   />
                   <span>Remember me</span>
                 </label>
@@ -410,7 +410,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setForgotModalOpen(true)}
-                  className="font-bold text-brand-dark dark:text-emerald-400 hover:text-brand-sage transition-colors cursor-pointer"
+                  className="font-bold text-foreground dark:text-emerald-400 hover:text-brand-accent transition-colors cursor-pointer"
                 >
                   Forgot password?
                 </button>
@@ -433,7 +433,7 @@ export default function LoginPage() {
               </button>
 
               {/* Terms of Service notice */}
-              <p className="text-[11px] text-center text-slate-400 leading-normal pt-1">
+              <p className="text-[11px] text-center text-muted-foreground leading-normal pt-1">
                 By signing in you agree to Animeal's terms of service, privacy policy, and cookie usage.
               </p>
             </form>
@@ -445,9 +445,9 @@ export default function LoginPage() {
       {/* Forgot Password Modal */}
       {forgotModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="w-full max-w-sm rounded-3xl bg-white dark:bg-[#132525] p-6 shadow-2xl border border-slate-200/60 dark:border-slate-800 transition-colors">
-            <h3 className="font-display text-lg font-bold text-slate-900 dark:text-white">Reset Password</h3>
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          <div className="w-full max-w-sm rounded-3xl bg-card dark:bg-[#132525] p-6 shadow-2xl border border-border/60 dark:border-border transition-colors">
+            <h3 className="font-display text-lg font-bold text-foreground dark:text-white">Reset Password</h3>
+            <p className="mt-1 text-xs text-muted-foreground dark:text-muted-foreground">
               Enter your account email to receive a password reset link.
             </p>
             <form onSubmit={handleForgotPassword} className="mt-4 space-y-3">
@@ -457,13 +457,13 @@ export default function LoginPage() {
                 placeholder="ikaw@example.com"
                 value={forgotEmail}
                 onChange={(e) => setForgotEmail(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-[#0e1d1d] p-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-brand-sage focus:outline-none focus:ring-2 focus:ring-brand-sage/20 transition-all"
+                className="w-full rounded-xl border border-border dark:border-border bg-muted/60 dark:bg-[#0e1d1d] p-2.5 text-sm text-foreground dark:text-white placeholder:text-muted-foreground dark:placeholder:text-muted-foreground focus:border-brand-sage focus:outline-none focus:ring-2 focus:ring-brand-sage/20 transition-all"
               />
               <div className="flex gap-2 justify-end pt-2">
                 <button
                   type="button"
                   onClick={() => setForgotModalOpen(false)}
-                  className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#1a3333] cursor-pointer"
+                  className="rounded-xl px-4 py-2 text-xs font-semibold text-muted-foreground dark:text-muted-foreground hover:bg-muted dark:hover:bg-[#1a3333] cursor-pointer"
                 >
                   Cancel
                 </button>

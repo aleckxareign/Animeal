@@ -49,13 +49,13 @@ export default function ChatInput({
   const canSend = text.trim().length > 0 && !disabled
 
   return (
-    <div className="border-t border-brand-dark/10 bg-white p-3 sm:p-4">
-      <div className="relative flex items-end gap-2 rounded-2xl border border-brand-dark/20 bg-brand-cream/30 p-2 shadow-xs transition-colors focus-within:border-brand-sage focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-sage/20">
+    <div className="border-t border-foreground/10 bg-card p-3 sm:p-4">
+      <div className="relative flex items-end gap-2 rounded-2xl border border-foreground/20 bg-background/30 p-2 shadow-xs transition-colors focus-within:border-brand-sage focus-within:bg-card focus-within:ring-2 focus-within:ring-brand-sage/20">
         {/* Voice/Mic button mockup */}
         <button
           type="button"
           onClick={onVoiceClick}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-brand-dark/50 transition-colors hover:bg-brand-sage/10 hover:text-brand-sage active:scale-95"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-foreground/50 transition-colors hover:bg-brand-sage/10 hover:text-brand-accent active:scale-95"
           title="Voice input (Mockup)"
           aria-label="Voice input"
         >
@@ -71,7 +71,7 @@ export default function ChatInput({
           onKeyDown={handleKeyDown}
           disabled={disabled}
           placeholder="Ask Mealie anything... (e.g., 'Pwede ba ang sibuyas sa aso?')"
-          className="max-h-36 min-h-[38px] flex-1 resize-none bg-transparent py-2 px-1 text-sm text-brand-dark placeholder:text-brand-dark/45 focus:outline-none disabled:opacity-50"
+          className="max-h-36 min-h-[38px] min-w-0 flex-1 resize-none bg-transparent py-2 px-1 text-sm text-foreground placeholder:text-foreground/45 focus:outline-none disabled:opacity-50"
         />
 
         {/* Send Button */}
@@ -82,7 +82,7 @@ export default function ChatInput({
           className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-all ${
             canSend
               ? 'bg-brand-sage text-white shadow-sm hover:bg-brand-sage/90 active:scale-95'
-              : 'bg-brand-dark/10 text-brand-dark/30 cursor-not-allowed'
+              : 'bg-brand-dark/10 text-foreground/30 cursor-not-allowed'
           }`}
           title="Send message"
           aria-label="Send message"
@@ -91,7 +91,7 @@ export default function ChatInput({
         </button>
       </div>
 
-      <div className="mt-1.5 flex items-center justify-between px-2 text-[11px] text-brand-dark/50">
+      <div className="mt-1.5 flex items-center justify-between px-2 text-[11px] text-foreground/50">
         <span className="flex items-center gap-1">
           <CornerDownLeft size={11} className="opacity-70" /> Press Enter to send, Shift+Enter for new line
         </span>

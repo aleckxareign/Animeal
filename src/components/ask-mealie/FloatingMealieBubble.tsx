@@ -16,7 +16,7 @@ export default function FloatingMealieBubble() {
     >
       <Link
         to="/ask-mealie"
-        className="group relative flex items-center gap-2.5 rounded-full border border-brand-sage/30 bg-white/95 dark:bg-slate-900/95 pl-2 pr-4 py-2 shadow-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:border-brand-sage hover:bg-white active:scale-95"
+        className="group relative flex items-center gap-2.5 rounded-full border border-brand-sage/30 bg-card/95 dark:bg-card/95 pl-2 pr-4 py-2 shadow-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:border-brand-sage hover:bg-card active:scale-95"
         title="Chat with Mealie AI - Pet Care & Nutrition Assistant"
       >
         {/* Glowing pulse ring */}
@@ -46,20 +46,20 @@ export default function FloatingMealieBubble() {
         {/* Text Label & Badge */}
         <div className="flex flex-col text-left">
           <div className="flex items-center gap-1.5">
-            <span className="font-bold text-xs sm:text-sm text-brand-dark dark:text-white group-hover:text-brand-sage transition-colors">
+            <span className="font-bold text-xs sm:text-sm text-foreground dark:text-white group-hover:text-brand-accent transition-colors">
               Ask Mealie
             </span>
-            <span className="flex items-center gap-0.5 rounded-full bg-brand-sage/10 dark:bg-brand-sage/20 px-1.5 py-0.2 text-[10px] font-bold text-brand-sage dark:text-emerald-300">
+            <span className="flex items-center gap-0.5 rounded-full bg-brand-sage/10 dark:bg-brand-sage/20 px-1.5 py-0.2 text-[10px] font-bold text-brand-accent dark:text-emerald-300">
               <Sparkles className="size-2.5" /> AI
             </span>
           </div>
-          <span className="text-[11px] font-medium text-brand-dark/60 dark:text-slate-400 hidden sm:block">
+          <span className="text-[11px] font-medium text-foreground/60 dark:text-muted-foreground hidden sm:block">
             Pet Nutrition Assistant
           </span>
         </div>
 
         {/* Icon cue */}
-        <div className="ml-1 hidden sm:flex size-6 items-center justify-center rounded-full bg-brand-sage/10 text-brand-sage transition-transform group-hover:translate-x-0.5">
+        <div className="ml-1 hidden sm:flex size-6 items-center justify-center rounded-full bg-brand-sage/10 text-brand-accent transition-transform group-hover:translate-x-0.5">
           <MessageCircle className="size-3.5" />
         </div>
       </Link>

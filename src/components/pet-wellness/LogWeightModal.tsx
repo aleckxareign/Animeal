@@ -85,24 +85,24 @@ export default function LogWeightModal({
         if (e.target === e.currentTarget) handleClose()
       }}
     >
-      <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden animate-scale-in">
+      <div className="relative w-full max-w-md bg-card rounded-2xl shadow-xl max-h-[calc(100dvh-2rem)] overflow-y-auto animate-scale-in">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 bg-brand-cream/60">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-background/60">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-sage/15 text-brand-sage">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-sage/15 text-brand-accent">
               <Scale className="w-5 h-5" />
             </div>
             <div>
-              <h3 id="log-weight-title" className="font-semibold text-brand-dark">
+              <h3 id="log-weight-title" className="font-semibold text-foreground">
                 Log Weight for {petName}
               </h3>
-              <p className="text-xs text-stone-500">Record a new weigh-in to track trends</p>
+              <p className="text-xs text-muted-foreground">Record a new weigh-in to track trends</p>
             </div>
           </div>
           <button
             type="button"
             onClick={handleClose}
-            className="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors"
+            className="p-1.5 text-muted-foreground hover:text-muted-foreground hover:bg-muted rounded-lg transition-colors"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
@@ -112,15 +112,15 @@ export default function LogWeightModal({
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {error && (
-            <div className="p-3 text-xs font-medium text-brand-alert bg-red-50 border border-red-200 rounded-lg">
+            <div className="p-3 text-xs font-medium text-destructive bg-red-50 dark:bg-red-500/15 border border-red-200 dark:border-red-400/30 rounded-lg">
               {error}
             </div>
           )}
 
           {/* Weight Input */}
           <div>
-            <label htmlFor="weight-input" className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1.5">
-              Weight (kg) <span className="text-brand-alert">*</span>
+            <label htmlFor="weight-input" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
+              Weight (kg) <span className="text-destructive">*</span>
             </label>
             <div className="relative">
               <input
@@ -134,44 +134,44 @@ export default function LogWeightModal({
                   setWeight(e.target.value)
                   setError('')
                 }}
-                className="w-full px-4 py-3 text-2xl font-bold text-brand-dark bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-sage focus:border-transparent transition-all pr-14"
+                className="w-full px-4 py-3 text-2xl font-bold text-foreground bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-sage focus:border-transparent transition-all pr-14"
                 placeholder="0.0"
                 required
                 autoFocus
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 font-semibold text-stone-400">
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 font-semibold text-muted-foreground">
                 kg
               </span>
             </div>
 
             {/* Quick Adjust Buttons */}
             <div className="flex items-center gap-2 mt-2">
-              <span className="text-xs text-stone-400">Quick adjust:</span>
+              <span className="text-xs text-muted-foreground">Quick adjust:</span>
               <button
                 type="button"
                 onClick={() => handleQuickAdjust(-0.5)}
-                className="px-2 py-0.5 text-xs font-medium bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-md transition-colors"
+                className="px-2 py-0.5 text-xs font-medium bg-muted hover:bg-accent text-muted-foreground rounded-md transition-colors"
               >
                 -0.5
               </button>
               <button
                 type="button"
                 onClick={() => handleQuickAdjust(-0.1)}
-                className="px-2 py-0.5 text-xs font-medium bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-md transition-colors"
+                className="px-2 py-0.5 text-xs font-medium bg-muted hover:bg-accent text-muted-foreground rounded-md transition-colors"
               >
                 -0.1
               </button>
               <button
                 type="button"
                 onClick={() => handleQuickAdjust(+0.1)}
-                className="px-2 py-0.5 text-xs font-medium bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-md transition-colors"
+                className="px-2 py-0.5 text-xs font-medium bg-muted hover:bg-accent text-muted-foreground rounded-md transition-colors"
               >
                 +0.1
               </button>
               <button
                 type="button"
                 onClick={() => handleQuickAdjust(+0.5)}
-                className="px-2 py-0.5 text-xs font-medium bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-md transition-colors"
+                className="px-2 py-0.5 text-xs font-medium bg-muted hover:bg-accent text-muted-foreground rounded-md transition-colors"
               >
                 +0.5
               </button>
@@ -180,8 +180,8 @@ export default function LogWeightModal({
 
           {/* Date Picker */}
           <div>
-            <label htmlFor="date-input" className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-stone-500" />
+            <label htmlFor="date-input" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
               Date of Measurement
             </label>
             <input
@@ -190,15 +190,15 @@ export default function LogWeightModal({
               max={todayStr}
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full px-3.5 py-2.5 text-sm font-medium text-stone-800 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-sage focus:border-transparent transition-all"
+              className="w-full px-3.5 py-2.5 text-sm font-medium text-foreground bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-sage focus:border-transparent transition-all"
             />
           </div>
 
           {/* Optional Notes */}
           <div>
-            <label htmlFor="notes-input" className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5 text-stone-500" />
-              Notes <span className="font-normal text-stone-400 lowercase">(optional)</span>
+            <label htmlFor="notes-input" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+              Notes <span className="font-normal text-muted-foreground lowercase">(optional)</span>
             </label>
             <textarea
               id="notes-input"
@@ -206,16 +206,16 @@ export default function LogWeightModal({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g., After morning walk, vet visit, switched to light kibble..."
-              className="w-full px-3.5 py-2.5 text-sm text-stone-800 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-sage focus:border-transparent transition-all placeholder:text-stone-400 resize-none"
+              className="w-full px-3.5 py-2.5 text-sm text-foreground bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-sage focus:border-transparent transition-all placeholder:text-muted-foreground resize-none"
             />
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-stone-100">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-border">
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2.5 text-sm font-semibold text-stone-600 hover:text-stone-800 hover:bg-stone-100 rounded-xl transition-colors"
+              className="px-4 py-2.5 text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
             >
               Cancel
             </button>

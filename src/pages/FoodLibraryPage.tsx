@@ -143,19 +143,19 @@ export default function FoodLibraryPage() {
   }, [allFoods, filters])
 
   return (
-    <div className="min-h-screen bg-brand-cream/60 py-10 sm:py-14 px-4 sm:px-8 lg:px-12">
+    <div className="min-h-screen bg-background/60 py-10 sm:py-14 px-4 sm:px-8 lg:px-12">
       <div className="max-w-[1600px] mx-auto">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-10">
           <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-sage/10 text-brand-sage text-sm font-bold mb-3">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-sage/10 text-brand-accent text-sm font-bold mb-3">
               <BookOpen className="size-4" />
               <span>Pet Food Directory & Nutritional Index</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-brand-dark tracking-tight font-display">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight font-display">
               Pet Food Library
             </h1>
-            <p className="text-stone-600 text-base sm:text-lg mt-2 max-w-3xl leading-relaxed">
+            <p className="text-muted-foreground text-base sm:text-lg mt-2 max-w-3xl leading-relaxed">
               Explore, compare, and check nutritional details of popular pet foods in the Philippines.
               Find the healthiest options and the best value for your budget!
             </p>
@@ -175,13 +175,13 @@ export default function FoodLibraryPage() {
         </div>
 
         {/* Informative Value Metric Banner */}
-        <div className="mb-6 p-4 rounded-2xl bg-white/80 border border-stone-200/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-stone-600">
+        <div className="mb-6 p-4 rounded-2xl bg-card/80 border border-border/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-muted-foreground">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 flex items-center justify-center shrink-0">
               <TrendingDown className="w-4 h-4" />
             </div>
             <div>
-              <span className="font-bold text-brand-dark block sm:inline mr-1">
+              <span className="font-bold text-foreground block sm:inline mr-1">
                 Pinoy Tip: Watch the "Price per 100 kcal"
               </span>
               <span>
@@ -190,8 +190,8 @@ export default function FoodLibraryPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0 text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+          <div className="flex items-center gap-2 shrink-0 text-[11px] font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/15 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-400/30">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-300" />
             <span>{allFoods.length} Verified & Custom items</span>
           </div>
         </div>
@@ -207,12 +207,12 @@ export default function FoodLibraryPage() {
 
         {/* Food Grid / Empty State */}
         {filteredAndSortedFoods.length === 0 ? (
-          <div className="bg-white rounded-3xl border border-stone-200/80 p-8 sm:p-14 text-center max-w-lg mx-auto shadow-sm my-8">
-            <div className="w-16 h-16 bg-stone-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-stone-400">
+          <div className="bg-card rounded-3xl border border-border/80 p-8 sm:p-14 text-center max-w-lg mx-auto shadow-sm my-8">
+            <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-4 text-muted-foreground">
               <SearchX className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold text-brand-dark mb-1">Walang nahanap na pagkain</h3>
-            <p className="text-sm text-stone-500 mb-6 leading-relaxed">
+            <h3 className="text-xl font-bold text-foreground mb-1">Walang nahanap na pagkain</h3>
+            <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
               We couldn't find any pet food matching your current search and filters. Try adjusting your search term or clearing the filters.
             </p>
             <div className="flex items-center justify-center gap-3">
@@ -227,9 +227,9 @@ export default function FoodLibraryPage() {
               <button
                 type="button"
                 onClick={() => setIsAddFoodOpen(true)}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-stone-300 hover:bg-stone-50 text-brand-dark text-xs sm:text-sm font-semibold transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-border hover:bg-muted text-foreground text-xs sm:text-sm font-semibold transition-colors"
               >
-                <Plus className="w-4 h-4 text-stone-500" />
+                <Plus className="w-4 h-4 text-muted-foreground" />
                 Add as Custom Food
               </button>
             </div>

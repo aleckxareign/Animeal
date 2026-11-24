@@ -38,46 +38,46 @@ export default function MealTrackerPage() {
   // ────────────────────────────
   if (pets.length === 0) {
     return (
-      <div className="min-h-[85vh] bg-brand-cream/40 py-12 px-4 sm:px-6">
+      <div className="min-h-[85vh] bg-background/40 py-12 px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center space-y-6">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-brand-sage/10 text-4xl shadow-xs">
             🐾
           </div>
 
           <div className="space-y-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-sage/15 px-3 py-1 text-xs font-bold text-brand-sage uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-sage/15 px-3 py-1 text-xs font-bold text-brand-accent uppercase tracking-wider">
               <Sparkles className="h-3.5 w-3.5" />
               Welcome to Animeal
             </span>
-            <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-brand-dark">
+            <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-foreground">
               Let's set up your pet's meal tracker
             </h1>
-            <p className="text-sm sm:text-base text-brand-dark/70 max-w-lg mx-auto">
+            <p className="text-sm sm:text-base text-foreground/70 max-w-lg mx-auto">
               Track daily calories, ensure balanced nutrition plates, coordinate household feeding, and keep your pets healthy and happy.
             </p>
           </div>
 
           {/* Call to Action card */}
-          <div className="rounded-3xl bg-white border border-brand-dark/10 shadow-lg p-8 space-y-6">
+          <div className="rounded-3xl bg-card border border-foreground/10 shadow-lg p-8 space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
-              <div className="rounded-2xl bg-brand-cream/50 p-4 border border-brand-dark/5">
+              <div className="rounded-2xl bg-background/50 p-4 border border-foreground/5">
                 <div className="text-2xl mb-1">🎯</div>
-                <h4 className="font-bold text-sm text-brand-dark">RER Calorie Math</h4>
-                <p className="text-xs text-brand-dark/60 mt-1">
+                <h4 className="font-bold text-sm text-foreground">RER Calorie Math</h4>
+                <p className="text-xs text-foreground/60 mt-1">
                   Automatic daily energy requirements based on weight & life-stage.
                 </p>
               </div>
-              <div className="rounded-2xl bg-brand-cream/50 p-4 border border-brand-dark/5">
+              <div className="rounded-2xl bg-background/50 p-4 border border-foreground/5">
                 <div className="text-2xl mb-1">🥣</div>
-                <h4 className="font-bold text-sm text-brand-dark">Plate Ratios</h4>
-                <p className="text-xs text-brand-dark/60 mt-1">
+                <h4 className="font-bold text-sm text-foreground">Plate Ratios</h4>
+                <p className="text-xs text-foreground/60 mt-1">
                   Visual protein, fat, and fiber breakdown with every meal logged.
                 </p>
               </div>
-              <div className="rounded-2xl bg-brand-cream/50 p-4 border border-brand-dark/5">
+              <div className="rounded-2xl bg-background/50 p-4 border border-foreground/5">
                 <div className="text-2xl mb-1">👨‍👩‍👧‍👦</div>
-                <h4 className="font-bold text-sm text-brand-dark">Sino Nagpakain?</h4>
-                <p className="text-xs text-brand-dark/60 mt-1">
+                <h4 className="font-bold text-sm text-foreground">Sino Nagpakain?</h4>
+                <p className="text-xs text-foreground/60 mt-1">
                   Prevent accidental double-feeding across the household.
                 </p>
               </div>
@@ -110,16 +110,16 @@ export default function MealTrackerPage() {
   const todayFeedings = getTodayFeedings(currentPet.id)
 
   return (
-    <div className="min-h-screen bg-brand-cream/30 py-10 px-4 sm:px-8 lg:px-12">
+    <div className="min-h-screen bg-background/30 py-10 px-4 sm:px-8 lg:px-12">
       <div className="mx-auto max-w-[1600px] space-y-10">
         {/* Top greeting & Pet Switcher */}
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <span className="text-sm font-bold uppercase tracking-wider text-brand-sage">
+              <span className="text-sm font-bold uppercase tracking-wider text-brand-accent">
                 {greeting}, Ka-Animeal! 👋
               </span>
-              <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-brand-dark tracking-tight">
+              <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
                 Meal Tracker & Dashboard
               </h1>
             </div>

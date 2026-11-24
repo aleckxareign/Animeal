@@ -16,13 +16,13 @@ const buttonVariants = cva(
         secondary:
           "bg-brand-dark text-white shadow-sm hover:bg-brand-dark/90 active:scale-[0.98]",
         outline:
-          "border border-brand-dark/20 bg-white/80 text-brand-dark backdrop-blur hover:bg-brand-cream/80 hover:border-brand-sage active:scale-[0.98]",
+          "border border-foreground/20 bg-card/80 text-foreground backdrop-blur hover:bg-background/80 hover:border-brand-sage active:scale-[0.98]",
         ghost:
-          "text-brand-dark hover:bg-brand-dark/5 active:scale-[0.98]",
+          "text-foreground hover:bg-foreground/5 active:scale-[0.98]",
         destructive:
           "bg-brand-alert text-white shadow-sm hover:bg-brand-alert/90 active:scale-[0.98]",
         link:
-          "text-brand-sage underline-offset-4 hover:underline",
+          "text-brand-accent underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 gap-2 px-4 py-2 text-sm",

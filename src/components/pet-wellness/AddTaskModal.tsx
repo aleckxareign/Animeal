@@ -105,24 +105,24 @@ export default function AddTaskModal({
         if (e.target === e.currentTarget) handleClose()
       }}
     >
-      <div className="relative w-full max-w-lg my-8 bg-white rounded-2xl shadow-xl overflow-hidden animate-scale-in">
+      <div className="relative w-full max-w-lg my-0 bg-card rounded-2xl shadow-xl max-h-[calc(100dvh-2rem)] overflow-y-auto animate-scale-in">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 bg-brand-cream/60">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-background/60">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-sage/15 text-brand-sage">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-sage/15 text-brand-accent">
               <Calendar className="w-5 h-5" />
             </div>
             <div>
-              <h3 id="add-task-title" className="font-semibold text-brand-dark">
+              <h3 id="add-task-title" className="font-semibold text-foreground">
                 Schedule Care Task
               </h3>
-              <p className="text-xs text-stone-500">For {petName} & family reminders</p>
+              <p className="text-xs text-muted-foreground">For {petName} & family reminders</p>
             </div>
           </div>
           <button
             type="button"
             onClick={handleClose}
-            className="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors"
+            className="p-1.5 text-muted-foreground hover:text-muted-foreground hover:bg-muted rounded-lg transition-colors"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
@@ -132,15 +132,15 @@ export default function AddTaskModal({
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5 max-h-[80vh] overflow-y-auto custom-scrollbar">
           {error && (
-            <div className="p-3 text-xs font-medium text-brand-alert bg-red-50 border border-red-200 rounded-lg">
+            <div className="p-3 text-xs font-medium text-destructive bg-red-50 dark:bg-red-500/15 border border-red-200 dark:border-red-400/30 rounded-lg">
               {error}
             </div>
           )}
 
           {/* Task Type Grid */}
           <div>
-            <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
-              Task Category <span className="text-brand-alert">*</span>
+            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+              Task Category <span className="text-destructive">*</span>
             </label>
             <div className="grid grid-cols-3 gap-2">
               {taskTypeEntries.map(([tKey, cfg]) => {
@@ -153,13 +153,13 @@ export default function AddTaskModal({
                     onClick={() => handleTypeSelect(tKey)}
                     className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border text-center transition-all ${
                       isSelected
-                        ? `bg-brand-sage/10 border-brand-sage ring-2 ring-brand-sage/20 font-semibold text-brand-dark shadow-xs`
-                        : `bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100 hover:border-stone-300`
+                        ? `bg-brand-sage/10 border-brand-sage ring-2 ring-brand-sage/20 font-semibold text-foreground shadow-xs`
+                        : `bg-background border-border text-muted-foreground hover:bg-muted hover:border-border`
                     }`}
                   >
                     <div
                       className={`p-1.5 rounded-lg ${
-                        isSelected ? cfg.badgeBg + ' ' + cfg.badgeText : 'bg-white text-stone-500 shadow-2xs'
+                        isSelected ? cfg.badgeBg + ' ' + cfg.badgeText : 'bg-card text-muted-foreground shadow-2xs'
                       }`}
                     >
                       <Icon className="w-4 h-4" />
@@ -173,9 +173,9 @@ export default function AddTaskModal({
 
           {/* Title */}
           <div>
-            <label htmlFor="task-title" className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-              <Tag className="w-3.5 h-3.5 text-stone-500" />
-              Task Title <span className="text-brand-alert">*</span>
+            <label htmlFor="task-title" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <Tag className="w-3.5 h-3.5 text-muted-foreground" />
+              Task Title <span className="text-destructive">*</span>
             </label>
             <input
               id="task-title"
@@ -186,7 +186,7 @@ export default function AddTaskModal({
                 setError('')
               }}
               placeholder="e.g., Morning kibble + fish oil"
-              className="w-full px-3.5 py-2.5 text-sm font-medium text-stone-900 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-sage focus:border-transparent transition-all placeholder:text-stone-400"
+              className="w-full px-3.5 py-2.5 text-sm font-medium text-foreground bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-sage focus:border-transparent transition-all placeholder:text-muted-foreground"
               required
             />
           </div>
@@ -194,23 +194,23 @@ export default function AddTaskModal({
           {/* Date & Time Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label htmlFor="due-date" className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-stone-500" />
-                Due Date <span className="text-brand-alert">*</span>
+              <label htmlFor="due-date" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+                Due Date <span className="text-destructive">*</span>
               </label>
               <input
                 id="due-date"
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm text-stone-800 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-sage focus:border-transparent transition-all"
+                className="w-full px-3.5 py-2.5 text-sm text-foreground bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-sage focus:border-transparent transition-all"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="due-time" className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-stone-500" />
+              <label htmlFor="due-time" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-muted-foreground" />
                 Time
               </label>
               <input
@@ -218,14 +218,14 @@ export default function AddTaskModal({
                 type="time"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm text-stone-800 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-sage focus:border-transparent transition-all"
+                className="w-full px-3.5 py-2.5 text-sm text-foreground bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-sage focus:border-transparent transition-all"
               />
             </div>
           </div>
 
           {/* Frequency */}
           <div>
-            <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
               Recurrence / Frequency
             </label>
             <div className="grid grid-cols-4 gap-2">
@@ -244,7 +244,7 @@ export default function AddTaskModal({
                   className={`py-2 px-2 rounded-xl text-xs font-semibold transition-all border ${
                     frequency === freq.id
                       ? 'bg-brand-sage text-white border-brand-sage shadow-xs'
-                      : 'bg-stone-50 text-stone-600 border-stone-200 hover:bg-stone-100'
+                      : 'bg-background text-muted-foreground border-border hover:bg-muted'
                   }`}
                 >
                   {freq.label}
@@ -255,9 +255,9 @@ export default function AddTaskModal({
 
           {/* Notes */}
           <div>
-            <label htmlFor="task-notes" className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5 text-stone-500" />
-              Notes / Instructions <span className="font-normal text-stone-400 lowercase">(optional)</span>
+            <label htmlFor="task-notes" className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+              Notes / Instructions <span className="font-normal text-muted-foreground lowercase">(optional)</span>
             </label>
             <textarea
               id="task-notes"
@@ -265,16 +265,16 @@ export default function AddTaskModal({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g., Mix 1 dropper with wet food; don't give on an empty stomach."
-              className="w-full px-3.5 py-2.5 text-sm text-stone-800 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-sage focus:border-transparent transition-all placeholder:text-stone-400 resize-none"
+              className="w-full px-3.5 py-2.5 text-sm text-foreground bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-sage focus:border-transparent transition-all placeholder:text-muted-foreground resize-none"
             />
           </div>
 
           {/* Modal Action Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-stone-100">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-border">
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2.5 text-sm font-semibold text-stone-600 hover:text-stone-800 hover:bg-stone-100 rounded-xl transition-colors"
+              className="px-4 py-2.5 text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
             >
               Cancel
             </button>

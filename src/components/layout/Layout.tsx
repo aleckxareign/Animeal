@@ -10,10 +10,10 @@ export default function Layout() {
   const isChatPage = pathname === '/ask-mealie'
 
   return (
-    <div className={`flex min-h-screen flex-col ${isChatPage ? 'h-screen overflow-hidden' : ''}`}>
+    <div className={`flex flex-col ${isChatPage ? 'h-dvh min-h-0 overflow-hidden' : 'min-h-screen'}`}>
       <ScrollToHash />
       <Navbar />
-      <main key={pathname} className={`page-enter flex-1 ${isChatPage ? 'flex overflow-hidden' : ''}`}>
+      <main key={pathname} className={`page-enter min-w-0 flex-1 ${isChatPage ? 'flex min-h-0 overflow-hidden' : ''}`}>
         <Outlet />
       </main>
       {!isChatPage && <Footer />}

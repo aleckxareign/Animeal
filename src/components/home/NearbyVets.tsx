@@ -494,33 +494,33 @@ export default function NearbyVets() {
   }
 
   return (
-    <section id="nearby-vets" className="bg-brand-cream/60 dark:bg-[#0d1717] py-12 sm:py-16 lg:py-20 transition-colors duration-300">
+    <section id="nearby-vets" className="bg-background/60 dark:bg-[#0d1717] py-12 sm:py-16 lg:py-20 transition-colors duration-300">
       <div className="@container mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
         <div className="grid items-start gap-8 @3xl:grid-cols-12 @3xl:gap-10">
           
           {/* ── Left Column: Search & Location Controls ── */}
           <div className="@3xl:col-span-4 space-y-4">
-            <span className="inline-flex items-center gap-2 rounded-full bg-brand-sage/10 dark:bg-emerald-950/40 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-brand-sage dark:text-emerald-400">
+            <span className="inline-flex items-center gap-2 rounded-full bg-brand-sage/10 dark:bg-emerald-950/40 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-brand-accent dark:text-emerald-400">
               <Compass className="size-4" /> NEAREST VET FINDER
             </span>
             
-            <h2 className="font-display text-3xl font-extrabold tracking-tight text-brand-dark dark:text-white sm:text-4xl">
+            <h2 className="font-display text-3xl font-extrabold tracking-tight text-foreground dark:text-white sm:text-4xl">
               Find the nearest vet.
             </h2>
             
-            <p className="text-sm leading-relaxed text-brand-dark/75 dark:text-slate-300 sm:text-base">
+            <p className="text-sm leading-relaxed text-foreground/75 dark:text-muted-foreground sm:text-base">
               Instant distance and directions to verified veterinary clinics and 24/7 animal hospitals near you.
             </p>
 
             {/* ── User Location & Proximity Status Card ── */}
-            <div className="rounded-2xl border border-brand-sage/20 dark:border-slate-800 bg-white dark:bg-[#132525] p-4 shadow-xs transition-all space-y-3">
+            <div className="rounded-2xl border border-brand-sage/20 dark:border-border bg-card dark:bg-[#132525] p-4 shadow-xs transition-all space-y-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 min-w-0">
                   <div
                     className={`flex size-10 shrink-0 items-center justify-center rounded-xl transition-colors ${
                       userLocation
-                        ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 ring-2 ring-emerald-500/20'
-                        : 'bg-brand-sage/10 dark:bg-slate-800 text-brand-sage dark:text-emerald-400'
+                        ? 'bg-emerald-100 dark:bg-emerald-500/15 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 dark:text-emerald-300 ring-2 ring-emerald-500/20'
+                        : 'bg-brand-sage/10 dark:bg-card text-brand-accent dark:text-emerald-400'
                     }`}
                   >
                     {isLocating ? (
@@ -531,7 +531,7 @@ export default function NearbyVets() {
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-brand-dark/50 dark:text-slate-400">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-foreground/50 dark:text-muted-foreground">
                         {userLocation?.source === 'gps'
                           ? 'Live GPS Location'
                           : userLocation?.source === 'search'
@@ -539,18 +539,18 @@ export default function NearbyVets() {
                           : 'Proximity'}
                       </span>
                       {userLocation?.source === 'gps' && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-500/15 dark:bg-emerald-950/60 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-400/30 dark:border-emerald-800">
                           <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
                           Active
                         </span>
                       )}
                     </div>
-                    <p className="text-sm font-extrabold text-brand-dark dark:text-white truncate mt-0.5">
+                    <p className="text-sm font-extrabold text-foreground dark:text-white truncate mt-0.5">
                       {userLocation
                         ? userLocation.displayName || userLocation.city || 'Coordinates Acquired'
                         : 'Location Not Set'}
                     </p>
-                    <p className="text-xs text-brand-dark/60 dark:text-slate-400 truncate mt-0.5">
+                    <p className="text-xs text-foreground/60 dark:text-muted-foreground truncate mt-0.5">
                       {locationSubtitle}
                     </p>
                   </div>
@@ -563,7 +563,7 @@ export default function NearbyVets() {
                   disabled={isLocating}
                   className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all transform active:scale-95 cursor-pointer shadow-xs ${
                     userLocation?.source === 'gps'
-                      ? 'bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800'
+                      ? 'bg-emerald-50 dark:bg-emerald-500/15 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-400/30 dark:border-emerald-800'
                       : 'bg-brand-dark hover:bg-brand-sage text-white'
                   }`}
                   title={userLocation?.source === 'gps' ? 'Refresh live GPS location' : 'Use your current location'}
@@ -589,12 +589,12 @@ export default function NearbyVets() {
 
               {/* Permission Denied Alert */}
               {locationStatus === 'denied' && (
-                <div className="rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 p-2.5 text-[11px] text-amber-900 dark:text-amber-200">
+                <div className="rounded-xl bg-amber-50 dark:bg-amber-500/15 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-400/30 dark:border-amber-800/60 p-2.5 text-[11px] text-amber-900 dark:text-amber-300 dark:text-amber-200">
                   <p className="font-bold flex items-center gap-1">
-                    <AlertCircle className="size-3.5 text-amber-600 shrink-0" />
+                    <AlertCircle className="size-3.5 text-amber-600 dark:text-amber-300 shrink-0" />
                     Location access blocked
                   </p>
-                  <p className="mt-0.5 text-amber-800/90 dark:text-amber-300">
+                  <p className="mt-0.5 text-amber-800/90 dark:text-amber-300 dark:text-amber-300">
                     Enable location access in your browser or type any Philippine city/neighborhood in the search bar below.
                   </p>
                 </div>
@@ -602,8 +602,8 @@ export default function NearbyVets() {
 
               {/* Nearest Clinic Highlight Badge */}
               {userLocation && nearestVet && (
-                <div className="flex items-center gap-2 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 px-3 py-1.5 text-xs font-semibold text-emerald-900 dark:text-emerald-200">
-                  <Sparkles className="size-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                <div className="flex items-center gap-2 rounded-xl bg-emerald-50/80 dark:bg-emerald-500/15 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-400/30 dark:border-emerald-800/60 px-3 py-1.5 text-xs font-semibold text-emerald-900 dark:text-emerald-300 dark:text-emerald-200">
+                  <Sparkles className="size-3.5 shrink-0 text-emerald-600 dark:text-emerald-300 dark:text-emerald-400" />
                   <span className="truncate">
                     Closest: <strong>{nearestVet.name}</strong> ({nearestVet.formattedDistance})
                   </span>
@@ -615,14 +615,14 @@ export default function NearbyVets() {
             <div className="relative" ref={searchContainerRef}>
               <form onSubmit={handleLocationSearch} className="relative">
                 <span className="sr-only">Search city, neighborhood, or clinic</span>
-                <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-brand-dark/40 dark:text-slate-400" />
+                <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-foreground/40 dark:text-muted-foreground" />
                 <input
                   type="text"
                   placeholder="Search city, neighborhood, or clinic name..."
                   value={searchQuery}
                   onFocus={() => setShowSuggestions(true)}
                   onChange={(e) => handleSearchInputChange(e.target.value)}
-                  className="min-h-11 w-full rounded-xl border border-brand-dark/15 dark:border-slate-700 bg-white dark:bg-[#132525] py-2.5 pl-10 pr-24 text-sm text-brand-dark dark:text-white placeholder:text-brand-dark/40 dark:placeholder:text-slate-500 focus:border-brand-sage focus:outline-none focus:ring-2 focus:ring-brand-sage/20 transition-all shadow-xs"
+                  className="min-h-11 w-full rounded-xl border border-foreground/15 dark:border-border bg-card dark:bg-[#132525] py-2.5 pl-10 pr-24 text-sm text-foreground dark:text-white placeholder:text-foreground/40 dark:placeholder:text-muted-foreground focus:border-brand-sage focus:outline-none focus:ring-2 focus:ring-brand-sage/20 transition-all shadow-xs"
                 />
                 
                 <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
@@ -634,7 +634,7 @@ export default function NearbyVets() {
                         setShowSuggestions(false)
                         setLocationSuggestions([])
                       }}
-                      className="p-1 rounded-md text-brand-dark/40 hover:text-brand-dark dark:text-slate-400 dark:hover:text-white hover:bg-black/5 transition-colors cursor-pointer"
+                      className="p-1 rounded-md text-foreground/40 hover:text-foreground dark:text-muted-foreground dark:hover:text-white hover:bg-black/5 transition-colors cursor-pointer"
                       title="Clear search"
                     >
                       <X className="size-3.5" />
@@ -653,11 +653,11 @@ export default function NearbyVets() {
 
               {/* Live Suggestions Popup Dropdown */}
               {showSuggestions && searchQuery.trim().length >= 2 && (
-                <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-2xl border border-brand-sage/20 dark:border-slate-700 bg-white dark:bg-[#132525] shadow-xl overflow-hidden py-1.5 max-h-80 overflow-y-auto">
+                <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-2xl border border-brand-sage/20 dark:border-border bg-card dark:bg-[#132525] shadow-xl overflow-hidden py-1.5 max-h-80 overflow-y-auto">
                   
                   {/* Loading indicator */}
                   {isFetchingSuggestions && (
-                    <div className="flex items-center gap-2 px-4 py-2.5 text-xs text-brand-dark/50 dark:text-slate-400">
+                    <div className="flex items-center gap-2 px-4 py-2.5 text-xs text-foreground/50 dark:text-muted-foreground">
                       <Loader2 className="size-3.5 animate-spin" />
                       <span>Searching places...</span>
                     </div>
@@ -666,7 +666,7 @@ export default function NearbyVets() {
                   {/* Live Location Suggestions from Nominatim */}
                   {locationSuggestions.length > 0 && (
                     <div className="p-1">
-                      <p className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-brand-dark/45 dark:text-slate-400">
+                      <p className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-foreground/45 dark:text-muted-foreground">
                         Locations & Areas
                       </p>
                       {locationSuggestions.map((suggestion, idx) => (
@@ -676,18 +676,18 @@ export default function NearbyVets() {
                           onClick={() => handleSelectLocation(suggestion)}
                           className="w-full flex items-center gap-2.5 px-3 py-2 text-left rounded-xl hover:bg-brand-sage/10 dark:hover:bg-slate-800/80 transition-colors cursor-pointer group"
                         >
-                          <div className="flex size-7 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 shrink-0 group-hover:bg-emerald-200 dark:group-hover:bg-emerald-900/80 transition-colors">
+                          <div className="flex size-7 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-500/15 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 dark:text-emerald-400 shrink-0 group-hover:bg-emerald-200 dark:group-hover:bg-emerald-900/80 transition-colors">
                             <MapPin className="size-3.5" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-xs font-bold text-brand-dark dark:text-white truncate">
+                            <p className="text-xs font-bold text-foreground dark:text-white truncate">
                               {suggestion.shortName}
                             </p>
-                            <p className="text-[10px] text-brand-dark/45 dark:text-slate-400 truncate leading-tight">
+                            <p className="text-[10px] text-foreground/45 dark:text-muted-foreground truncate leading-tight">
                               {suggestion.displayName}
                             </p>
                           </div>
-                          <span className="shrink-0 text-[10px] text-brand-dark/35 dark:text-slate-500 capitalize">
+                          <span className="shrink-0 text-[10px] text-foreground/35 dark:text-muted-foreground capitalize">
                             {suggestion.type}
                           </span>
                         </button>
@@ -697,8 +697,8 @@ export default function NearbyVets() {
 
                   {/* Matching Clinics from local data */}
                   {matchingClinics.length > 0 && (
-                    <div className={`p-1 ${locationSuggestions.length > 0 ? 'border-t border-brand-dark/5 dark:border-slate-800' : ''}`}>
-                      <p className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-brand-dark/45 dark:text-slate-400">
+                    <div className={`p-1 ${locationSuggestions.length > 0 ? 'border-t border-foreground/5 dark:border-border' : ''}`}>
+                      <p className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-foreground/45 dark:text-muted-foreground">
                         Veterinary Clinics
                       </p>
                       {matchingClinics.map((clinic) => (
@@ -709,20 +709,20 @@ export default function NearbyVets() {
                           className="w-full flex items-center justify-between gap-2 px-3 py-2 text-left rounded-xl hover:bg-brand-sage/10 dark:hover:bg-slate-800/80 transition-colors text-xs cursor-pointer"
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
-                            <div className="flex size-7 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 shrink-0">
+                            <div className="flex size-7 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-500/15 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 dark:text-blue-400 shrink-0">
                               <Building2 className="size-3.5" />
                             </div>
                             <div className="min-w-0">
-                              <p className="font-bold text-brand-dark dark:text-white truncate">
+                              <p className="font-bold text-foreground dark:text-white truncate">
                                 {clinic.name}
                               </p>
-                              <p className="text-[10px] text-brand-dark/50 dark:text-slate-400 truncate">
+                              <p className="text-[10px] text-foreground/50 dark:text-muted-foreground truncate">
                                 {clinic.city || clinic.address}
                               </p>
                             </div>
                           </div>
                           {clinic.distance && (
-                            <span className="shrink-0 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                            <span className="shrink-0 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/15 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-400/30 dark:border-emerald-800">
                               {clinic.distance}
                             </span>
                           )}
@@ -733,8 +733,8 @@ export default function NearbyVets() {
 
                   {/* Empty state */}
                   {!isFetchingSuggestions && locationSuggestions.length === 0 && matchingClinics.length === 0 && (
-                    <div className="px-4 py-3 text-center text-xs text-brand-dark/60 dark:text-slate-400">
-                      Press <kbd className="font-bold text-brand-dark dark:text-white bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">Enter</kbd> or tap Search to look up "{searchQuery}"
+                    <div className="px-4 py-3 text-center text-xs text-foreground/60 dark:text-muted-foreground">
+                      Press <kbd className="font-bold text-foreground dark:text-white bg-muted dark:bg-card px-1.5 py-0.5 rounded">Enter</kbd> or tap Search to look up "{searchQuery}"
                     </div>
                   )}
                 </div>
@@ -754,7 +754,7 @@ export default function NearbyVets() {
                   className={`min-h-9 rounded-full px-3.5 text-xs font-bold transition-all cursor-pointer ${
                     !filterEmergency && !filterOpenNow
                       ? 'bg-brand-sage text-white shadow-xs'
-                      : 'border border-brand-dark/15 dark:border-slate-700 bg-white dark:bg-[#132525] text-brand-dark/75 dark:text-slate-300 hover:bg-brand-cream dark:hover:bg-[#1a3333]'
+                      : 'border border-foreground/15 dark:border-border bg-card dark:bg-[#132525] text-foreground/75 dark:text-muted-foreground hover:bg-background dark:hover:bg-[#1a3333]'
                   }`}
                 >
                   All ({vetsWithLiveDistance.length})
@@ -768,7 +768,7 @@ export default function NearbyVets() {
                   className={`min-h-9 rounded-full px-3.5 text-xs font-bold transition-all cursor-pointer ${
                     filterEmergency
                       ? 'bg-rose-600 text-white shadow-xs ring-2 ring-rose-500/30'
-                      : 'border border-brand-dark/15 dark:border-slate-700 bg-white dark:bg-[#132525] text-brand-dark/75 dark:text-slate-300 hover:bg-brand-cream dark:hover:bg-[#1a3333]'
+                      : 'border border-foreground/15 dark:border-border bg-card dark:bg-[#132525] text-foreground/75 dark:text-muted-foreground hover:bg-background dark:hover:bg-[#1a3333]'
                   }`}
                 >
                   🚨 24/7 Emergency
@@ -782,7 +782,7 @@ export default function NearbyVets() {
                   className={`min-h-9 rounded-full px-3.5 text-xs font-bold transition-all cursor-pointer ${
                     filterOpenNow
                       ? 'bg-emerald-700 text-white shadow-xs ring-2 ring-emerald-500/30'
-                      : 'border border-brand-dark/15 dark:border-slate-700 bg-white dark:bg-[#132525] text-brand-dark/75 dark:text-slate-300 hover:bg-brand-cream dark:hover:bg-[#1a3333]'
+                      : 'border border-foreground/15 dark:border-border bg-card dark:bg-[#132525] text-foreground/75 dark:text-muted-foreground hover:bg-background dark:hover:bg-[#1a3333]'
                   }`}
                 >
                   🟢 Open Now
@@ -793,7 +793,7 @@ export default function NearbyVets() {
                   <button
                     type="button"
                     onClick={handleResetFilters}
-                    className="inline-flex min-h-9 items-center gap-1 rounded-full border border-brand-dark/15 dark:border-slate-700 bg-white dark:bg-[#132525] px-3 text-xs font-bold text-brand-dark/70 dark:text-slate-300 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40 dark:hover:text-rose-300 transition-colors cursor-pointer ml-auto"
+                    className="inline-flex min-h-9 items-center gap-1 rounded-full border border-foreground/15 dark:border-border bg-card dark:bg-[#132525] px-3 text-xs font-bold text-foreground/70 dark:text-muted-foreground hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40 dark:hover:text-rose-300 transition-colors cursor-pointer ml-auto"
                     title="Reset filters and search"
                   >
                     <RotateCcw className="size-3" />
@@ -803,14 +803,14 @@ export default function NearbyVets() {
               </div>
 
               {/* Clinic Count & Proximity Status */}
-              <div className="flex items-center justify-between text-xs font-medium text-brand-dark/60 dark:text-slate-400 pt-0.5">
+              <div className="flex items-center justify-between text-xs font-medium text-foreground/60 dark:text-muted-foreground pt-0.5">
                 <p>
-                  Showing <span className="font-bold text-brand-dark dark:text-white">{visibleVets.length}</span>
+                  Showing <span className="font-bold text-foreground dark:text-white">{visibleVets.length}</span>
                   {visibleVets.length < filteredVets.length && ` of ${filteredVets.length}`} {filteredVets.length === 1 ? 'clinic' : 'clinics'}
-                  {userLocation && <span className="ml-1 text-emerald-700 dark:text-emerald-400 font-semibold">(nearest first)</span>}
+                  {userLocation && <span className="ml-1 text-emerald-700 dark:text-emerald-300 dark:text-emerald-400 font-semibold">(nearest first)</span>}
                 </p>
                 {searchQuery && (
-                  <span className="text-[11px] text-brand-dark/50 dark:text-slate-400 truncate max-w-[140px]">
+                  <span className="text-[11px] text-foreground/50 dark:text-muted-foreground truncate max-w-[140px]">
                     for "{searchQuery}"
                   </span>
                 )}
@@ -822,13 +822,13 @@ export default function NearbyVets() {
           <div className="min-w-0 @3xl:col-span-8">
             
             {/* Mobile Tab Toggle */}
-            <div className="mb-3 flex rounded-xl border border-border/60 dark:border-slate-800 bg-white dark:bg-[#132525] p-1 @3xl:hidden">
+            <div className="mb-3 flex rounded-xl border border-border/60 dark:border-border bg-card dark:bg-[#132525] p-1 @3xl:hidden">
               <button
                 type="button"
                 onClick={() => setMobileTab('list')}
                 aria-pressed={mobileTab === 'list'}
                 className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg text-sm font-bold ${
-                  mobileTab === 'list' ? 'bg-brand-sage text-white' : 'text-brand-dark/65 dark:text-slate-400'
+                  mobileTab === 'list' ? 'bg-brand-sage text-white' : 'text-foreground/65 dark:text-muted-foreground'
                 }`}
               >
                 <List className="size-4" /> Clinics ({filteredVets.length})
@@ -838,14 +838,14 @@ export default function NearbyVets() {
                 onClick={() => setMobileTab('map')}
                 aria-pressed={mobileTab === 'map'}
                 className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg text-sm font-bold ${
-                  mobileTab === 'map' ? 'bg-brand-sage text-white' : 'text-brand-dark/65 dark:text-slate-400'
+                  mobileTab === 'map' ? 'bg-brand-sage text-white' : 'text-foreground/65 dark:text-muted-foreground'
                 }`}
               >
                 <MapIcon className="size-4" /> Map View
               </button>
             </div>
 
-            <div className="overflow-hidden rounded-3xl border border-border/70 dark:border-slate-800 bg-white dark:bg-[#132525] shadow-sm transition-all">
+            <div className="overflow-hidden rounded-3xl border border-border/70 dark:border-border bg-card dark:bg-[#132525] shadow-sm transition-all">
               
               {/* ── Stylized Interactive Area Map ── */}
               <div className={`relative h-72 sm:h-80 overflow-hidden bg-[#e4ede1] dark:bg-[#0c1a1a] ${mobileTab === 'map' ? 'block' : 'hidden @3xl:block'}`}>
@@ -868,7 +868,7 @@ export default function NearbyVets() {
                 </svg>
 
                 {/* Top Badge on Map */}
-                <div className="absolute left-3.5 top-3.5 z-20 flex items-center gap-2 rounded-full bg-white/95 dark:bg-[#132525]/95 px-3.5 py-1.5 text-[11px] font-semibold text-brand-dark dark:text-slate-200 shadow-sm backdrop-blur-sm border border-black/5 dark:border-white/10">
+                <div className="absolute left-3.5 top-3.5 z-20 flex items-center gap-2 rounded-full bg-card/95 dark:bg-[#132525]/95 px-3.5 py-1.5 text-[11px] font-semibold text-foreground dark:text-slate-200 shadow-sm backdrop-blur-sm border border-black/5 dark:border-white/10">
                   <span className={`size-2 rounded-full ${userLocation ? 'bg-emerald-500 animate-pulse' : 'bg-brand-sage'}`} />
                   <span>• {currentRegionName}</span>
                 </div>
@@ -921,34 +921,34 @@ export default function NearbyVets() {
 
                 {/* ── Selected Clinic Floating Preview Card ── */}
                 {activeVet ? (
-                  <div className="absolute bottom-3 left-3 right-3 z-30 flex flex-col gap-2 rounded-2xl border border-white/80 dark:border-slate-800 bg-white/95 dark:bg-[#132525]/95 p-3.5 sm:p-4 shadow-xl backdrop-blur-md transition-all">
+                  <div className="absolute bottom-3 left-3 right-3 z-30 flex flex-col gap-2 rounded-2xl border border-white/80 dark:border-border bg-card/95 dark:bg-[#132525]/95 p-3.5 sm:p-4 shadow-xl backdrop-blur-md transition-all">
                     <div className="flex items-center justify-between gap-3">
                       <div className="min-w-0">
                         {/* Header Badges */}
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-brand-sage dark:text-emerald-400">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-brand-accent dark:text-emerald-400">
                             SELECTED CLINIC
                           </span>
                           {activeVet.emergency && (
-                            <span className="rounded-full bg-rose-100 dark:bg-rose-950/60 px-2 py-0.5 text-[9px] font-bold text-rose-700 dark:text-rose-300">
+                            <span className="rounded-full bg-rose-100 dark:bg-rose-500/15 dark:bg-rose-950/60 px-2 py-0.5 text-[9px] font-bold text-rose-700 dark:text-rose-300 dark:text-rose-300">
                               24/7 Emergency
                             </span>
                           )}
                           {userLocation && sortedVets[0]?.id === activeVet.id && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 text-[9px] font-bold text-emerald-800 dark:text-emerald-300">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-500/15 dark:bg-emerald-950/60 px-2 py-0.5 text-[9px] font-bold text-emerald-800 dark:text-emerald-300 dark:text-emerald-300">
                               <Sparkles className="size-2.5" /> Nearest to you
                             </span>
                           )}
                         </div>
                         
                         {/* Title */}
-                        <p className="truncate text-base sm:text-lg font-black text-brand-dark dark:text-white mt-0.5">
+                        <p className="truncate text-base sm:text-lg font-black text-foreground dark:text-white mt-0.5">
                           {activeVet.name}
                         </p>
                         
                         {/* City, Distance, Hours */}
-                        <p className="truncate text-xs text-brand-dark/75 dark:text-slate-300">
-                          {activeVet.city} • <strong className="text-brand-dark dark:text-white font-bold">{activeVet.formattedDistance}</strong>
+                        <p className="truncate text-xs text-foreground/75 dark:text-muted-foreground">
+                          {activeVet.city} • <strong className="text-foreground dark:text-white font-bold">{activeVet.formattedDistance}</strong>
                           {activeVet.hours && ` • ${activeVet.hours}`}
                         </p>
                       </div>
@@ -968,7 +968,7 @@ export default function NearbyVets() {
                           target="_blank"
                           rel="noreferrer"
                           aria-label={`Turn-by-turn directions to ${activeVet.name}`}
-                          className="inline-flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[#163832] dark:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all shadow-xs active:scale-95 cursor-pointer"
+                          className="inline-flex size-10 items-center justify-center rounded-full bg-card dark:bg-card border border-border dark:border-border text-foreground dark:text-emerald-400 hover:bg-muted dark:hover:bg-slate-700 transition-all shadow-xs active:scale-95 cursor-pointer"
                           title="Open Google Maps Turn-by-Turn GPS Directions"
                         >
                           <Navigation className="size-4" />
@@ -978,12 +978,12 @@ export default function NearbyVets() {
 
                     {/* Services Line */}
                     {activeVet.services && activeVet.services.length > 0 && (
-                      <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-border/40 dark:border-slate-800 text-[11px] text-brand-dark/75 dark:text-slate-400">
-                        <span className="font-semibold text-brand-dark/60 dark:text-slate-400">Services:</span>
+                      <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-border/40 dark:border-border text-[11px] text-foreground/75 dark:text-muted-foreground">
+                        <span className="font-semibold text-foreground/60 dark:text-muted-foreground">Services:</span>
                         {activeVet.services.map((service) => (
                           <span
                             key={service}
-                            className="text-brand-dark dark:text-slate-200 font-medium mr-1.5"
+                            className="text-foreground dark:text-slate-200 font-medium mr-1.5"
                           >
                             {service}
                           </span>
@@ -992,7 +992,7 @@ export default function NearbyVets() {
                     )}
                   </div>
                 ) : (
-                  <div className="absolute inset-x-3 bottom-3 rounded-xl bg-white/95 dark:bg-[#132525]/95 p-3 text-sm font-semibold text-brand-dark/70 dark:text-slate-300 shadow-sm">
+                  <div className="absolute inset-x-3 bottom-3 rounded-xl bg-card/95 dark:bg-[#132525]/95 p-3 text-sm font-semibold text-foreground/70 dark:text-muted-foreground shadow-sm">
                     No clinics match these filters.
                   </div>
                 )}
@@ -1002,13 +1002,13 @@ export default function NearbyVets() {
               <div className={`divide-y divide-border/60 dark:divide-slate-800 ${mobileTab === 'list' ? 'block' : 'hidden @3xl:block'}`}>
                 {visibleVets.length === 0 ? (
                   <div className="p-8 text-center">
-                    <AlertCircle className="mx-auto size-8 text-brand-dark/30 dark:text-slate-600" />
-                    <h3 className="mt-3 font-bold text-brand-dark dark:text-white">No clinics found</h3>
-                    <p className="mt-1 text-sm text-brand-dark/65 dark:text-slate-400">Try searching another city or reset filters.</p>
+                    <AlertCircle className="mx-auto size-8 text-foreground/30 dark:text-muted-foreground" />
+                    <h3 className="mt-3 font-bold text-foreground dark:text-white">No clinics found</h3>
+                    <p className="mt-1 text-sm text-foreground/65 dark:text-muted-foreground">Try searching another city or reset filters.</p>
                     <button
                       type="button"
                       onClick={handleResetFilters}
-                      className="mt-3 min-h-11 rounded-xl px-4 text-sm font-bold text-brand-sage dark:text-emerald-400 hover:bg-brand-cream dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                      className="mt-3 min-h-11 rounded-xl px-4 text-sm font-bold text-brand-accent dark:text-emerald-400 hover:bg-background dark:hover:bg-slate-800 transition-colors cursor-pointer"
                     >
                       Reset filters
                     </button>
@@ -1026,8 +1026,8 @@ export default function NearbyVets() {
                           isSelected
                             ? 'bg-brand-sage/5 dark:bg-emerald-950/20'
                             : isTopNearest
-                            ? 'bg-emerald-50/50 dark:bg-emerald-950/30'
-                            : 'hover:bg-brand-cream/30 dark:hover:bg-slate-800/40'
+                            ? 'bg-emerald-50/50 dark:bg-emerald-500/15 dark:bg-emerald-950/30'
+                            : 'hover:bg-background/30 dark:hover:bg-slate-800/40'
                         }`}
                       >
                         <div className="flex items-center gap-2 p-3.5 sm:gap-4 sm:px-5">
@@ -1040,25 +1040,25 @@ export default function NearbyVets() {
                           >
                             {/* Top Line: Name & Badges */}
                             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                              <span className="font-bold text-sm sm:text-base text-brand-dark dark:text-white">
+                              <span className="font-bold text-sm sm:text-base text-foreground dark:text-white">
                                 {vet.name}
                               </span>
 
                               {isTopNearest && (
-                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:text-emerald-300">
+                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-500/15 dark:bg-emerald-950/60 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:text-emerald-300 dark:text-emerald-300">
                                   <Sparkles className="size-2.5" /> Nearest
                                 </span>
                               )}
 
                               {vet.emergency && (
-                                <span className="rounded-full bg-rose-100 dark:bg-rose-950/50 px-2 py-0.5 text-[10px] font-bold text-rose-700 dark:text-rose-300">
+                                <span className="rounded-full bg-rose-100 dark:bg-rose-500/15 dark:bg-rose-950/50 px-2 py-0.5 text-[10px] font-bold text-rose-700 dark:text-rose-300 dark:text-rose-300">
                                   24/7 emergency
                                 </span>
                               )}
 
                               <span
                                 className={`inline-flex items-center gap-1 text-[11px] font-semibold ${
-                                  vet.openNow ? 'text-emerald-700 dark:text-emerald-400' : 'text-brand-dark/50 dark:text-slate-400'
+                                  vet.openNow ? 'text-emerald-700 dark:text-emerald-300 dark:text-emerald-400' : 'text-foreground/50 dark:text-muted-foreground'
                                 }`}
                               >
                                 <span className={`size-1.5 rounded-full ${vet.openNow ? 'bg-emerald-500' : 'bg-brand-dark/30 dark:bg-slate-600'}`} />
@@ -1067,7 +1067,7 @@ export default function NearbyVets() {
                             </div>
 
                             {/* Second Line: City · Address */}
-                            <div className="mt-1 flex items-center gap-1 text-xs text-brand-dark/65 dark:text-slate-400 truncate">
+                            <div className="mt-1 flex items-center gap-1 text-xs text-foreground/65 dark:text-muted-foreground truncate">
                               <span>{vet.city}</span>
                               <span>·</span>
                               <span className="truncate">{vet.address}</span>
@@ -1078,12 +1078,12 @@ export default function NearbyVets() {
                           <div className="shrink-0 text-right pr-1">
                             <span
                               className={`block text-xs sm:text-sm font-bold ${
-                                isTopNearest ? 'text-emerald-700 dark:text-emerald-400 font-extrabold' : 'text-brand-dark dark:text-white'
+                                isTopNearest ? 'text-emerald-700 dark:text-emerald-300 dark:text-emerald-400 font-extrabold' : 'text-foreground dark:text-white'
                               }`}
                             >
                               {vet.formattedDistance}
                             </span>
-                            <span className="text-[10px] text-brand-dark/50 dark:text-slate-400">
+                            <span className="text-[10px] text-foreground/50 dark:text-muted-foreground">
                               {userLocation ? 'from you' : 'approx.'}
                             </span>
                           </div>
@@ -1093,7 +1093,7 @@ export default function NearbyVets() {
                             <a
                               href={`tel:${vet.phone.replace(/[^0-9+]/g, '')}`}
                               aria-label={`Call ${vet.name}`}
-                              className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl text-brand-sage dark:text-emerald-400 hover:bg-brand-sage/10 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                              className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl text-brand-accent dark:text-emerald-400 hover:bg-brand-sage/10 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                               title={`Call ${vet.phone}`}
                             >
                               <Phone className="size-4" />
@@ -1104,7 +1104,7 @@ export default function NearbyVets() {
                               target="_blank"
                               rel="noreferrer"
                               aria-label={`Turn-by-turn directions to ${vet.name}`}
-                              className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-cream/60 dark:bg-slate-800 text-brand-dark dark:text-white hover:bg-brand-sage hover:text-white transition-colors cursor-pointer"
+                              className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl bg-background/60 dark:bg-card text-foreground dark:text-white hover:bg-brand-sage hover:text-white transition-colors cursor-pointer"
                               title="Open Google Maps Turn-by-Turn GPS Directions"
                             >
                               <Navigation className="size-4" />
@@ -1113,7 +1113,7 @@ export default function NearbyVets() {
                             <button
                               type="button"
                               onClick={() => setExpandedClinicId((prev) => (prev === vet.id ? null : vet.id))}
-                              className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-brand-dark/40 hover:text-brand-dark dark:text-slate-500 dark:hover:text-white transition-colors cursor-pointer"
+                              className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-foreground/40 hover:text-foreground dark:text-muted-foreground dark:hover:text-white transition-colors cursor-pointer"
                               title={isAccordionExpanded ? 'Hide details' : 'View clinic details'}
                             >
                               {isAccordionExpanded ? (
@@ -1127,17 +1127,17 @@ export default function NearbyVets() {
 
                         {/* Detailed Clinic Accordion Panel */}
                         {isAccordionExpanded && (
-                          <div className="px-5 pb-4 pt-1 border-t border-border/30 dark:border-slate-800/60 bg-brand-cream/20 dark:bg-slate-900/40 text-xs space-y-2.5 animate-fade-in">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-brand-dark/80 dark:text-slate-300">
+                          <div className="px-5 pb-4 pt-1 border-t border-border/30 dark:border-border/60 bg-background/20 dark:bg-card/40 text-xs space-y-2.5 animate-fade-in">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-foreground/80 dark:text-muted-foreground">
                               {vet.hours && (
                                 <div className="flex items-center gap-1.5">
-                                  <Clock className="size-3.5 text-brand-sage dark:text-emerald-400" />
+                                  <Clock className="size-3.5 text-brand-accent dark:text-emerald-400" />
                                   <span>Hours: <strong>{vet.hours}</strong></span>
                                 </div>
                               )}
                               {typeof vet.latitude === 'number' && typeof vet.longitude === 'number' && (
-                                <div className="flex items-center gap-1.5 text-[11px] text-brand-dark/60 dark:text-slate-400">
-                                  <MapPin className="size-3.5 text-brand-sage dark:text-emerald-400" />
+                                <div className="flex items-center gap-1.5 text-[11px] text-foreground/60 dark:text-muted-foreground">
+                                  <MapPin className="size-3.5 text-brand-accent dark:text-emerald-400" />
                                   <span>GPS: {vet.latitude.toFixed(4)}, {vet.longitude.toFixed(4)}</span>
                                 </div>
                               )}
@@ -1145,11 +1145,11 @@ export default function NearbyVets() {
 
                             {vet.services && vet.services.length > 0 && (
                               <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                                <span className="font-semibold text-brand-dark/60 dark:text-slate-400">Services:</span>
+                                <span className="font-semibold text-foreground/60 dark:text-muted-foreground">Services:</span>
                                 {vet.services.map((svc) => (
                                   <span
                                     key={svc}
-                                    className="rounded-full bg-white dark:bg-slate-800 border border-brand-dark/10 dark:border-slate-700 px-2 py-0.5 text-[10px] font-semibold text-brand-dark dark:text-slate-200"
+                                    className="rounded-full bg-card dark:bg-card border border-foreground/10 dark:border-border px-2 py-0.5 text-[10px] font-semibold text-foreground dark:text-slate-200"
                                   >
                                     {svc}
                                   </span>
@@ -1160,7 +1160,7 @@ export default function NearbyVets() {
                             <div className="flex items-center gap-3 pt-1">
                               <a
                                 href={`tel:${vet.phone.replace(/[^0-9+]/g, '')}`}
-                                className="inline-flex items-center gap-1.5 rounded-lg bg-brand-dark dark:bg-slate-800 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-sage transition-colors cursor-pointer"
+                                className="inline-flex items-center gap-1.5 rounded-lg bg-brand-dark dark:bg-card px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-sage transition-colors cursor-pointer"
                               >
                                 <Phone className="size-3" />
                                 <span>Call {vet.phone}</span>
@@ -1187,7 +1187,7 @@ export default function NearbyVets() {
                   <button
                     type="button"
                     onClick={() => setExpanded((value) => !value)}
-                    className="min-h-12 w-full px-4 text-sm font-bold text-brand-sage dark:text-emerald-400 hover:bg-brand-cream/60 dark:hover:bg-slate-800/40 transition-colors cursor-pointer text-center"
+                    className="min-h-12 w-full px-4 text-sm font-bold text-brand-accent dark:text-emerald-400 hover:bg-background/60 dark:hover:bg-slate-800/40 transition-colors cursor-pointer text-center"
                   >
                     {expanded ? 'Show fewer clinics' : `Show ${filteredVets.length - INITIAL_COUNT} more clinics`}
                   </button>

@@ -22,6 +22,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const root = document.documentElement
+    root.style.colorScheme = theme
     if (theme === 'dark') {
       root.classList.add('dark')
     } else {

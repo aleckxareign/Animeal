@@ -352,9 +352,9 @@ export default function VerdictCard({ data, activePet }: VerdictCardProps) {
   )
 
   return (
-    <div className="rounded-2xl border border-brand-dark/10 bg-white p-5 sm:p-6 shadow-sm space-y-6">
+    <div className="rounded-2xl border border-foreground/10 bg-card p-5 sm:p-6 shadow-sm space-y-6">
       {/* Top Verdict Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-brand-dark/10 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-5">
         <div className="flex items-center gap-3.5">
           <div
             className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl shadow-sm text-white ${details.badgeBg}`}
@@ -366,33 +366,33 @@ export default function VerdictCard({ data, activePet }: VerdictCardProps) {
               <span
                 className={`inline-block rounded-md px-2.5 py-0.5 text-xs font-black uppercase tracking-wider ${
                   details.verdict === 'good'
-                    ? 'bg-emerald-100 text-emerald-800'
+                    ? 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-300'
                     : details.verdict === 'okay'
-                      ? 'bg-amber-100 text-amber-800'
-                      : 'bg-rose-100 text-rose-800'
+                      ? 'bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-300'
+                      : 'bg-rose-100 dark:bg-rose-500/15 text-rose-800 dark:text-rose-300'
                 }`}
               >
                 Suitability Verdict
               </span>
-              <span className="text-xs text-brand-dark/50">
-                Score: <strong className="text-brand-dark">{details.score}/100</strong>
+              <span className="text-xs text-foreground/50">
+                Score: <strong className="text-foreground">{details.score}/100</strong>
               </span>
             </div>
-            <h2 className="font-display text-2xl font-extrabold text-brand-dark">
+            <h2 className="font-display text-2xl font-extrabold text-foreground">
               {details.label}
             </h2>
-            <p className="text-xs text-brand-dark/70 sm:text-sm">
+            <p className="text-xs text-foreground/70 sm:text-sm">
               {details.sublabel}
             </p>
           </div>
         </div>
 
         {activePet && (
-          <div className="flex items-center gap-2 rounded-xl bg-brand-cream/60 border border-brand-dark/10 px-3 py-2 self-start sm:self-auto">
+          <div className="flex items-center gap-2 rounded-xl bg-background/60 border border-foreground/10 px-3 py-2 self-start sm:self-auto">
             <span className="text-xl">{activePet.avatarEmoji || '🐾'}</span>
             <div className="text-xs">
-              <p className="font-bold text-brand-dark">{activePet.name}</p>
-              <p className="text-brand-dark/60 capitalize">
+              <p className="font-bold text-foreground">{activePet.name}</p>
+              <p className="text-foreground/60 capitalize">
                 {activePet.species} • {activePet.lifeStage}
               </p>
             </div>
@@ -401,16 +401,16 @@ export default function VerdictCard({ data, activePet }: VerdictCardProps) {
       </div>
 
       {/* Species & Context Notice */}
-      <div className="flex items-center gap-2 rounded-xl bg-brand-dark/5 px-3.5 py-2 text-xs font-medium text-brand-dark/80">
-        <Activity className="h-4 w-4 text-brand-sage shrink-0" />
+      <div className="flex items-center gap-2 rounded-xl bg-brand-dark/5 px-3.5 py-2 text-xs font-medium text-foreground/80">
+        <Activity className="h-4 w-4 text-brand-accent shrink-0" />
         <span>{details.speciesNotice}</span>
       </div>
 
       {/* Macronutrient Distribution Bar */}
-      <div className="space-y-2 rounded-xl border border-brand-dark/10 bg-brand-cream/20 p-4">
-        <div className="flex justify-between items-center text-xs font-bold text-brand-dark">
+      <div className="space-y-2 rounded-xl border border-foreground/10 bg-background/20 p-4">
+        <div className="flex justify-between items-center text-xs font-bold text-foreground">
           <span>Macronutrient Breakdown (As Fed)</span>
-          <span className="text-brand-dark/50 font-normal">Approximate profile</span>
+          <span className="text-foreground/50 font-normal">Approximate profile</span>
         </div>
 
         {/* Stacked Percentage Bar */}
@@ -443,7 +443,7 @@ export default function VerdictCard({ data, activePet }: VerdictCardProps) {
         </div>
 
         {/* Legend */}
-        <div className="flex flex-wrap gap-x-4 gap-y-1.5 pt-1 text-[11px] text-brand-dark/70">
+        <div className="flex flex-wrap gap-x-4 gap-y-1.5 pt-1 text-[11px] text-foreground/70">
           <div className="flex items-center gap-1.5">
             <span className="h-2.5 w-2.5 rounded-full bg-brand-sage" />
             <span>Protein ({proteinVal}%)</span>
@@ -472,15 +472,15 @@ export default function VerdictCard({ data, activePet }: VerdictCardProps) {
         {/* Positive Points */}
         {details.positives.length > 0 && (
           <div className="space-y-2">
-            <h4 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-800">
-              <ThumbsUp className="h-3.5 w-3.5 text-emerald-600" />
+            <h4 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">
+              <ThumbsUp className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-300" />
               <span>Nutritional Highlights</span>
             </h4>
-            <ul className="space-y-2 text-xs sm:text-sm text-brand-dark/80">
+            <ul className="space-y-2 text-xs sm:text-sm text-foreground/80">
               {details.positives.map((point, idx) => (
                 <li
                   key={idx}
-                  className="flex items-start gap-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200/60 p-3"
+                  className="flex items-start gap-2.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-500/15 border border-emerald-200/60 dark:border-emerald-400/30 p-3"
                 >
                   <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-[10px] font-bold text-white">
                     ✓
@@ -495,15 +495,15 @@ export default function VerdictCard({ data, activePet }: VerdictCardProps) {
         {/* Caution Points */}
         {details.cautions.length > 0 && (
           <div className="space-y-2">
-            <h4 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-800">
-              <ShieldAlert className="h-3.5 w-3.5 text-amber-600" />
+            <h4 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">
+              <ShieldAlert className="h-3.5 w-3.5 text-amber-600 dark:text-amber-300" />
               <span>Watchouts & Dietary Considerations</span>
             </h4>
-            <ul className="space-y-2 text-xs sm:text-sm text-brand-dark/80">
+            <ul className="space-y-2 text-xs sm:text-sm text-foreground/80">
               {details.cautions.map((point, idx) => (
                 <li
                   key={idx}
-                  className="flex items-start gap-2.5 rounded-xl bg-amber-50/70 border border-amber-200/70 p-3"
+                  className="flex items-start gap-2.5 rounded-xl bg-amber-50/70 dark:bg-amber-500/15 border border-amber-200/70 dark:border-amber-400/30 p-3"
                 >
                   <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-amber-600 text-[10px] font-bold text-white">
                     !
@@ -517,11 +517,11 @@ export default function VerdictCard({ data, activePet }: VerdictCardProps) {
       </div>
 
       {/* Veterinary Disclaimer */}
-      <div className="rounded-xl border border-brand-dark/15 bg-brand-cream/60 p-3.5 text-xs text-brand-dark/70">
+      <div className="rounded-xl border border-foreground/15 bg-background/60 p-3.5 text-xs text-foreground/70">
         <div className="flex items-start gap-2.5">
-          <Info className="h-4 w-4 text-brand-dark/60 shrink-0 mt-0.5" />
+          <Info className="h-4 w-4 text-foreground/60 shrink-0 mt-0.5" />
           <p className="leading-relaxed">
-            <strong className="text-brand-dark">Nutritional Disclaimer:</strong>{' '}
+            <strong className="text-foreground">Nutritional Disclaimer:</strong>{' '}
             This automated verdict is based on standard guaranteed analysis and general AAFCO pet nutrition guidelines. It is not veterinary advice. Always consult your licensed veterinarian for pets with allergies, medical conditions, or specialized therapeutic diets.
           </p>
         </div>

@@ -104,19 +104,19 @@ export default function CareSchedulePage() {
   const completedTodayCount = tasks.filter((t) => t.completed && t.completedAt && isToday(t.completedAt)).length
 
   return (
-    <div className="min-h-screen bg-brand-cream/30 dark:bg-slate-950 py-10 px-4 sm:px-8 lg:px-12 transition-colors">
+    <div className="min-h-screen bg-background/30 dark:bg-card py-10 px-4 sm:px-8 lg:px-12 transition-colors">
       <div className="mx-auto max-w-[1600px] space-y-8">
         {/* Top Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-brand-sage/10 dark:bg-brand-sage/20 px-3.5 py-1 text-xs font-bold text-brand-sage mb-2">
+            <div className="inline-flex items-center gap-2 rounded-full bg-brand-sage/10 dark:bg-brand-sage/20 px-3.5 py-1 text-xs font-bold text-brand-accent mb-2">
               <Calendar className="size-3.5" />
               <span>Scheduling & Smart Reminders System</span>
             </div>
-            <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-brand-dark dark:text-white tracking-tight">
+            <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-foreground dark:text-white tracking-tight">
               Care Schedule & Reminders
             </h1>
-            <p className="text-sm sm:text-base text-stone-600 dark:text-slate-400 mt-1">
+            <p className="text-sm sm:text-base text-muted-foreground dark:text-muted-foreground mt-1">
               Plan, assign, and track feeding, medication, grooming, and veterinary care for your household.
             </p>
           </div>
@@ -126,7 +126,7 @@ export default function CareSchedulePage() {
               <button
                 type="button"
                 onClick={requestNotifications}
-                className="flex items-center gap-2 rounded-xl border border-brand-sage/40 bg-white dark:bg-slate-900 px-4 py-2.5 text-xs font-bold text-brand-sage hover:bg-brand-sage/10 transition"
+                className="flex items-center gap-2 rounded-xl border border-brand-sage/40 bg-card dark:bg-card px-4 py-2.5 text-xs font-bold text-brand-accent hover:bg-brand-sage/10 transition"
               >
                 <Bell className="size-4 animate-bounce" />
                 <span>Enable Push Notifications</span>
@@ -146,36 +146,36 @@ export default function CareSchedulePage() {
 
         {/* Quick Stats Overview */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="rounded-2xl border border-stone-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-2xs">
-            <p className="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-slate-400">
+          <div className="rounded-2xl border border-border/80 dark:border-border bg-card dark:bg-card p-5 shadow-2xs">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground dark:text-muted-foreground">
               Pending Tasks
             </p>
-            <p className="font-display text-3xl font-extrabold text-amber-600 dark:text-amber-400 mt-1">
+            <p className="font-display text-3xl font-extrabold text-amber-600 dark:text-amber-300 dark:text-amber-400 mt-1">
               {pendingCount}
             </p>
-            <p className="text-xs text-stone-500 dark:text-slate-400 mt-1">Awaiting completion</p>
+            <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1">Awaiting completion</p>
           </div>
 
-          <div className="rounded-2xl border border-stone-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-2xs">
-            <p className="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-slate-400">
+          <div className="rounded-2xl border border-border/80 dark:border-border bg-card dark:bg-card p-5 shadow-2xs">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground dark:text-muted-foreground">
               Completed Today
             </p>
-            <p className="font-display text-3xl font-extrabold text-brand-sage dark:text-emerald-400 mt-1">
+            <p className="font-display text-3xl font-extrabold text-brand-accent dark:text-emerald-400 mt-1">
               {completedTodayCount}
             </p>
-            <p className="text-xs text-stone-500 dark:text-slate-400 mt-1">Tasks accomplished</p>
+            <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1">Tasks accomplished</p>
           </div>
 
-          <div className="rounded-2xl border border-stone-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-2xs">
-            <p className="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-slate-400">
+          <div className="rounded-2xl border border-border/80 dark:border-border bg-card dark:bg-card p-5 shadow-2xs">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground dark:text-muted-foreground">
               Active Completer
             </p>
             <div className="flex items-center gap-2 mt-2">
-              <User className="size-4 text-brand-sage" />
+              <User className="size-4 text-brand-accent" />
               <select
                 value={activeCompleter}
                 onChange={(e) => setActiveCompleter(e.target.value)}
-                className="bg-stone-50 dark:bg-slate-800 border border-stone-200 dark:border-slate-700 rounded-lg px-2.5 py-1 text-xs font-bold text-brand-dark dark:text-white"
+                className="bg-background dark:bg-card border border-border dark:border-border rounded-lg px-2.5 py-1 text-xs font-bold text-foreground dark:text-white"
               >
                 {household.map((m) => (
                   <option key={m.id} value={m.name}>
@@ -184,21 +184,21 @@ export default function CareSchedulePage() {
                 ))}
               </select>
             </div>
-            <p className="text-[11px] text-stone-500 dark:text-slate-400 mt-1">Attributed on check-off</p>
+            <p className="text-[11px] text-muted-foreground dark:text-muted-foreground mt-1">Attributed on check-off</p>
           </div>
         </div>
 
         {/* Filter Toolbar */}
-        <div className="rounded-2xl border border-stone-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm space-y-4">
+        <div className="rounded-2xl border border-border/80 dark:border-border bg-card dark:bg-card p-4 sm:p-5 shadow-sm space-y-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             {/* View Mode Tabs */}
-            <div className="flex rounded-xl bg-stone-100 dark:bg-slate-800 p-1 text-xs font-bold text-stone-600 dark:text-slate-300">
+            <div className="flex rounded-xl bg-muted dark:bg-card p-1 text-xs font-bold text-muted-foreground dark:text-muted-foreground">
               <button
                 onClick={() => setViewMode('daily')}
                 className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg transition ${
                   viewMode === 'daily'
-                    ? 'bg-white dark:bg-slate-700 text-brand-dark dark:text-white shadow-2xs'
-                    : 'hover:text-brand-dark'
+                    ? 'bg-card dark:bg-slate-700 text-foreground dark:text-white shadow-2xs'
+                    : 'hover:text-foreground'
                 }`}
               >
                 <CalendarDays className="size-3.5" />
@@ -209,8 +209,8 @@ export default function CareSchedulePage() {
                 onClick={() => setViewMode('weekly')}
                 className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg transition ${
                   viewMode === 'weekly'
-                    ? 'bg-white dark:bg-slate-700 text-brand-dark dark:text-white shadow-2xs'
-                    : 'hover:text-brand-dark'
+                    ? 'bg-card dark:bg-slate-700 text-foreground dark:text-white shadow-2xs'
+                    : 'hover:text-foreground'
                 }`}
               >
                 <CalendarRange className="size-3.5" />
@@ -221,8 +221,8 @@ export default function CareSchedulePage() {
                 onClick={() => setViewMode('all')}
                 className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg transition ${
                   viewMode === 'all'
-                    ? 'bg-white dark:bg-slate-700 text-brand-dark dark:text-white shadow-2xs'
-                    : 'hover:text-brand-dark'
+                    ? 'bg-card dark:bg-slate-700 text-foreground dark:text-white shadow-2xs'
+                    : 'hover:text-foreground'
                 }`}
               >
                 <Calendar className="size-3.5" />
@@ -232,8 +232,8 @@ export default function CareSchedulePage() {
 
             {/* Status Filter */}
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-stone-500 dark:text-slate-400">Status:</span>
-              <div className="flex rounded-lg border border-stone-200 dark:border-slate-700 p-0.5 text-xs font-bold">
+              <span className="text-xs font-semibold text-muted-foreground dark:text-muted-foreground">Status:</span>
+              <div className="flex rounded-lg border border-border dark:border-border p-0.5 text-xs font-bold">
                 {(['all', 'pending', 'completed'] as FilterStatus[]).map((st) => (
                   <button
                     key={st}
@@ -241,7 +241,7 @@ export default function CareSchedulePage() {
                     className={`px-3 py-1.5 rounded-md capitalize transition ${
                       statusFilter === st
                         ? 'bg-brand-sage text-white shadow-xs'
-                        : 'text-stone-600 dark:text-slate-300 hover:text-brand-dark'
+                        : 'text-muted-foreground dark:text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     {st}
@@ -252,16 +252,16 @@ export default function CareSchedulePage() {
           </div>
 
           {/* Pet Switcher & Category Badges */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-stone-100 dark:border-slate-800">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-border dark:border-border">
             {/* Pet Selector */}
             <div className="flex items-center gap-2 overflow-x-auto pb-1">
-              <span className="text-xs font-semibold text-stone-500 dark:text-slate-400 shrink-0">Pet:</span>
+              <span className="text-xs font-semibold text-muted-foreground dark:text-muted-foreground shrink-0">Pet:</span>
               <button
                 onClick={() => setSelectedPetId('all')}
                 className={`px-3 py-1 rounded-full text-xs font-bold shrink-0 transition ${
                   selectedPetId === 'all'
-                    ? 'bg-brand-dark dark:bg-white text-white dark:text-brand-dark'
-                    : 'bg-stone-100 dark:bg-slate-800 text-stone-600 dark:text-slate-300'
+                    ? 'bg-brand-dark dark:bg-card text-white dark:text-foreground'
+                    : 'bg-muted dark:bg-card text-muted-foreground dark:text-muted-foreground'
                 }`}
               >
                 All Pets
@@ -273,7 +273,7 @@ export default function CareSchedulePage() {
                   className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold shrink-0 transition ${
                     selectedPetId === p.id
                       ? 'bg-brand-sage text-white shadow-xs'
-                      : 'bg-stone-100 dark:bg-slate-800 text-stone-600 dark:text-slate-300'
+                      : 'bg-muted dark:bg-card text-muted-foreground dark:text-muted-foreground'
                   }`}
                 >
                   <span>{p.avatarEmoji}</span>
@@ -284,11 +284,11 @@ export default function CareSchedulePage() {
 
             {/* Category Filter */}
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-stone-500 dark:text-slate-400">Category:</span>
+              <span className="text-xs font-semibold text-muted-foreground dark:text-muted-foreground">Category:</span>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value as TaskType | 'all')}
-                className="px-3 py-1.5 rounded-xl border border-stone-200 dark:border-slate-700 bg-stone-50 dark:bg-slate-800 text-xs font-bold text-brand-dark dark:text-white"
+                className="px-3 py-1.5 rounded-xl border border-border dark:border-border bg-background dark:bg-card text-xs font-bold text-foreground dark:text-white"
               >
                 <option value="all">All Categories</option>
                 <option value="feeding">Feeding</option>
@@ -307,15 +307,15 @@ export default function CareSchedulePage() {
 
         {/* Task Cards List */}
         {filteredTasks.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-stone-300 dark:border-slate-800 bg-white dark:bg-slate-900 p-12 text-center space-y-4 shadow-sm">
-            <div className="size-16 rounded-full bg-brand-sage/10 text-brand-sage flex items-center justify-center mx-auto">
+          <div className="rounded-3xl border border-dashed border-border dark:border-border bg-card dark:bg-card p-12 text-center space-y-4 shadow-sm">
+            <div className="size-16 rounded-full bg-brand-sage/10 text-brand-accent flex items-center justify-center mx-auto">
               <Calendar className="size-8" />
             </div>
             <div>
-              <h3 className="font-display text-xl font-bold text-brand-dark dark:text-white">
+              <h3 className="font-display text-xl font-bold text-foreground dark:text-white">
                 Walang naka-schedule na task!
               </h3>
-              <p className="text-sm text-stone-500 dark:text-slate-400 max-w-md mx-auto mt-1">
+              <p className="text-sm text-muted-foreground dark:text-muted-foreground max-w-md mx-auto mt-1">
                 Lahat ng reminders ay natapos na o wala pang naka-schedule sa napiling filter.
               </p>
             </div>
@@ -339,8 +339,8 @@ export default function CareSchedulePage() {
                   key={task.id}
                   className={`relative rounded-2xl border p-5 transition flex flex-col justify-between shadow-2xs ${
                     task.completed
-                      ? 'border-stone-200 dark:border-slate-800 bg-stone-50/60 dark:bg-slate-900/40 opacity-75'
-                      : 'border-stone-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-sage/60 hover:shadow-md'
+                      ? 'border-border dark:border-border bg-muted/60 dark:bg-card/40 opacity-75'
+                      : 'border-border dark:border-border bg-card dark:bg-card hover:border-brand-sage/60 hover:shadow-md'
                   }`}
                 >
                   <div className="space-y-3">
@@ -353,7 +353,7 @@ export default function CareSchedulePage() {
                         </span>
 
                         {task.frequency !== 'once' && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-stone-100 dark:bg-slate-800 text-[10px] font-semibold text-stone-600 dark:text-slate-400">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted dark:bg-card text-[10px] font-semibold text-muted-foreground dark:text-muted-foreground">
                             <Repeat className="size-2.5" />
                             <span className="capitalize">{task.frequency}</span>
                           </span>
@@ -364,7 +364,7 @@ export default function CareSchedulePage() {
                         <button
                           type="button"
                           onClick={() => handleDelete(task.id, task.title)}
-                          className="size-7 rounded-lg text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 flex items-center justify-center transition"
+                          className="size-7 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 flex items-center justify-center transition"
                           title="Delete task"
                         >
                           <Trash2 className="size-3.5" />
@@ -377,29 +377,29 @@ export default function CareSchedulePage() {
                       <h3
                         className={`text-base font-bold leading-snug ${
                           task.completed
-                            ? 'line-through text-stone-500 dark:text-slate-500'
-                            : 'text-brand-dark dark:text-white'
+                            ? 'line-through text-muted-foreground dark:text-muted-foreground'
+                            : 'text-foreground dark:text-white'
                         }`}
                       >
                         {task.title}
                       </h3>
                       {task.notes && (
-                        <p className="text-xs text-stone-500 dark:text-slate-400 mt-1 line-clamp-2">
+                        <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1 line-clamp-2">
                           {task.notes}
                         </p>
                       )}
                     </div>
 
                     {/* Pet & Due Metadata */}
-                    <div className="pt-2 border-t border-stone-100 dark:border-slate-800 space-y-1.5 text-xs text-stone-600 dark:text-slate-400">
+                    <div className="pt-2 border-t border-border dark:border-border space-y-1.5 text-xs text-muted-foreground dark:text-muted-foreground">
                       <div className="flex items-center justify-between">
                         <span className="flex items-center gap-1.5 font-medium">
-                          <Clock className="size-3.5 text-brand-sage" />
+                          <Clock className="size-3.5 text-brand-accent" />
                           <span>{formatDate(task.dueDate)} • {formatTime(task.time)}</span>
                         </span>
 
                         {associatedPet && (
-                          <span className="font-bold text-brand-dark dark:text-white flex items-center gap-1">
+                          <span className="font-bold text-foreground dark:text-white flex items-center gap-1">
                             <span>{associatedPet.avatarEmoji}</span>
                             <span>{associatedPet.name}</span>
                           </span>
@@ -407,15 +407,15 @@ export default function CareSchedulePage() {
                       </div>
 
                       {task.assignedTo && (
-                        <div className="flex items-center gap-1.5 text-[11px] text-stone-500 dark:text-slate-400">
-                          <User className="size-3 text-stone-400" />
-                          <span>Assigned to: <strong className="text-brand-dark dark:text-white">{task.assignedTo}</strong></span>
+                        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground dark:text-muted-foreground">
+                          <User className="size-3 text-muted-foreground" />
+                          <span>Assigned to: <strong className="text-foreground dark:text-white">{task.assignedTo}</strong></span>
                         </div>
                       )}
 
                       {task.completed && task.completedBy && (
-                        <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/40 p-2 text-[11px] text-emerald-800 dark:text-emerald-300 font-medium flex items-center gap-1.5">
-                          <CheckCircle2 className="size-3.5 text-emerald-600 shrink-0" />
+                        <div className="rounded-lg bg-emerald-50 dark:bg-emerald-500/15 dark:bg-emerald-950/40 p-2 text-[11px] text-emerald-800 dark:text-emerald-300 dark:text-emerald-300 font-medium flex items-center gap-1.5">
+                          <CheckCircle2 className="size-3.5 text-emerald-600 dark:text-emerald-300 shrink-0" />
                           <span>Completed by <strong>{task.completedBy}</strong></span>
                         </div>
                       )}
@@ -423,13 +423,13 @@ export default function CareSchedulePage() {
                   </div>
 
                   {/* Completion Action Button */}
-                  <div className="mt-4 pt-3 border-t border-stone-100 dark:border-slate-800">
+                  <div className="mt-4 pt-3 border-t border-border dark:border-border">
                     <button
                       type="button"
                       onClick={() => handleToggleComplete(task)}
                       className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition shadow-xs ${
                         task.completed
-                          ? 'border border-stone-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-stone-600 dark:text-slate-300 hover:bg-stone-50'
+                          ? 'border border-border dark:border-border bg-card dark:bg-card text-muted-foreground dark:text-muted-foreground hover:bg-muted'
                           : 'bg-brand-sage text-white hover:bg-brand-sage/90 active:scale-[0.99]'
                       }`}
                     >

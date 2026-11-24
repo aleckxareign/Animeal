@@ -188,8 +188,8 @@ export default function WeightTracker({ pet }: WeightTrackerProps) {
     <div className="space-y-6 animate-fade-in">
       {/* Rapid Weight Change Alert (>10% change in 30 days) */}
       {rapidWeightAlert && (
-        <div className="bg-red-50 border-2 border-brand-alert/40 rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-brand-alert/15 text-brand-alert flex items-center justify-center shrink-0">
+        <div className="bg-red-50 dark:bg-red-500/15 border-2 border-brand-alert/40 rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-start gap-4">
+          <div className="w-12 h-12 rounded-xl bg-brand-alert/15 text-destructive flex items-center justify-center shrink-0">
             <AlertTriangle className="w-6 h-6 animate-pulse" />
           </div>
           <div className="space-y-2 flex-1">
@@ -197,12 +197,12 @@ export default function WeightTracker({ pet }: WeightTrackerProps) {
               <span className="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider bg-brand-alert text-white">
                 Veterinary Advisory
               </span>
-              <h3 className="text-base font-bold text-brand-alert">
+              <h3 className="text-base font-bold text-destructive">
                 Significant Weight {rapidWeightAlert.direction === 'gain' ? 'Gain' : 'Loss'} Detected ({rapidWeightAlert.pct}%)
               </h3>
             </div>
-            <p className="text-sm text-stone-700 leading-relaxed">
-              {pet.name} has had a <span className="font-bold text-brand-dark">{rapidWeightAlert.direction} of {rapidWeightAlert.deltaKg} kg ({rapidWeightAlert.pct}%)</span> over the past {rapidWeightAlert.days} days ({rapidWeightAlert.fromKg} kg → {rapidWeightAlert.toKg} kg).
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {pet.name} has had a <span className="font-bold text-foreground">{rapidWeightAlert.direction} of {rapidWeightAlert.deltaKg} kg ({rapidWeightAlert.pct}%)</span> over the past {rapidWeightAlert.days} days ({rapidWeightAlert.fromKg} kg → {rapidWeightAlert.toKg} kg).
               A weight shift of 10% or more in a 30-day window can be an early indicator of thyroid imbalance, diabetes, kidney issues, metabolic shifts, or parasite concerns.
             </p>
             <div className="flex flex-wrap items-center gap-3 pt-1">
@@ -215,9 +215,9 @@ export default function WeightTracker({ pet }: WeightTrackerProps) {
               </Link>
               <Link
                 to="/ask-mealie"
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-white border border-stone-300 text-stone-700 hover:bg-stone-50 transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-card border border-border text-muted-foreground hover:bg-muted transition-colors"
               >
-                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-300" />
                 Ask Mealie AI for Advice
               </Link>
             </div>
@@ -228,72 +228,72 @@ export default function WeightTracker({ pet }: WeightTrackerProps) {
       {/* Overview Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {/* Current Weight Card */}
-        <div className="bg-white rounded-2xl p-5 sm:p-6 border border-stone-100 shadow-xs flex flex-col justify-between">
+        <div className="bg-card rounded-2xl p-5 sm:p-6 border border-border shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-stone-500">
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Current Weight
             </span>
-            <div className="w-8 h-8 rounded-lg bg-brand-sage/10 text-brand-sage flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-brand-sage/10 text-brand-accent flex items-center justify-center">
               <Scale className="w-4 h-4" />
             </div>
           </div>
           <div className="my-3">
-            <div className="text-3xl sm:text-4xl font-extrabold text-brand-dark">
+            <div className="text-3xl sm:text-4xl font-extrabold text-foreground">
               {currentDisplayWeight.toFixed(1)}{' '}
-              <span className="text-lg font-medium text-stone-500">kg</span>
+              <span className="text-lg font-medium text-muted-foreground">kg</span>
             </div>
             <div className="flex items-center gap-2 mt-1">
               {previousLog ? (
                 weightDiff === 0 ? (
-                  <span className="text-xs font-semibold text-stone-500">
+                  <span className="text-xs font-semibold text-muted-foreground">
                     ±0.0 kg vs prior weigh-in
                   </span>
                 ) : weightDiff > 0 ? (
-                  <span className="text-xs font-semibold text-amber-700 flex items-center gap-1">
+                  <span className="text-xs font-semibold text-amber-700 dark:text-amber-300 flex items-center gap-1">
                     <TrendingUp className="w-3.5 h-3.5" />
                     +{weightDiff.toFixed(1)} kg (+{weightDiffPct.toFixed(1)}%)
                   </span>
                 ) : (
-                  <span className="text-xs font-semibold text-teal-700 flex items-center gap-1">
+                  <span className="text-xs font-semibold text-teal-700 dark:text-teal-300 flex items-center gap-1">
                     <TrendingDown className="w-3.5 h-3.5" />
                     {weightDiff.toFixed(1)} kg ({weightDiffPct.toFixed(1)}%)
                   </span>
                 )
               ) : (
-                <span className="text-xs text-stone-400">Baseline registration weight</span>
+                <span className="text-xs text-muted-foreground">Baseline registration weight</span>
               )}
             </div>
           </div>
-          <div className="text-xs text-stone-400 pt-3 border-t border-stone-100 flex items-center justify-between">
+          <div className="text-xs text-muted-foreground pt-3 border-t border-border flex items-center justify-between">
             <span>Last weighed:</span>
-            <span className="font-medium text-stone-600">
+            <span className="font-medium text-muted-foreground">
               {latestLog ? timeAgo(latestLog.date) : 'Today'}
             </span>
           </div>
         </div>
 
         {/* Target & Ideal Range Card */}
-        <div className="bg-white rounded-2xl p-5 sm:p-6 border border-stone-100 shadow-xs flex flex-col justify-between">
+        <div className="bg-card rounded-2xl p-5 sm:p-6 border border-border shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-stone-500">
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Ideal Target Band
             </span>
-            <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-500/15 text-teal-700 dark:text-teal-300 flex items-center justify-center">
               <Info className="w-4 h-4" />
             </div>
           </div>
           <div className="my-3">
-            <div className="text-3xl sm:text-4xl font-extrabold text-brand-dark">
+            <div className="text-3xl sm:text-4xl font-extrabold text-foreground">
               {(pet.weight * 0.95).toFixed(1)} - {(pet.weight * 1.05).toFixed(1)}{' '}
-              <span className="text-lg font-medium text-stone-500">kg</span>
+              <span className="text-lg font-medium text-muted-foreground">kg</span>
             </div>
-            <p className="text-xs text-stone-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               ±5% healthy buffer for {pet.species} ({pet.breed || 'standard breed'})
             </p>
           </div>
-          <div className="text-xs text-stone-400 pt-3 border-t border-stone-100 flex items-center justify-between">
+          <div className="text-xs text-muted-foreground pt-3 border-t border-border flex items-center justify-between">
             <span>Status:</span>
-            <span className="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+            <span className="font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/15 px-2 py-0.5 rounded-md">
               In Target Range
             </span>
           </div>
@@ -302,7 +302,7 @@ export default function WeightTracker({ pet }: WeightTrackerProps) {
         {/* Action Button Card */}
         <div className="bg-linear-to-br from-brand-dark to-stone-900 text-white rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-white/10 text-brand-cream mb-2">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-card/10 text-brand-cream mb-2">
               <Calendar className="w-3.5 h-3.5" />
               Regular Monitoring
             </div>
@@ -323,24 +323,24 @@ export default function WeightTracker({ pet }: WeightTrackerProps) {
       </div>
 
       {/* Weight Trend Chart Card */}
-      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-stone-100 shadow-xs space-y-4">
+      <div className="bg-card rounded-2xl p-5 sm:p-6 border border-border shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h3 className="text-lg font-bold text-brand-dark flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-brand-sage" />
+            <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-brand-accent" />
               Weight Trend Over Time
             </h3>
-            <p className="text-xs text-stone-500">
+            <p className="text-xs text-muted-foreground">
               Interactive timeline of recorded weights with healthy range shading
             </p>
           </div>
 
           <div className="flex items-center gap-4 text-xs">
-            <div className="flex items-center gap-1.5 text-stone-600">
+            <div className="flex items-center gap-1.5 text-muted-foreground">
               <div className="w-3 h-3 rounded-full bg-brand-sage" />
               <span>Logged Weight</span>
             </div>
-            <div className="flex items-center gap-1.5 text-stone-600">
+            <div className="flex items-center gap-1.5 text-muted-foreground">
               <div className="w-3 h-3 rounded-xs bg-emerald-500/20 border border-emerald-400" />
               <span>Target Band (±5%)</span>
             </div>
@@ -348,7 +348,7 @@ export default function WeightTracker({ pet }: WeightTrackerProps) {
         </div>
 
         {/* Pure SVG Chart */}
-        <div className="relative w-full overflow-hidden bg-stone-50/60 rounded-xl p-2 border border-stone-200/60">
+        <div className="relative w-full overflow-hidden bg-muted/60 rounded-xl p-2 border border-border/60">
           <svg
             viewBox={`0 0 ${chartConfig.svgWidth} ${chartConfig.svgHeight}`}
             className="w-full h-auto overflow-visible select-none"
@@ -388,7 +388,7 @@ export default function WeightTracker({ pet }: WeightTrackerProps) {
                     y1={y}
                     x2={chartConfig.padding.left + chartConfig.plotWidth}
                     y2={y}
-                    stroke="#e5e7eb"
+                    stroke="var(--border)"
                     strokeWidth="1"
                     strokeDasharray="4 4"
                   />
@@ -396,7 +396,7 @@ export default function WeightTracker({ pet }: WeightTrackerProps) {
                     x={chartConfig.padding.left - 8}
                     y={y + 4}
                     textAnchor="end"
-                    className="text-[11px] fill-stone-400 font-medium"
+                    className="text-[11px] fill-muted-foreground font-medium"
                   >
                     {val.toFixed(1)}kg
                   </text>
@@ -413,7 +413,7 @@ export default function WeightTracker({ pet }: WeightTrackerProps) {
             <path
               d={chartConfig.pathD}
               fill="none"
-              stroke="#44632f"
+              stroke="var(--brand-accent)"
               strokeWidth="3"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -438,8 +438,8 @@ export default function WeightTracker({ pet }: WeightTrackerProps) {
                     cx={pt.x}
                     cy={pt.y}
                     r={isHovered ? 7 : 5}
-                    fill="#ffffff"
-                    stroke="#44632f"
+                    fill="var(--card)"
+                    stroke="var(--brand-accent)"
                     strokeWidth={isHovered ? 3 : 2.5}
                     className="transition-all duration-150"
                   />
@@ -450,7 +450,7 @@ export default function WeightTracker({ pet }: WeightTrackerProps) {
                     y={chartConfig.padding.top + chartConfig.plotHeight + 20}
                     textAnchor="middle"
                     className={`text-[10px] transition-colors ${
-                      isHovered ? 'fill-brand-dark font-bold' : 'fill-stone-400 font-medium'
+                      isHovered ? 'fill-foreground font-bold' : 'fill-muted-foreground font-medium'
                     }`}
                   >
                     {formatDate(pt.item.date).split(',')[0]}
@@ -487,16 +487,16 @@ export default function WeightTracker({ pet }: WeightTrackerProps) {
       </div>
 
       {/* Weight History Table / List */}
-      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-stone-100 shadow-xs space-y-4">
+      <div className="bg-card rounded-2xl p-5 sm:p-6 border border-border shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-base font-bold text-brand-dark flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-stone-500" />
+            <h3 className="text-base font-bold text-foreground flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-muted-foreground" />
               Weight History & Logs
             </h3>
-            <p className="text-xs text-stone-500">Comprehensive list of weigh-in measurements</p>
+            <p className="text-xs text-muted-foreground">Comprehensive list of weigh-in measurements</p>
           </div>
-          <span className="text-xs font-semibold text-stone-500 bg-stone-100 px-2.5 py-1 rounded-md">
+          <span className="text-xs font-semibold text-muted-foreground bg-muted px-2.5 py-1 rounded-md">
             {history.length} records
           </span>
         </div>
@@ -504,7 +504,7 @@ export default function WeightTracker({ pet }: WeightTrackerProps) {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-stone-200 text-stone-400 font-semibold uppercase tracking-wider">
+              <tr className="border-b border-border text-muted-foreground font-semibold uppercase tracking-wider">
                 <th className="pb-3 pl-2">Date</th>
                 <th className="pb-3">Weight</th>
                 <th className="pb-3">Change</th>
@@ -519,34 +519,34 @@ export default function WeightTracker({ pet }: WeightTrackerProps) {
                 const diff = prev ? entry.weight - prev.weight : 0
 
                 return (
-                  <tr key={entry.id} className="hover:bg-stone-50/70 transition-colors">
-                    <td className="py-3.5 pl-2 font-medium text-brand-dark">
+                  <tr key={entry.id} className="hover:bg-muted/70 transition-colors">
+                    <td className="py-3.5 pl-2 font-medium text-foreground">
                       <div>{formatDate(entry.date)}</div>
-                      <div className="text-[11px] text-stone-400 font-normal">
+                      <div className="text-[11px] text-muted-foreground font-normal">
                         {timeAgo(entry.date)}
                       </div>
                     </td>
-                    <td className="py-3.5 font-bold text-sm text-brand-dark">
+                    <td className="py-3.5 font-bold text-sm text-foreground">
                       {entry.weight.toFixed(1)} kg
                     </td>
                     <td className="py-3.5">
                       {prev ? (
                         diff === 0 ? (
-                          <span className="text-stone-400">0.0 kg</span>
+                          <span className="text-muted-foreground">0.0 kg</span>
                         ) : diff > 0 ? (
-                          <span className="text-amber-700 font-semibold">
+                          <span className="text-amber-700 dark:text-amber-300 font-semibold">
                             +{diff.toFixed(1)} kg
                           </span>
                         ) : (
-                          <span className="text-teal-700 font-semibold">
+                          <span className="text-teal-700 dark:text-teal-300 font-semibold">
                             {diff.toFixed(1)} kg
                           </span>
                         )
                       ) : (
-                        <span className="text-stone-400 italic">Baseline</span>
+                        <span className="text-muted-foreground italic">Baseline</span>
                       )}
                     </td>
-                    <td className="py-3.5 text-stone-600 max-w-xs truncate">
+                    <td className="py-3.5 text-muted-foreground max-w-xs truncate">
                       {entry.notes || <span className="text-stone-300 italic">—</span>}
                     </td>
                     <td className="py-3.5 pr-2 text-right">
@@ -554,7 +554,7 @@ export default function WeightTracker({ pet }: WeightTrackerProps) {
                         <button
                           type="button"
                           onClick={() => handleDeleteLog(entry.id)}
-                          className="p-1.5 text-stone-400 hover:text-brand-alert hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-colors"
                           title="Delete entry"
                         >
                           <Trash2 className="w-4 h-4" />

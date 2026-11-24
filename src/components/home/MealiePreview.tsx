@@ -22,7 +22,7 @@ function MealieAvatar({ size = 'md' }: { size?: 'sm' | 'md' }) {
 
   return (
     <div
-      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-brand-sage/20 bg-brand-sage/10 p-1.5 ${sizes[size]}`}
+      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-brand-sage/20 bg-brand-cream p-1.5 ${sizes[size]}`}
     >
       <img
         src="/images/logo-only.svg"
@@ -35,7 +35,7 @@ function MealieAvatar({ size = 'md' }: { size?: 'sm' | 'md' }) {
 
 export default function MealiePreview() {
   return (
-    <section className="bg-white py-12 sm:py-16 lg:py-20">
+    <section className="bg-card py-12 sm:py-16 lg:py-20">
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-5 sm:px-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-12 lg:px-10">
 
         {/* Left Content */}
@@ -56,7 +56,7 @@ export default function MealiePreview() {
               <ArrowRight className="size-5" />
             </Button>
 
-            <span className="text-sm font-semibold text-brand-dark/70">
+            <span className="text-sm font-semibold text-foreground/70">
               Free • Instant answers • AI-powered pet care information
             </span>
           </div>
@@ -64,10 +64,10 @@ export default function MealiePreview() {
 
         {/* Live Chat Mockup Card */}
         <div className="mx-auto w-full max-w-xl lg:max-w-none">
-          <Card className="overflow-hidden rounded-3xl border border-border/80 bg-white shadow-xl ring-1 ring-black/5">
+          <Card className="overflow-hidden rounded-3xl border border-border/80 bg-card shadow-xl ring-1 ring-black/5">
 
             {/* Chat Header */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/50 bg-brand-cream/40 px-4 py-4 sm:px-5">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/50 bg-background/40 px-4 py-4 sm:px-5">
               <div className="flex min-w-0 items-center gap-3.5">
 
                 {/* Mealie Logo + Online Indicator */}
@@ -80,32 +80,32 @@ export default function MealiePreview() {
                 {/* Assistant Details */}
                 <div>
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <h4 className="text-base font-bold text-brand-dark sm:text-lg">
+                    <h4 className="text-base font-bold text-foreground sm:text-lg">
                       Mealie Assistant
                     </h4>
 
                     <Badge
                       variant="secondary"
-                      className="bg-brand-sage/15 px-2 py-0.5 text-xs font-bold text-brand-sage"
+                      className="bg-brand-sage/15 px-2 py-0.5 text-xs font-bold text-brand-accent"
                     >
                       AI Guide
                     </Badge>
                   </div>
 
-                  <p className="text-xs text-brand-dark/65 sm:text-sm">
+                  <p className="text-xs text-foreground/65 sm:text-sm">
                     English & Taglish • Online
                   </p>
                 </div>
               </div>
 
               {/* Status Badge */}
-              <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-800">
+              <span className="rounded-full bg-emerald-50 dark:bg-emerald-500/15 px-3 py-1.5 text-xs font-bold text-emerald-800 dark:text-emerald-300">
                 Ready to help
               </span>
             </div>
 
             {/* Conversation Body */}
-            <div className="space-y-5 bg-brand-cream/15 p-4 sm:p-5">
+            <div className="space-y-5 bg-background/15 p-4 sm:p-5">
 
               {/* Assistant Welcome Message */}
               <div className="flex items-start gap-3.5">
@@ -114,7 +114,7 @@ export default function MealiePreview() {
                 <MealieAvatar size="sm" />
 
                 {/* Message Bubble */}
-                <div className="rounded-2xl rounded-tl-sm border border-border/60 bg-white p-3 sm:p-4 text-sm leading-relaxed text-brand-dark shadow-sm sm:text-base">
+                <div className="rounded-2xl rounded-tl-sm border border-border/60 bg-card p-3 sm:p-4 text-sm leading-relaxed text-foreground shadow-sm sm:text-base">
                   Kamusta! I'm <strong>Mealie</strong>, your pet
                   nutrition and wellness assistant. Ask me anything
                   about what's safe to feed, portion sizes, or
@@ -124,7 +124,7 @@ export default function MealiePreview() {
 
               {/* Popular Questions */}
               <div className="pt-2">
-                <p className="mb-3 text-xs font-bold uppercase tracking-wider text-brand-dark/60 sm:text-sm">
+                <p className="mb-3 text-xs font-bold uppercase tracking-wider text-foreground/60 sm:text-sm">
                   Popular Questions:
                 </p>
 
@@ -133,7 +133,7 @@ export default function MealiePreview() {
                     <Link
                       key={s}
                       to={`/ask-mealie?q=${encodeURIComponent(s)}`}
-                      className="min-h-11 inline-flex items-center rounded-2xl border border-border/80 bg-white px-4 py-2 text-xs font-semibold text-brand-dark shadow-2xs transition-all hover:border-brand-sage hover:bg-brand-sage/5 hover:text-brand-sage sm:text-sm"
+                      className="min-h-11 inline-flex items-center rounded-2xl border border-border/80 bg-card px-4 py-2 text-xs font-semibold text-foreground shadow-2xs transition-all hover:border-brand-sage hover:bg-brand-sage/5 hover:text-brand-accent sm:text-sm"
                     >
                       {s}
                     </Link>
@@ -144,9 +144,9 @@ export default function MealiePreview() {
               {/* Simulated Chat Input */}
               <Link
                 to="/ask-mealie"
-                className="mt-5 flex items-center justify-between rounded-2xl border border-border bg-white gap-3 px-4 py-3 shadow-xs transition-colors hover:border-brand-sage"
+                className="mt-5 flex items-center justify-between rounded-2xl border border-border bg-card gap-3 px-4 py-3 shadow-xs transition-colors hover:border-brand-sage"
               >
-                <span className="min-w-0 text-sm font-medium text-brand-dark/60">
+                <span className="min-w-0 text-sm font-medium text-foreground/60">
                   Ask Mealie anything... (e.g. 'Pwede ba ang saging sa aso?')
                 </span>
 

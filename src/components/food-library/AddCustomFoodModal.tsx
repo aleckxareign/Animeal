@@ -150,18 +150,18 @@ export default function AddCustomFoodModal({
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-stone-200 overflow-hidden z-10 animate-scale-in my-6 max-h-[92vh] flex flex-col">
+      <div className="relative w-full max-w-2xl bg-card rounded-3xl shadow-2xl border border-border overflow-hidden z-10 animate-scale-in my-0 max-h-[min(92vh,calc(100dvh-2rem))] flex flex-col">
         {/* Header */}
-        <div className="p-5 sm:p-6 pb-4 border-b border-stone-200 flex items-center justify-between gap-4 bg-stone-50">
+        <div className="p-5 sm:p-6 pb-4 border-b border-border flex items-center justify-between gap-4 bg-background">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-500/15 text-purple-700 dark:text-purple-300 flex items-center justify-center">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-brand-dark">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground">
                 Add Custom Food
               </h2>
-              <p className="text-xs sm:text-sm text-stone-500">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Add homemade recipes, vet formulas, or unlisted pet foods
               </p>
             </div>
@@ -169,7 +169,7 @@ export default function AddCustomFoodModal({
 
           <button
             onClick={onClose}
-            className="text-stone-400 hover:text-stone-700 p-2 rounded-xl hover:bg-stone-100 transition-colors"
+            className="text-muted-foreground hover:text-muted-foreground p-2 rounded-xl hover:bg-muted transition-colors"
             aria-label="Close dialog"
           >
             <X className="w-5 h-5" />
@@ -181,8 +181,8 @@ export default function AddCustomFoodModal({
           {/* Product Name & Brand */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-brand-dark uppercase tracking-wider mb-1.5">
-                Food Name <span className="text-brand-alert">*</span>
+              <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-1.5">
+                Food Name <span className="text-destructive">*</span>
               </label>
               <input
                 type="text"
@@ -193,18 +193,18 @@ export default function AddCustomFoodModal({
                   if (errors.name) setErrors({ ...errors, name: '' })
                 }}
                 placeholder="e.g. Boiled Chicken Breast with Carrots"
-                className={`w-full px-3.5 py-2.5 rounded-xl border text-sm bg-stone-50 focus:bg-white focus:outline-none focus:ring-2 transition-all ${
+                className={`w-full px-3.5 py-2.5 rounded-xl border text-sm bg-background focus:bg-card focus:outline-none focus:ring-2 transition-all ${
                   errors.name
                     ? 'border-brand-alert ring-1 ring-brand-alert'
-                    : 'border-stone-200 focus:ring-brand-sage focus:border-brand-sage'
+                    : 'border-border focus:ring-brand-sage focus:border-brand-sage'
                 }`}
               />
-              {errors.name && <p className="text-xs text-brand-alert mt-1">{errors.name}</p>}
+              {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-brand-dark uppercase tracking-wider mb-1.5">
-                Brand / Made By <span className="text-brand-alert">*</span>
+              <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-1.5">
+                Brand / Made By <span className="text-destructive">*</span>
               </label>
               <input
                 type="text"
@@ -215,13 +215,13 @@ export default function AddCustomFoodModal({
                   if (errors.brand) setErrors({ ...errors, brand: '' })
                 }}
                 placeholder="e.g. Homemade, Special Diet, Aozi"
-                className={`w-full px-3.5 py-2.5 rounded-xl border text-sm bg-stone-50 focus:bg-white focus:outline-none focus:ring-2 transition-all ${
+                className={`w-full px-3.5 py-2.5 rounded-xl border text-sm bg-background focus:bg-card focus:outline-none focus:ring-2 transition-all ${
                   errors.brand
                     ? 'border-brand-alert ring-1 ring-brand-alert'
-                    : 'border-stone-200 focus:ring-brand-sage focus:border-brand-sage'
+                    : 'border-border focus:ring-brand-sage focus:border-brand-sage'
                 }`}
               />
-              {errors.brand && <p className="text-xs text-brand-alert mt-1">{errors.brand}</p>}
+              {errors.brand && <p className="text-xs text-destructive mt-1">{errors.brand}</p>}
             </div>
           </div>
 
@@ -229,8 +229,8 @@ export default function AddCustomFoodModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Species Checkboxes */}
             <div>
-              <label className="block text-xs font-bold text-brand-dark uppercase tracking-wider mb-1.5">
-                Target Species <span className="text-brand-alert">*</span>
+              <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-1.5">
+                Target Species <span className="text-destructive">*</span>
               </label>
               <div className="flex gap-2">
                 <button
@@ -238,8 +238,8 @@ export default function AddCustomFoodModal({
                   onClick={() => toggleSpecies('dog')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl border text-xs font-semibold transition-all ${
                     species.includes('dog')
-                      ? 'bg-amber-100/80 border-amber-300 text-amber-900 shadow-xs'
-                      : 'bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100'
+                      ? 'bg-amber-100/80 dark:bg-amber-500/15 border-amber-300 dark:border-amber-400/30 text-amber-900 dark:text-amber-300 shadow-xs'
+                      : 'bg-background border-border text-muted-foreground hover:bg-muted'
                   }`}
                 >
                   <Dog className="w-4 h-4" />
@@ -250,8 +250,8 @@ export default function AddCustomFoodModal({
                   onClick={() => toggleSpecies('cat')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl border text-xs font-semibold transition-all ${
                     species.includes('cat')
-                      ? 'bg-indigo-100/80 border-indigo-300 text-indigo-900 shadow-xs'
-                      : 'bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100'
+                      ? 'bg-indigo-100/80 dark:bg-indigo-500/15 border-indigo-300 dark:border-indigo-400/30 text-indigo-900 dark:text-indigo-300 shadow-xs'
+                      : 'bg-background border-border text-muted-foreground hover:bg-muted'
                   }`}
                 >
                   <Cat className="w-4 h-4" />
@@ -262,13 +262,13 @@ export default function AddCustomFoodModal({
 
             {/* Category Select */}
             <div>
-              <label className="block text-xs font-bold text-brand-dark uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-1.5">
                 Food Category
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as FoodCategory)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-stone-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-sage"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border text-sm bg-background focus:bg-card focus:outline-none focus:ring-2 focus:ring-brand-sage"
               >
                 <option value="dry">Dry Kibble</option>
                 <option value="wet">Wet / Canned</option>
@@ -281,7 +281,7 @@ export default function AddCustomFoodModal({
 
           {/* Life Stages */}
           <div>
-            <label className="block text-xs font-bold text-brand-dark uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-1.5">
               Suitable Life Stages
             </label>
             <div className="flex flex-wrap gap-2">
@@ -295,7 +295,7 @@ export default function AddCustomFoodModal({
                     className={`capitalize px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
                       active
                         ? 'bg-brand-sage text-white border-brand-sage shadow-xs'
-                        : 'bg-stone-50 text-stone-600 border-stone-200 hover:bg-stone-100'
+                        : 'bg-background text-muted-foreground border-border hover:bg-muted'
                     }`}
                   >
                     {stage}
@@ -306,15 +306,15 @@ export default function AddCustomFoodModal({
           </div>
 
           {/* Nutritional Breakdown (Guaranteed Analysis) */}
-          <div className="p-4 bg-stone-50 rounded-2xl border border-stone-200">
+          <div className="p-4 bg-background rounded-2xl border border-border">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-brand-dark uppercase tracking-wider">
+              <span className="text-xs font-bold text-foreground uppercase tracking-wider">
                 Nutritional Values (per 100g)
               </span>
               <button
                 type="button"
                 onClick={handleEstimateCalories}
-                className="text-[11px] font-semibold text-brand-sage hover:text-brand-dark underline flex items-center gap-1"
+                className="text-[11px] font-semibold text-brand-accent hover:text-foreground underline flex items-center gap-1"
               >
                 <Flame className="w-3.5 h-3.5" />
                 Auto-estimate kcal from macros
@@ -324,8 +324,8 @@ export default function AddCustomFoodModal({
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               {/* Calories */}
               <div className="col-span-2 sm:col-span-1">
-                <label className="block text-[11px] font-bold text-stone-600 mb-1">
-                  Calories (kcal) <span className="text-brand-alert">*</span>
+                <label className="block text-[11px] font-bold text-muted-foreground mb-1">
+                  Calories (kcal) <span className="text-destructive">*</span>
                 </label>
                 <input
                   type="number"
@@ -334,13 +334,13 @@ export default function AddCustomFoodModal({
                   required
                   value={caloriesPer100g}
                   onChange={(e) => setCaloriesPer100g(e.target.value)}
-                  className="w-full px-2.5 py-2 rounded-xl border border-stone-300 text-sm bg-white font-bold text-brand-dark text-center"
+                  className="w-full px-2.5 py-2 rounded-xl border border-border text-sm bg-card font-bold text-foreground text-center"
                 />
               </div>
 
               {/* Protein */}
               <div>
-                <label className="block text-[11px] font-semibold text-stone-600 mb-1">
+                <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
                   Protein %
                 </label>
                 <input
@@ -350,13 +350,13 @@ export default function AddCustomFoodModal({
                   max="100"
                   value={protein}
                   onChange={(e) => setProtein(e.target.value)}
-                  className="w-full px-2.5 py-2 rounded-xl border border-stone-300 text-sm bg-white text-center font-medium"
+                  className="w-full px-2.5 py-2 rounded-xl border border-border text-sm bg-card text-center font-medium"
                 />
               </div>
 
               {/* Fat */}
               <div>
-                <label className="block text-[11px] font-semibold text-stone-600 mb-1">
+                <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
                   Fat %
                 </label>
                 <input
@@ -366,13 +366,13 @@ export default function AddCustomFoodModal({
                   max="100"
                   value={fat}
                   onChange={(e) => setFat(e.target.value)}
-                  className="w-full px-2.5 py-2 rounded-xl border border-stone-300 text-sm bg-white text-center font-medium"
+                  className="w-full px-2.5 py-2 rounded-xl border border-border text-sm bg-card text-center font-medium"
                 />
               </div>
 
               {/* Fiber */}
               <div>
-                <label className="block text-[11px] font-semibold text-stone-600 mb-1">
+                <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
                   Fiber %
                 </label>
                 <input
@@ -382,13 +382,13 @@ export default function AddCustomFoodModal({
                   max="100"
                   value={fiber}
                   onChange={(e) => setFiber(e.target.value)}
-                  className="w-full px-2.5 py-2 rounded-xl border border-stone-300 text-sm bg-white text-center font-medium"
+                  className="w-full px-2.5 py-2 rounded-xl border border-border text-sm bg-card text-center font-medium"
                 />
               </div>
 
               {/* Moisture */}
               <div>
-                <label className="block text-[11px] font-semibold text-stone-600 mb-1">
+                <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
                   Moisture %
                 </label>
                 <input
@@ -398,7 +398,7 @@ export default function AddCustomFoodModal({
                   max="100"
                   value={moisture}
                   onChange={(e) => setMoisture(e.target.value)}
-                  className="w-full px-2.5 py-2 rounded-xl border border-stone-300 text-sm bg-white text-center font-medium"
+                  className="w-full px-2.5 py-2 rounded-xl border border-border text-sm bg-card text-center font-medium"
                 />
               </div>
             </div>
@@ -407,8 +407,8 @@ export default function AddCustomFoodModal({
           {/* Pricing & Packaging */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-brand-dark uppercase tracking-wider mb-1.5">
-                Package / Batch Weight (g) <span className="text-brand-alert">*</span>
+              <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-1.5">
+                Package / Batch Weight (g) <span className="text-destructive">*</span>
               </label>
               <div className="relative">
                 <input
@@ -419,20 +419,20 @@ export default function AddCustomFoodModal({
                   value={packageSize}
                   onChange={(e) => setPackageSize(e.target.value)}
                   placeholder="e.g. 1000"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-stone-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-sage pr-8"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border text-sm bg-background focus:bg-card focus:outline-none focus:ring-2 focus:ring-brand-sage pr-8"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-stone-400">
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground">
                   grams
                 </span>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-brand-dark uppercase tracking-wider mb-1.5">
-                Total Price (PHP ₱) <span className="text-brand-alert">*</span>
+              <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-1.5">
+                Total Price (PHP ₱) <span className="text-destructive">*</span>
               </label>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-stone-400">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-muted-foreground">
                   ₱
                 </span>
                 <input
@@ -443,7 +443,7 @@ export default function AddCustomFoodModal({
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   placeholder="0.00"
-                  className="w-full pl-8 pr-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-stone-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-sage font-medium"
+                  className="w-full pl-8 pr-3.5 py-2.5 rounded-xl border border-border text-sm bg-background focus:bg-card focus:outline-none focus:ring-2 focus:ring-brand-sage font-medium"
                 />
               </div>
             </div>
@@ -452,7 +452,7 @@ export default function AddCustomFoodModal({
           {/* Serving Guideline */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-brand-dark uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-1.5">
                 Standard Portion Size
               </label>
               <input
@@ -461,12 +461,12 @@ export default function AddCustomFoodModal({
                 value={servingSize}
                 onChange={(e) => setServingSize(e.target.value)}
                 placeholder="100"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-stone-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-sage"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border text-sm bg-background focus:bg-card focus:outline-none focus:ring-2 focus:ring-brand-sage"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-brand-dark uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-1.5">
                 Portion Unit / Note
               </label>
               <input
@@ -474,17 +474,17 @@ export default function AddCustomFoodModal({
                 value={servingUnit}
                 onChange={(e) => setServingUnit(e.target.value)}
                 placeholder="e.g. g/day for 10kg dog"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm bg-stone-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-sage"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border text-sm bg-background focus:bg-card focus:outline-none focus:ring-2 focus:ring-brand-sage"
               />
             </div>
           </div>
 
           {/* Footer Submit Button */}
-          <div className="pt-4 border-t border-stone-200 flex items-center justify-end gap-3">
+          <div className="pt-4 border-t border-border flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl text-sm font-semibold text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors"
+              className="px-4 py-2.5 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
               Cancel
             </button>

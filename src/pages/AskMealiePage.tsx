@@ -351,10 +351,10 @@ export default function AskMealiePage() {
   }
 
   return (
-    <div className="flex h-full w-full flex-col bg-[#fcfbf9] dark:bg-slate-950 overflow-hidden">
-      <div className="mx-auto flex h-full w-full max-w-4xl flex-col px-3 sm:px-6 py-2 sm:py-3 overflow-hidden">
+    <div className="flex h-full min-h-0 min-w-0 w-full flex-col bg-background dark:bg-card overflow-x-hidden overflow-y-auto">
+      <div className="mx-auto flex h-full min-h-[32rem] w-full max-w-4xl shrink-0 flex-col px-3 sm:px-6 py-2 sm:py-3">
         {/* 1. Header with Pet Context Switcher */}
-        <div className="shrink-0 rounded-2xl border border-stone-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
+        <div className="shrink-0 rounded-2xl border border-border/80 dark:border-border bg-card dark:bg-card shadow-xs overflow-hidden">
           <ChatHeader
             pets={pets}
             activePet={activePet}
@@ -364,14 +364,14 @@ export default function AskMealiePage() {
         </div>
 
         {/* 2. Top Banner: Veterinary Advice Disclaimer */}
-        <div className="mt-2 shrink-0 rounded-xl overflow-hidden border border-amber-300/60 shadow-2xs">
+        <div className="mt-2 shrink-0 rounded-xl overflow-hidden border border-amber-300/60 dark:border-amber-400/30 shadow-2xs">
           <VeterinaryDisclaimerBanner />
         </div>
 
         {/* 3. Messages Scroll Area */}
         <div
           ref={messagesContainerRef}
-          className="my-3 flex-1 overflow-y-auto rounded-2xl border border-stone-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-4 sm:p-6 space-y-4 shadow-sm"
+          className="my-3 min-h-24 min-w-0 flex-1 overflow-x-hidden overflow-y-auto rounded-2xl border border-border/80 dark:border-border bg-card dark:bg-card/90 p-4 sm:p-6 space-y-4 shadow-sm"
         >
           {messages.map((msg) => (
             <MessageBubble
@@ -388,7 +388,7 @@ export default function AskMealiePage() {
         {/* 5. Bottom Interactive Deck (Quick Chips + Chat Input) */}
         <div className="shrink-0 space-y-2 pb-1">
           {/* Quick-Question Suggestion Chips */}
-          <div className="rounded-xl border border-stone-200/70 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 shadow-2xs overflow-hidden">
+          <div className="rounded-xl border border-border/70 dark:border-border bg-card/80 dark:bg-card/80 shadow-2xs overflow-hidden">
             <QuickChips
               onSelectChip={handleSendMessage}
               disabled={isThinking}
@@ -396,7 +396,7 @@ export default function AskMealiePage() {
           </div>
 
           {/* Chat Input Area */}
-          <div className="rounded-2xl border border-stone-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+          <div className="rounded-2xl border border-border/80 dark:border-border bg-card dark:bg-card shadow-sm overflow-hidden">
             <ChatInput
               onSendMessage={handleSendMessage}
               disabled={isThinking}
