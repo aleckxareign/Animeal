@@ -206,6 +206,7 @@ export default function EditPetModal({ isOpen, pet, onClose }: EditPetModalProps
                   className="w-full rounded-xl border border-foreground/20 bg-background/30 px-3 py-2 text-sm font-semibold text-foreground focus:border-brand-sage focus:outline-none"
                 />
                 <select
+                  aria-label="Age unit"
                   value={ageUnit}
                   onChange={(e) => setAgeUnit(e.target.value as 'years' | 'months')}
                   className="rounded-xl border border-foreground/20 bg-background/30 px-2 py-2 text-xs font-semibold text-foreground"

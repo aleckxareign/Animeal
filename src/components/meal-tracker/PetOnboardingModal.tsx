@@ -242,6 +242,7 @@ export default function PetOnboardingModal({
                       className="w-full rounded-xl border border-foreground/20 bg-background/30 px-3 py-3 text-base font-semibold text-foreground focus:border-brand-sage focus:outline-none focus:ring-2 focus:ring-brand-sage/20"
                     />
                     <select
+                      aria-label="Age unit"
                       value={ageUnit}
                       onChange={(e) => setAgeUnit(e.target.value as 'years' | 'months')}
                       className="rounded-xl border border-foreground/20 bg-background/30 px-3 py-3 text-sm font-semibold text-foreground focus:border-brand-sage focus:outline-none"

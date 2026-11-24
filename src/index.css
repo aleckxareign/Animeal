@@ -302,6 +302,24 @@ button {
     appearance: base-select;
   }
 
+  #root select {
+    position: relative;
+    padding-inline-end: 2.25rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* Reserve arrow space inside the control, even in a shrinking flex row. */
+  #root select::picker-icon {
+    position: absolute;
+    inset-inline-end: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+    pointer-events: none;
+  }
+
   #root select::picker(select) {
     max-height: min(18rem, 50dvh);
     max-width: calc(100vw - 2rem);
@@ -336,8 +354,9 @@ button {
   min-width: 0;
 }
 
-.pet-profile-form select[aria-label='Age unit'] {
+#root select[aria-label='Age unit'] {
   flex-shrink: 0;
+  min-width: 7rem;
 }
 
 .tab-content { animation: fade-in 0.2s ease-out; }
