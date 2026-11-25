@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { FormEvent } from 'react'
 import { Navigate, useLocation, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
+import { generateNonce } from '../services/supabase-auth'
 import {
   Sparkles,
   ArrowRight,
@@ -23,7 +24,7 @@ import {
 } from 'lucide-react'
 
 export default function LoginPage() {
-  const { isLoggedIn, signIn, signUp, signInWithGoogle } = useAuth()
+  const { isLoggedIn, signIn, signUp, signInWithGoogle, signInWithGoogleIdToken } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const location = useLocation()
   const from = (location.state as { from?: string } | null)?.from ?? '/'
@@ -41,6 +42,83 @@ export default function LoginPage() {
   const [forgotModalOpen, setForgotModalOpen] = useState(false)
   const [forgotEmail, setForgotEmail] = useState('')
   const [forgotSent, setForgotSent] = useState(false)
+
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+  const googleButtonRef = useRef<HTMLDivElement>(null)
+  const rawNonceRef = useRef<string | undefined>(undefined)
+  const [isGoogleButtonReady, setIsGoogleButtonReady] = useState(false)
+
+  // Initialize Google Identity Services (One Tap + Sign-In Button)
+  useEffect(() => {
+    if (!googleClientId) return
+
+    let isMounted = true
+
+    async function initGoogle() {
+      // Wait for Google script to load if not yet ready
+      if (!window.google?.accounts?.id) {
+        let attempts = 0
+        while (!window.google?.accounts?.id && attempts < 25) {
+          await new Promise((res) => setTimeout(res, 100))
+          attempts++
+        }
+      }
+
+      if (!isMounted || !window.google?.accounts?.id) return
+
+      try {
+        const { rawNonce, hashedNonce } = await generateNonce()
+        if (!isMounted) return
+        rawNonceRef.current = rawNonce
+
+        window.google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: async (response) => {
+            setIsSubmitting(true)
+            setErrorMessage(null)
+            try {
+              const { error } = await signInWithGoogleIdToken(response.credential, rawNonceRef.current)
+              if (error) {
+                setErrorMessage(error.message || 'Google sign-in error.')
+                setIsSubmitting(false)
+              }
+            } catch (err: unknown) {
+              setErrorMessage(err instanceof Error ? err.message : 'Google sign-in failed.')
+              setIsSubmitting(false)
+            }
+          },
+          nonce: hashedNonce,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+        })
+
+        if (googleButtonRef.current) {
+          googleButtonRef.current.innerHTML = ''
+          window.google.accounts.id.renderButton(googleButtonRef.current, {
+            type: 'standard',
+            theme: theme === 'dark' ? 'filled_black' : 'outline',
+            size: 'large',
+            text: mode === 'signup' ? 'signup_with' : 'signin_with',
+            shape: 'pill',
+            width: 320,
+            logo_alignment: 'left',
+          })
+          setIsGoogleButtonReady(true)
+        }
+
+        // Show Google One Tap prompt if supported by browser
+        window.google.accounts.id.prompt()
+      } catch (err) {
+        console.warn('Google Identity initialization notice:', err)
+      }
+    }
+
+    initGoogle()
+
+    return () => {
+      isMounted = false
+    }
+  }, [googleClientId, mode, theme, signInWithGoogleIdToken])
 
   if (isLoggedIn) return <Navigate to={from} replace />
 
@@ -270,36 +348,47 @@ export default function LoginPage() {
               </button>
             </div>
 
-            {/* Quick Action Buttons (Google OAuth) */}
+            {/* Quick Action Buttons (Google Identity Services / Supabase OAuth) */}
             <div className="space-y-2.5">
-              {/* Sign in / Sign up with Google (Live Supabase OAuth) */}
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-2.5 rounded-full border border-border/90 dark:border-border bg-card dark:bg-[#1a3333] py-2.5 px-4 text-xs font-bold text-foreground dark:text-slate-100 hover:bg-muted dark:hover:bg-[#203f3f] shadow-xs transition-all disabled:opacity-50 cursor-pointer"
-              >
-                {/* Standard Google "G" SVG */}
-                <svg className="size-4 shrink-0" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.15z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.02 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
-                  />
-                </svg>
-                <span>{mode === 'signin' ? 'Sign in with Google' : 'Sign up with Google'}</span>
-              </button>
+              {googleClientId && (
+                <div
+                  className={`flex flex-col items-center justify-center w-full min-h-[44px] ${
+                    isGoogleButtonReady ? 'block' : 'hidden'
+                  }`}
+                >
+                  <div ref={googleButtonRef} className="w-full flex justify-center" />
+                </div>
+              )}
+
+              {(!googleClientId || !isGoogleButtonReady) && (
+                <button
+                  type="button"
+                  onClick={handleGoogleLogin}
+                  disabled={isSubmitting}
+                  className="w-full flex items-center justify-center gap-2.5 rounded-full border border-border/90 dark:border-border bg-card dark:bg-[#1a3333] py-2.5 px-4 text-xs font-bold text-foreground dark:text-slate-100 hover:bg-muted dark:hover:bg-[#203f3f] shadow-xs transition-all disabled:opacity-50 cursor-pointer"
+                >
+                  {/* Standard Google "G" SVG */}
+                  <svg className="size-4 shrink-0" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.15z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.02 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                    />
+                  </svg>
+                  <span>{mode === 'signin' ? 'Sign in with Google' : 'Sign up with Google'}</span>
+                </button>
+              )}
             </div>
 
             {/* Divider */}

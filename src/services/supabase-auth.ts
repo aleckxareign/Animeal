@@ -104,6 +104,35 @@ export const supabaseAuth = {
   },
 
   /**
+   * Sign in using a Google ID token from Google Identity Services (GIS).
+   * Runs client-side so the prompt appears directly on https://animeal-livid.vercel.app,
+   * completely avoiding the raw Supabase URL screen.
+   */
+  async signInWithGoogleIdToken(idToken: string, nonce?: string): Promise<AuthResponse> {
+    if (!isSupabaseConfigured) {
+      return {
+        user: null,
+        session: null,
+        error: new Error(
+          'Supabase is not configured yet. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env'
+        ),
+      }
+    }
+
+    const { data, error } = await supabase.auth.signInWithIdToken({
+      provider: 'google',
+      token: idToken,
+      nonce: nonce || undefined,
+    })
+
+    return {
+      user: data.user,
+      session: data.session,
+      error,
+    }
+  },
+
+  /**
    * Sign out the active user session
    */
   async signOut(): Promise<{ error: Error | null }> {
@@ -173,5 +202,26 @@ export const supabaseAuth = {
       return null
     }
   },
+}
+
+/**
+ * Generate a cryptographically secure random nonce and its SHA-256 hash.
+ * Used for Google Identity Services: Google receives the hashed nonce,
+ * while Supabase receives the raw nonce to verify against the ID token claim.
+ */
+export async function generateNonce(): Promise<{ rawNonce: string; hashedNonce: string }> {
+  try {
+    const rawNonce = crypto.randomUUID()
+    const encoder = new TextEncoder()
+    const encodedNonce = encoder.encode(rawNonce)
+    const hashBuffer = await crypto.subtle.digest('SHA-256', encodedNonce)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    const hashedNonce = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+    return { rawNonce, hashedNonce }
+  } catch (e) {
+    console.warn('Nonce generation fallback triggered:', e)
+    const rawNonce = Math.random().toString(36).substring(2) + Date.now().toString(36)
+    return { rawNonce, hashedNonce: rawNonce }
+  }
 }
 

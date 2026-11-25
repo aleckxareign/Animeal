@@ -22,6 +22,7 @@ type AuthContextType = {
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>
   signUp: (email: string, password: string, fullName?: string) => Promise<{ error: Error | null; needsEmailConfirmation?: boolean }>
   signInWithGoogle: () => Promise<{ error: Error | null }>
+  signInWithGoogleIdToken: (idToken: string, nonce?: string) => Promise<{ error: Error | null }>
   demoLogin: () => void
   updateProfile: (updates: { fullName?: string; avatarUrl?: string }) => Promise<{ error: Error | null }>
 }
@@ -168,6 +169,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: null }
   }, [])
 
+  const signInWithGoogleIdToken = useCallback(async (idToken: string, nonce?: string) => {
+    setLoading(true)
+    const res = await supabaseAuth.signInWithGoogleIdToken(idToken, nonce)
+    setLoading(false)
+    if (!res.error && res.user) {
+      setSession(res.session)
+      setRawUser(res.user)
+      setUser({
+        id: res.user.id,
+        email: res.user.email || '',
+        fullName:
+          res.user.user_metadata?.full_name ||
+          res.user.user_metadata?.name ||
+          res.user.email?.split('@')[0] ||
+          'Pet Parent',
+        avatarUrl:
+          res.user.user_metadata?.avatar_url ||
+          res.user.user_metadata?.picture,
+      })
+      localStorage.setItem('animeal-logged-in', 'true')
+    }
+    return { error: res.error }
+  }, [])
+
   const demoLogin = useCallback(() => {
     localStorage.setItem('animeal-logged-in', 'true')
     localStorage.setItem('animeal-demo-session', 'true')
@@ -228,6 +253,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signIn,
         signUp,
         signInWithGoogle,
+        signInWithGoogleIdToken,
         demoLogin,
         updateProfile,
       }}
