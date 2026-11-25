@@ -119,7 +119,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <ul className="hidden shrink-0 whitespace-nowrap items-center gap-6 xl:gap-8 text-sm xl:text-base font-semibold text-foreground dark:text-white 2xl:flex">
+          <ul className="hidden shrink-0 whitespace-nowrap items-center gap-4 2xl:gap-8 text-sm xl:text-base font-semibold text-foreground dark:text-white xl:flex">
             <li>
               <NavLink
                 to="/"
@@ -231,7 +231,7 @@ export default function Navbar() {
           </ul>
 
           {/* Right Action Area */}
-          <div className="hidden items-center gap-3 shrink-0 2xl:flex">
+          <div className="hidden items-center gap-3 shrink-0 xl:flex">
             {/* Active Pet Pill */}
             {activePet && (
               <Link
@@ -385,7 +385,7 @@ export default function Navbar() {
           {/* Mobile menu trigger button */}
           <button
             id="mobile-menu-trigger"
-            className="flex size-11 items-center justify-center rounded-xl border border-border/80 text-foreground dark:text-white 2xl:hidden hover:bg-background/50 cursor-pointer"
+            className="flex size-11 items-center justify-center rounded-xl border border-border/80 text-foreground dark:text-white xl:hidden hover:bg-background/50 cursor-pointer"
             onClick={() => setMobileOpen((v) => !v)}
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
@@ -396,7 +396,7 @@ export default function Navbar() {
 
         {/* Mobile menu dropdown drawer */}
         {mobileOpen && (
-          <div className="border-t border-border/60 bg-card/95 dark:bg-card/95 max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain px-6 pb-8 pt-4 backdrop-blur-md 2xl:hidden animate-slide-up">
+          <div className="border-t border-border/60 bg-card/95 dark:bg-card/95 max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain px-6 pb-8 pt-4 backdrop-blur-md xl:hidden animate-slide-up">
             {activePet && (
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-background dark:bg-card p-3.5 text-sm">
                 <div className="flex items-center gap-2 font-bold text-foreground dark:text-white">

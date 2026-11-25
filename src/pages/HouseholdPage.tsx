@@ -208,7 +208,7 @@ export default function HouseholdPage() {
                   >
                     {household.map((m) => (
                       <option key={m.id} value={m.name}>
-                        {m.name} {m.isOwner ? '(Ikaw)' : ''}
+                        {m.name} {m.isOwner ? '(You)' : ''}
                       </option>
                     ))}
                   </select>
